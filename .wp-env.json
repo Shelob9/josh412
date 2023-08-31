@@ -1,0 +1,20 @@
+{
+    "plugins": [
+        "../digital-garden-builder"
+    ],
+    "themes": [
+        "https://downloads.wordpress.org/theme/oaknut.1.0.1.zip"
+    ],
+    "port": 2112,
+    "env": {
+        "tests": {
+            "config": {
+                "KEY_1": false
+            },
+            "port": 2113
+        }
+    },
+    "mappings": {
+        "wp-content/mu-plugins": "./mu-plugins"
+    }
+}

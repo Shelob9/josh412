@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../digital-garden-builder"
+		},
+		{
+			"path": "../photos-client"
+		},
+	],
+	"settings": {
+		"intelephense.environment.includePaths": [
+			"../digital-garden-builder",
+			"./mu-plugins"
+		]
+	}
+}
