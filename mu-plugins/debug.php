@@ -1,5 +1,7 @@
 <?php
 
+
+
 if( ! function_exists('dd') ) {
     /**
      * Laravel's dd, but less good.
