@@ -59,6 +59,8 @@ export default {
 			NEW_URL
 		)).transform(res);
 
+		await BUCKET.put(path,res);
+
 		return res;
 	},
 };
