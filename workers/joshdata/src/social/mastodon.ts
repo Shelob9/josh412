@@ -1,10 +1,10 @@
 export type Status = {
     id: number;
-    type: string
-    url: string
-    content: string
-    created_at: string
-    in_reply_to_account_id: number
+    type: string;
+    url: string;
+    content: string;
+    created_at: string;
+    in_reply_to_account_id: number;
     media_attachments: Media[];
 }
 export type Media = {
