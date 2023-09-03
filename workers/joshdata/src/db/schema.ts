@@ -3,42 +3,62 @@ import { sqliteTable, text, integer,primaryKey,uniqueIndex } from 'drizzle-orm/s
 export const classifications = sqliteTable('classifications', {
     txid: integer('txid').notNull(),
     termid: integer('termid').notNull(),
-    itemid: text('itemid').notNull(),
-  }, (table) => {
-    return {
-        pk: primaryKey(
-            table.txid,
-            table.termid,
-            table.itemid,
-        ),
-    }
+	  source: text('source').notNull(),
+	  sourceid: text('sourceid')
+      .notNull(),
+    
+}, (table) => {
+  return {
+    pk: primaryKey(
+			table.txid, 
+			table.termid,
+			table.source,
+			table.sourceid,
+		),
+  };
 });
-
-export const sociallinks = sqliteTable('sociallinks', {
-    id: integer('id').notNull().primaryKey(),
-    remoteid: text('remoteid').notNull(),
-    url: text('url').notNull(),
-    network: text('network').notNull(),
-    authorid: text('author').notNull(),
-    replytoid: text('replytoid'),
-    parentid: text('parentid'),
-});
-
-export const mediaitems = sqliteTable('mediaitems', {
-    id: integer('id').notNull().primaryKey(),
-    remoteid: text('remoteid').notNull(),
-    network: text('network').notNull(),
-    url: text('url').notNull(),
-    mimetype: text('format').notNull(),
-    width: integer('width').notNull(),
-    height: integer('height').notNull(),
-    itemid: text('itemid').notNull(),
-});
-
-
-
-
-
 
 export type SELECT_CLASSIFICATION = typeof classifications.$inferSelect;
 export type INSERT_CLASSIFICATION = typeof classifications.$inferInsert;
+
+export const links = sqliteTable('links', {
+    id: integer('id').notNull().primaryKey(),
+	  url: text('url').notNull(),
+	  source: text('source'),
+	  sourceid: text('sourceid'),
+}, (table) => {
+  return {
+    url: index("url_idx").on(table.url),
+		source: index("source_idx").on(
+			table.source,
+			table.sourceid
+		),
+  };
+});
+
+export const image = sqliteTable('image', {
+    id: integer('id').notNull().primaryKey(),
+    url: text('url').notNull(),
+	  description: text('description'),
+	  source: text('source'),
+	  sourceid: text('sourceid'),
+    mimetype: text('format').notNull(),
+    width: integer('width').notNull(),
+    height: integer('height').notNull(),
+	  sizes: blob('json', { mode: 'json' })
+			.$type<{ 
+				url: string,
+				mimetype: string,
+				height: number,
+				width: number 
+			}>()
+}, (table) => {
+  return {
+    url: index("url_idx").on(table.url),
+		source: index("source_idx").on(
+			table.source,
+			table.sourceid
+		),
+  };
+});
+
