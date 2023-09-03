@@ -1,5 +1,16 @@
 type Where = 'starts' | 'ends' | 'contains' | 'exact';
-
+type Classification = {
+	// search(es) to run.
+  searches: {
+    search: string | string[];
+	  where: Where;
+		all: boolean;
+	}[];
+	// If all searches, or just one must match
+	all: boolean;
+	// classification name
+	name: string;
+}
 function searchString(subject: string, search: string | string[], where: Where, all = false): boolean {
   if (Array.isArray(search)) {
     if (all) {
