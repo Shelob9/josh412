@@ -58,15 +58,48 @@ async function dataapi({
         return termItem;
     }
 
+	async function storeTermClassification(
+		classId: number,
+		taxonomyItem :{id: number},
+		termItem: {id: number},
+		kvKey: string,
+		sourceType:SourceType,
+	){
+ 
+		
+
+		const args = { 
+								 taxonomy: taxonomyItem.id,
+								 term: termItem.id, 
+								 sourceType, 
+								 sourceId: kvKey
+				};
+			await drizzle(classifications)
+				.insert(args);
+		const classification = await drizzle(classifications)
+		 .findOne(args);
+			 
+      return classification;
+				
+	}
+
     async function storeItem(sourceType: SourceType, taxonomy: string, terms: string[], data: any, key?: string) {
         const taxonomyItem = await getTx(taxonomy);
         
         const kvKey = await storeItemInKV(sourceType, data, key);
 
-        terms.forEach(async term => {
-            const termItem = await getTerm(term);
-					  await drizzle(classifications).insert({ id: generateUid(), taxonomy: taxonomyItem.id, term: termItem.id, sourceType, sourceId: kvKey });
-        });
+			for (const term of txTerms) {
+				  const termItem = getTerm(term);
+            
+                await storeTermClassification(
+                  taxonomyItem,
+									termItem,
+									kvKey,
+									sourceType
+								);
+						
+			}
+        
     }
 
     return {
