@@ -36,8 +36,13 @@ type Classification = {
 };
 
 type Source = {
+	//id of item it is stored in
   id: string;
-  text:source;
+	// actual content
+// todo support arrays of strings and of blocks 
+  text:string;
+	// what table or kv source id is in
+	sourcetype:string;
 };
 
 type Match = {
