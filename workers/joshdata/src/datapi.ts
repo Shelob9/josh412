@@ -25,9 +25,11 @@ async function dataapi({
     kv: KVNamespace,
 }) {
 
-  // store one item in KV
-    async function storeItemInKV(sourceType: SourceType, data: any) {
-			 const key = makeKey(sourceType);
+    // store one item in KV
+    async function storeItemInKV(sourceType: SourceType, data: any, key?: string) {
+        if (!key) {
+            key = makeKey(sourceType);
+        }
         await kv.put(key, JSON.stringify(data));
         return key;
     }
@@ -56,17 +58,21 @@ async function dataapi({
         return termItem;
     }
 
-    async function storeItem(sourceType: SourceType, taxonomy: string, terms: string[], data: any) {
+    async function storeItem(sourceType: SourceType, taxonomy: string, terms: string[], data: any, key?: string) {
         const taxonomyItem = await getTx(taxonomy);
         
-        const key = await storeItemInKV(sourceType, data);
+        const kvKey = await storeItemInKV(sourceType, data, key);
+
+        terms.forEach(async term => {
+            const termItem = await getTerm(term);
+					  await drizzle(classifications).insert({ id: generateUid(), taxonomy: taxonomyItem.id, term: termItem.id, sourceType, sourceId: kvKey });
+        });
     }
 
     return {
         storeItemInKV,
         storeItem,
         getTerm,
-			getTx,
+        getTx,
     }
 }
-
