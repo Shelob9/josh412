@@ -18,7 +18,7 @@ export const classifications = sqliteTable('classifications', {
   };
 });
 
-export type SELECT_CLASSIFICATION = typeof classifications.$inferSelect;
+export type SELECT_CLASSIFICATIONS = typeof classifications.$inferSelect;
 export type INSERT_CLASSIFICATION = typeof classifications.$inferInsert;
 
 export const links = sqliteTable('links', {
@@ -35,6 +35,9 @@ export const links = sqliteTable('links', {
 		),
   };
 });
+
+export type SELECT_LINKS = typeof links.$inferSelect;
+export type INSERT_LINK = typeof links.$inferInsert;
 
 export const image = sqliteTable('image', {
     id: integer('id').notNull().primaryKey(),
@@ -62,3 +65,5 @@ export const image = sqliteTable('image', {
   };
 });
 
+export type SELECT_IMAGES = typeof images.$inferSelect;
+export type INSERT_IMAGE = typeof images.$inferInsert;
