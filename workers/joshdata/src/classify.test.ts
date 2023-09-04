@@ -35,3 +35,38 @@ describe('searchString function', () => {
     expect(searchString(subject, 'Hello, world', 'exact')).toBe(false);
   });
 });
+
+
+describe('searchString function with array', () => {
+  const subject = 'Hello, world! This is a test string.';
+
+  test('should return true when the subject starts with any of the search strings', () => {
+    const search = ['Hello', 'world', 'test'];
+    expect(searchString(subject, search, 'starts')).toBe(true);
+  });
+
+  test('should return false when the subject does not start with any of the search strings', () => {
+    const search = ['world', 'test', 'string'];
+    expect(searchString(subject, search, 'starts')).toBe(false);
+  });
+
+  test('should return true when the subject ends with any of the search strings', () => {
+    const search = ['string.', 'Hello', 'world'];
+    expect(searchString(subject, search, 'ends')).toBe(true);
+  });
+
+  test('should return false when the subject does not end with any of the search strings', () => {
+    const search = ['Hello', 'world', 'test'];
+    expect(searchString(subject, search, 'ends')).toBe(false);
+  });
+
+  test('should return true when the subject exactly matches any of the search strings', () => {
+    const search = ['Hello, world! This is a test string.', 'Hello', 'world'];
+    expect(searchString(subject, search, 'exact')).toBe(true);
+  });
+
+  test('should return false when the subject does not exactly match any of the search strings', () => {
+    const search = ['Hello, world!', 'This is a test', 'string'];
+    expect(searchString(subject, search, 'exact')).toBe(false);
+  });
+});
