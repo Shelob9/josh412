@@ -12,8 +12,8 @@ function generateUid(): string {
 }
 
 // make key for kv
-const makeKey = (sourceType: SourceType) => {
-    const uid = generateUid();
+const makeKey = (sourceType: SourceType, uid? : string) => {
+    uid = uid ?? generateUid();
     return `${sourceType}:${uid}`;
 }
 
