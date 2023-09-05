@@ -21,8 +21,8 @@ export default {
       });
 
       return new Response(JSON.stringify({
-        results,
         q,
+        results,
       }));
     }
     return new Response(`{}`);
