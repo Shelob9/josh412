@@ -31,38 +31,77 @@ export async function dataApi({
         return key;
     }
 
-    // get a taxonomy, creating if needed
-    async function getTx(taxonomy: string) {
 
 
+    //Store classification for item
+    async function storeItemClassification(classificationKey: string, itemKey: string): Promise<string[]> {
+        const saved = await kv.get(classificationKey);
+        const classification : string[] = saved ? JSON.parse(saved) : [];
+        if( ! classification.includes(itemKey) ){
+            classification.push(itemKey);
+            await kv.put(classificationKey, JSON.stringify(classification));
+        }
+        return classification;
+    }
+
+    //Remove classification for item
+    async function removeItemClassification(classificationKey: string, itemKey: string): Promise<string[]> {
+        const saved = await kv.get(classificationKey);
+        const classification : string[] = saved ? JSON.parse(saved) : [];
+        if( classification.includes(itemKey) ){
+            classification.splice(classification.indexOf(itemKey),1);
+            await kv.put(classificationKey, JSON.stringify(classification));
+        }
+        return classification;
+    }
+
+    // get keys opf items with classification
+    async function getKeysOfItemsWithClassification(classificationKey: string): Promise<string[]> {
+        const keys = await kv.get(classificationKey);
+        return keys ? JSON.parse(keys) : [];
 
     }
 
-    // get a term, creating if needed
-    async function getTerm(term: string) {
-
+    //get all items with classification
+    async function getItemsWithClassification(classificationKey: string): Promise<any[]> {
+        const keys = await getKeysOfItemsWithClassification(classificationKey);
+        const items = await Promise.all(
+            keys.map(
+                async (key: string) => {
+                    const data = await kv.get(key);
+                    if( data ){
+                        return JSON.parse(data);
+                    }
+                    return null;
+                }
+            )
+            //remove nulls
+            .filter(item => item)
+        );
+        return items;
     }
 
-	async function storeTermClassification(
-	){
 
 
-
-
-
-	}
-
-    async function storeItem(sourceType: SourceType, taxonomy: string, terms: string[], data: any, key?: string) {
-        const taxonomyItem = await getTx(taxonomy);
-
+    async function storeItem(sourceType: SourceType,classificationKeys: string[], data: any, key?: string) {
         const kvKey = await storeItemInKV(sourceType, data, key);
 
+        if( classificationKeys.length > 0 ){
+            await Promise.all(
+                classificationKeys.map(
+                    async (classificationKey: string) => {
+                        await storeItemClassification(classificationKey, kvKey);
+                    })
+            );
+        }
+        return kvKey;
 
     }
 
     return {
         storeItem,
-        getTerm,
-        getTx,
+        getItemsWithClassification,
+        getKeysOfItemsWithClassification,
+        storeItemClassification,
     }
 }
