@@ -22,7 +22,7 @@ export function searchString(subject: string, search: string | string[], where: 
     }
   }
 }
-type Classification = {
+export type Classification = {
 	// search(es) to run.
   searches: {
     search: string | string[];
@@ -35,7 +35,7 @@ type Classification = {
 	id: string;
 };
 
-type Source = {
+export type Classification_Source = {
 	//id of item it is stored in
   id: string;
 	// actual content
@@ -45,13 +45,13 @@ type Source = {
 	sourcetype:string;
 };
 
-type Match = {
-  source: Source;
+export type Classification_Match = {
+  source: Classification_Source;
   classifications: string[];
 }
 
-function classifySources(sources: Source[], classifications: Classification[]): Match[] {
-  const matches: Match[] = [];
+export function classifySources(sources: Classification_Source[], classifications: Classification[]): Classification_Match[] {
+  const matches: Classification_Match[] = [];
 
   // iterate over each source
   sources.forEach(source => {

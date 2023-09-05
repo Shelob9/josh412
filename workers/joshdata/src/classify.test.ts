@@ -1,4 +1,4 @@
-import { searchString } from './classify';  
+import { Classification, Classification_Source, classifySources, searchString } from './classify';
 
 describe('searchString function', () => {
   const subject = 'Hello, world!';
@@ -69,4 +69,105 @@ describe('searchString function with array', () => {
     const search = ['Hello, world!', 'This is a test', 'string'];
     expect(searchString(subject, search, 'exact')).toBe(false);
   });
+});
+
+describe('classifySources', () => {
+  const sources : Classification_Source[] = [
+    {
+      id: '1',
+      text: 'Hello, world!',
+      sourcetype: 'test',
+    },
+    {
+      id: '2',
+      text: 'This is a test string.',
+      sourcetype: 'test',
+    },
+  ];
+  test( 'should return an empty array when there are no matches', () => {
+    const classifications : Classification[] = [
+      {
+        searches: [
+          {
+            search: 'test',
+            where: 'exact',
+            all: false,
+          },
+        ],
+        all: false,
+        id: 'test',
+      },
+    ];
+    expect(classifySources(sources, classifications)).toEqual([]);
+  });
+  test( 'should return an array of matches when there are matches', () => {
+    const classifications : Classification[] = [
+      {
+        searches: [
+          {
+            search: 'Hello',
+            where: 'contains',
+            all: false,
+          },
+        ],
+        all: false,
+        id: 'test',
+      },
+    ];
+    expect(classifySources(sources, classifications)).toEqual([
+      {
+        source: sources[0],
+        classifications: [classifications[0].id],
+      },
+    ]);
+  }
+  );
+  test( 'should return an array of matches when there are multiple matches', () => {
+    const classifications : Classification[] = [
+      {
+        searches: [
+          {
+            search: 'Hello',
+            where: 'contains',
+            all: false,
+          },
+        ],
+        all: false,
+        id: 'test1',
+      },
+      {
+        searches: [
+          {
+            search: 'food and stuff',
+            where: 'exact',
+            all: false,
+          },
+        ],
+        all: false,
+        id: 'test2',
+      },
+      {
+        searches: [
+          {
+            search: 'test',
+            where: 'contains',
+            all: false,
+          },
+        ],
+        all: false,
+        id: 'test3',
+      },
+    ];
+    expect(classifySources(sources, classifications)).toEqual([
+      {
+        source: sources[0],
+        classifications: ["test1"],
+      },
+      {
+        source: sources[1],
+        classifications: ["test3"],
+      },
+    ]);
+  } );
+
 });
