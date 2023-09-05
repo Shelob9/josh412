@@ -1,6 +1,6 @@
 type Where = 'starts' | 'ends' | 'contains' | 'exact';
 
-function searchString(subject: string, search: string | string[], where: Where, all = false): boolean {
+export function searchString(subject: string, search: string | string[], where: Where, all = false): boolean {
   if (Array.isArray(search)) {
     if (all) {
       return search.every(s => searchString(subject, s, where));
@@ -39,7 +39,7 @@ type Source = {
 	//id of item it is stored in
   id: string;
 	// actual content
-// todo support arrays of strings and of blocks 
+// todo support arrays of strings and of blocks
   text:string;
 	// what table or kv source id is in
 	sourcetype:string;

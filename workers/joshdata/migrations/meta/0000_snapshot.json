@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "31aa03bc-fb8c-4f2b-bed9-1b5546c85cc4",
+  "id": "286da974-57cf-4564-9b8a-113d1e21f293",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "classifications": {
@@ -9,7 +9,7 @@
       "columns": {
         "txid": {
           "name": "txid",
-          "type": "integer",
+          "type": "blob",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -21,8 +21,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "itemid": {
-          "name": "itemid",
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "sourceid": {
+          "name": "sourceid",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -32,9 +39,10 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "classifications_txid_termid_itemid_pk": {
+        "classifications_txid_termid_source_sourceid_pk": {
           "columns": [
-            "itemid",
+            "source",
+            "sourceid",
             "termid",
             "txid"
           ]
@@ -42,8 +50,8 @@
       },
       "uniqueConstraints": {}
     },
-    "mediaitems": {
-      "name": "mediaitems",
+    "images": {
+      "name": "images",
       "columns": {
         "id": {
           "name": "id",
@@ -52,25 +60,32 @@
           "notNull": true,
           "autoincrement": false
         },
-        "remoteid": {
-          "name": "remoteid",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "network": {
-          "name": "network",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "url": {
           "name": "url",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "sourceid": {
+          "name": "sourceid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "format": {
@@ -94,33 +109,42 @@
           "notNull": true,
           "autoincrement": false
         },
-        "itemid": {
-          "name": "itemid",
-          "type": "text",
+        "json": {
+          "name": "json",
+          "type": "blob",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "images_url_idx": {
+          "name": "images_url_idx",
+          "columns": [
+            "url"
+          ],
+          "isUnique": false
+        },
+        "images_source_idx": {
+          "name": "images_source_idx",
+          "columns": [
+            "source",
+            "sourceid"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "sociallinks": {
-      "name": "sociallinks",
+    "links": {
+      "name": "links",
       "columns": {
         "id": {
           "name": "id",
           "type": "integer",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "remoteid": {
-          "name": "remoteid",
-          "type": "text",
-          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
@@ -131,36 +155,142 @@
           "notNull": true,
           "autoincrement": false
         },
-        "network": {
-          "name": "network",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "author": {
-          "name": "author",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "replytoid": {
-          "name": "replytoid",
+        "source": {
+          "name": "source",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "parentid": {
-          "name": "parentid",
+        "sourceid": {
+          "name": "sourceid",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "links_url_idx": {
+          "name": "links_url_idx",
+          "columns": [
+            "url"
+          ],
+          "isUnique": false
+        },
+        "links_source_idx": {
+          "name": "links_source_idx",
+          "columns": [
+            "source",
+            "sourceid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "taxonomies": {
+      "name": "taxonomies",
+      "columns": {
+        "txid": {
+          "name": "txid",
+          "type": "blob",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "label": {
+          "name": "label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "private": {
+          "name": "private",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "slug_idx": {
+          "name": "slug_idx",
+          "columns": [
+            "slug"
+          ],
+          "isUnique": true
+        },
+        "label_idx": {
+          "name": "label_idx",
+          "columns": [
+            "label"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "terms": {
+      "name": "terms",
+      "columns": {
+        "termid": {
+          "name": "termid",
+          "type": "blob",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "label": {
+          "name": "label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "private": {
+          "name": "private",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "terms_slug_idx": {
+          "name": "terms_slug_idx",
+          "columns": [
+            "slug"
+          ],
+          "isUnique": true
+        },
+        "terms_label_idx": {
+          "name": "terms_label_idx",
+          "columns": [
+            "label"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
