@@ -16,7 +16,7 @@ const bigInt = (column: string) =>  blob(column, { mode: 'bigint' });
 const boolean = (column: string) => integer(column, { mode: 'boolean' });
 // classifications by taxonomy and tag
 export const classifications = sqliteTable('classifications', {
-    txid: bigInt('txid').notNull(),
+    txid: blob('txid', { mode: 'bigint' }).notNull(),
     termid: integer('termid').notNull(),
 	  source: text('source').notNull(),
 	  sourceid: text('sourceid')
@@ -38,7 +38,7 @@ export type INSERT_CLASSIFICATION = typeof classifications.$inferInsert;
 
 // taxonomies
 export const taxonomies = sqliteTable('taxonomies', {
-  txid: bigInt('txid').primaryKey(),
+  txid: blob('txid', { mode: 'bigint' }).primaryKey(),
   slug: text('slug'),
   label: text('label'),
   private: boolean('private')
@@ -56,10 +56,10 @@ export type NewTaxonomy = typeof taxonomies.$inferInsert;
 
 // taxonomy terms
 export const terms = sqliteTable('terms', {
-  termid: bigInt('termid').primaryKey(),
+  termid: blob('termid', { mode: 'bigint' }).primaryKey(),
   slug: text('slug'),
   label: text('label'),
-  private: boolean('private')
+  private: blob('private', { mode: 'bigint' }),//boolean('private')
 }, (table) => {
   return {
     slugIndex: uniqueIndex('terms_slug_idx').on(table.slug),
