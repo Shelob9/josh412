@@ -6,8 +6,9 @@
     "deploy": "wrangler deploy",
     "start": "wrangler dev",
     "migrate": "wrangler d1 migrations apply josh412-dgb",
+    "migrate:fresh": " drizzle-kit drop && npm run migrate",
     "migrate:generate": "drizzle-kit generate:sqlite",
-    "migrate:local" : "wrangler d1 migrations apply josh412-dgb --local"
+    "migrate:local": "wrangler d1 migrations apply josh412-dgb --local"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230419.0",

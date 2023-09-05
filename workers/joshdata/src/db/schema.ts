@@ -1,17 +1,31 @@
-import { sqliteTable, autoincrement, text, boolean, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer,index, text,blob, primaryKey, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
+/**
+ * Custom column type for big integer columns
+ * @see https://orm.drizzle.team/docs/column-types/sqlite#bigint
+ * @param column Column name
+ * @returns
+ */
+const bigInt = (column: string) =>  blob(column, { mode: 'bigint' });
+/**
+ * Custom column type for boolean columns
+ * @see https://orm.drizzle.team/docs/column-types/sqlite#boolean
+ * @param column Column name
+ * @returns
+ */
+const boolean = (column: string) => integer(column, { mode: 'boolean' });
 // classifications by taxonomy and tag
 export const classifications = sqliteTable('classifications', {
-    txid: integer('txid').notNull(),
+    txid: bigInt('txid').notNull(),
     termid: integer('termid').notNull(),
 	  source: text('source').notNull(),
 	  sourceid: text('sourceid')
       .notNull(),
-    
+
 }, (table) => {
   return {
     pk: primaryKey(
-			table.txid, 
+			table.txid,
 			table.termid,
 			table.source,
 			table.sourceid,
@@ -24,7 +38,7 @@ export type INSERT_CLASSIFICATION = typeof classifications.$inferInsert;
 
 // taxonomies
 export const taxonomies = sqliteTable('taxonomies', {
-  txid: autoincrement('txid').primaryKey(),
+  txid: bigInt('txid').primaryKey(),
   slug: text('slug'),
   label: text('label'),
   private: boolean('private')
@@ -42,14 +56,14 @@ export type NewTaxonomy = typeof taxonomies.$inferInsert;
 
 // taxonomy terms
 export const terms = sqliteTable('terms', {
-  termid: autoincrement('termid').primaryKey(),
+  termid: bigInt('termid').primaryKey(),
   slug: text('slug'),
   label: text('label'),
   private: boolean('private')
 }, (table) => {
   return {
-    slugIndex: uniqueIndex('slug_idx').on(table.slug),
-    labelIndex: uniqueIndex('label_idx').on(table.label),
+    slugIndex: uniqueIndex('terms_slug_idx').on(table.slug),
+    labelIndex: uniqueIndex('terms_label_idx').on(table.label),
   }
 });
 
@@ -67,8 +81,8 @@ export const links = sqliteTable('links', {
 	  sourceid: text('sourceid'),
 }, (table) => {
   return {
-    url: index("url_idx").on(table.url),
-		source: index("source_idx").on(
+    url: index("links_url_idx").on(table.url),
+		source: index("links_source_idx").on(
 			table.source,
 			table.sourceid
 		),
@@ -79,7 +93,7 @@ export type SELECT_LINKS = typeof links.$inferSelect;
 export type INSERT_LINK = typeof links.$inferInsert;
 
 // images
-export const image = sqliteTable('image', {
+export const images = sqliteTable('images', {
     id: integer('id').notNull().primaryKey(),
     url: text('url').notNull(),
 	  description: text('description'),
@@ -89,16 +103,16 @@ export const image = sqliteTable('image', {
     width: integer('width').notNull(),
     height: integer('height').notNull(),
 	  sizes: blob('json', { mode: 'json' })
-			.$type<{ 
+			.$type<{
 				url: string,
 				mimetype: string,
 				height: number,
-				width: number 
+				width: number
 			}>()
 }, (table) => {
   return {
-    url: index("url_idx").on(table.url),
-		source: index("source_idx").on(
+    url: index("images_url_idx").on(table.url),
+		source: index("images_source_idx").on(
 			table.source,
 			table.sourceid
 		),
