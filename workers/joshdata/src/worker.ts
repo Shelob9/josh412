@@ -1,7 +1,8 @@
 import { DrizzleD1Database, drizzle } from 'drizzle-orm/d1';
 import { INSERT_CLASSIFICATION, classifications } from './db/schema';
-import { Status, getAccount, getStatuses } from './social/mastodon';
-
+import {  getAccount, getStatus, getStatuses } from './social/mastodon';
+import { Status } from './social/types/mastodon'
+import { injestToots } from './handlers/injestToots';
 export interface Env {
 	KV: KVNamespace;
 	DB1: D1Database,
@@ -99,39 +100,8 @@ export default {
 
 		const hasAuth = request.headers.has('Authorization') || url.searchParams.has('auth');
 
-			if (!hasAuth ) {
-				return new Response(JSON.stringify({
-					message: 'unauthorized',
-					hasAuth,
-				}), {
-					status: 401,
-					headers: {
-						"content-type": "text/json;charset=UTF-8",
-					}
-				});
 
-			}
-			let hAUth = request.headers.get('Authorization');
-			let uAuth = url.searchParams.get('auth');
-			if( hAUth !== `Bearer ${AUTH_SECRET}` && uAuth !== AUTH_SECRET ){
-				return new Response(JSON.stringify({
-					message: 'unauthorized',
-					hasAuth,
-
-				}), {
-					status: 401,
-					headers: {
-						"content-type": "text/json;charset=UTF-8",
-					}
-				});
-			}
-
-
-		async function processStatus (toot: {
-			id: number;
-			created_at: string;
-			content: string;
-		}){
+		async function processStatus (toot: Status){
 			const key = `socialpost:mastodon:status:${toot.id}`;
 			await KV.put(key,JSON.stringify(toot));
 		}
@@ -151,47 +121,28 @@ export default {
 							return JSON.parse(data);
 						}
 					));
+
 				return jsonReponse({
 					statuses,
-					complete: keys.list_complete	,
+					complete: keys.list_complete,
+					//@ts-ignore
 					cursor: keys.cursor ? keys.cursor : null,
 					cacheStatus: keys.cacheStatus,
+					//@ts-ignore
 					next: keys.cursor ? `${url.origin}${url.pathname}?cursor=${keys.cursor}` : null,
 				},200);
 			}
 			if( '/api/mastodon/injest' == url.pathname ){
-				const instanceUrl = 'https://mastodon.social/';
-				const lastId = await KV.get('socialpost:mastodon:laststatusid');
-				if( lastId === 'done' ){
-					return jsonReponse({
-						lastId,
-						done: true,
-					},200);
-				}
 				const username = 'josh412';
-				const account = await getAccount(instanceUrl,username);
-				const statuses = await getStatuses(instanceUrl,account.id,lastId ? parseInt(lastId,10) : undefined);
-				const newLastId = statuses[statuses.length - 1].id.toString();
-				statuses.map(
-					async (status:Status) => {
-						await processStatus(status);
-					}
-				)
-				if( newLastId ){
-					await KV.put('socialpost:mastodon:laststatusid',newLastId);
+				const instanceUrl = 'https://mastodon.social/';
 
-				}else{
-					//mark done
-					await KV.put('socialpost:mastodon:laststatusid','done');
-				}
-				//store last status id
-				return jsonReponse({
-					lastId,
-					newLastId,
-					statusCount: statuses.length,
-					//statuses,
-
-				},200);
+				const results = await injestToots({
+					kv: KV,
+					instanceUrl,
+					username,
+					stage: 'save',
+				});
+				return results;
 			}
 			if( url.pathname.startsWith('/photos') ){
 				const urlkey =  url.pathname.replace(/^\/photos\//,'');
@@ -242,10 +193,7 @@ export default {
 					const result = await data.getItemByKey(key);
 					return jsonReponse(result,200);
 
-				} catch (error : unknown) {
-					return jsonReponse(error,500);
 
-				}
 
 
 			}else{

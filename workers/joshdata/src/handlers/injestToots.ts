@@ -1,5 +1,6 @@
-import { classifySources } from "../classify"
-import { Status, getAccount, getStatuses } from "../social/mastodon";
+import { jsonReponse } from "../responseFactory";
+import { saveStatuses } from "../injest";
+
 
 export const classifyToots = () => {
 
@@ -14,61 +15,38 @@ export const makeInjestLastKey = (network:string) => {
     return `meta_socialpost:${network}:lastid`;
 }
 
-export const injestToots = async ({kv,instanceUrl,username}: {
+export const injestToots = async ({kv,instanceUrl,username,stage}: {
     kv: KVNamespace,
     instanceUrl: string,
     username: string,
+    stage: 'save'|'classify',
 }) => {
     const network = 'mastodon';
-    const getLastId = async () : Promise<string|false> => {
-        const lastId = await kv.get(makeInjestLastKey(network));
-        if( 'done' === lastId ){
-            return false;
-        }
-        return lastId ? lastId : '0';
-    }
-
-    const storeLastId = async (newValue: string) => {
-        await kv.put(makeInjestLastKey(network),newValue);
-    }
-
-
-    async function processStatus (toot: {
-        id: number;
-        created_at: string;
-        content: string;
-    }){
-        await kv.put(makeSocialPostKey(network,toot.id.toString()),JSON.stringify(toot));
-    }
-    let done = false;
-    const lastId = await getLastId();
-        if( false == lastId ){
-            return {
-                lastId: 0,
-                newLastId: lastId,
+    switch (stage) {
+        case 'save':
+            const  {
+                lastId,
+                newLastId,
                 done,
-            }
-        }
-        const account = await getAccount(instanceUrl,username);
-        const statuses = await getStatuses(instanceUrl,account.id,lastId ? parseInt(lastId,10) : undefined);
-        const newLastId = statuses[statuses.length - 1].id.toString() as number;
-        statuses.map(
-            async (status:Status) => {
-                await processStatus(status);
-            }
-        )
-        if( newLastId ){
-            await storeLastId(newLastId);
+            } = await saveStatuses({
+                kv,
+                instanceUrl,
+                username,
+                network
+            });
+            return jsonReponse({
+                lastId,
+                newLastId,
+                done,
+            },200);
+            break;
 
-        }else{
-            //mark done
-            await kv.put('socialpost:mastodon:laststatusid','done');
-            done = true;
-        }
-        return {
-            lastId,
-            newLastId,
-            done,
-        }
+        default:
+            return jsonReponse({
+                4:42
+            },200);
+            break;
+            break;
+    }
 
 }

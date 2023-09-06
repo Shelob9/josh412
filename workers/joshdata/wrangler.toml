@@ -2,8 +2,7 @@ name = "joshdata"
 main = "src/worker.ts"
 compatibility_date = "2023-08-21"
 
-[vars]
-AUTH_SECRET = "9b88b17f4abfdb870e1ac42"
+
 [[kv_namespaces]]
 binding = "KV"
 id = "419991e62cdd45e6b1acbc45fadf0204"
