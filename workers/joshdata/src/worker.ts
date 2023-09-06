@@ -239,7 +239,6 @@ export default {
 			}
 			else if( url.pathname.startsWith('/api/get') ){
 				const key = url.pathname.replace(/^\//,'').replace(/^api\/get\//,'');
-				try {
 					const result = await data.getItemByKey(key);
 					return jsonReponse(result,200);
 

@@ -9,8 +9,8 @@ export type Status = {
 }
 export type Media = {
     id: number;
-    type: string
-    preview_url: string;
+    type: string;
+    url: string;
     sensitive: boolean;
     meta: {
         original: {

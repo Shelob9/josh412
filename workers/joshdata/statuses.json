@@ -1,0 +1,2001 @@
+[
+  {
+    "id": "111018305694940008",
+    "created_at": "2023-09-06T12:55:08.682Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111018305694940008",
+    "url": "https://mastodon.social/@Josh412/111018305694940008",
+    "replies_count": 0,
+    "reblogs_count": 0,
+    "favourites_count": 0,
+    "edited_at": null,
+    "content": "<p>&quot;It’s so strange to us that dating apps and sex toys publish more detailed security information than cars. Even though the car brands we researched each had several long-winded privacy policies (Toyota wins with 12), we couldn’t find confirmation that any of the brands meet our Minimum Security Standards.</p><p>Our main concern is that we can’t tell whether any of the cars encrypt all of the personal information that sits on the car.&quot;<br /><a href=\"https://foundation.mozilla.org/en/privacynotincluded/articles/its-official-cars-are-the-worst-product-category-we-have-ever-reviewed-for-privacy/\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">foundation.mozilla.org/en/priv</span><span class=\"invisible\">acynotincluded/articles/its-official-cars-are-the-worst-product-category-we-have-ever-reviewed-for-privacy/</span></a></p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": {
+      "url": "https://foundation.mozilla.org/en/privacynotincluded/articles/its-official-cars-are-the-worst-product-category-we-have-ever-reviewed-for-privacy/",
+      "title": "*Privacy Not Included: A Buyer’s Guide for Connected Products",
+      "description": "All 25 car brands we researched earned our *Privacy Not Included warning label – making cars the worst category of products that we have ever reviewed",
+      "language": "en",
+      "type": "link",
+      "author_name": "",
+      "author_url": "",
+      "provider_name": "Mozilla Foundation",
+      "provider_url": "",
+      "html": "",
+      "width": 2500,
+      "height": 1309,
+      "image": "https://files.mastodon.social/cache/preview_cards/images/072/153/590/original/c9a132dcdae8deb6.png",
+      "image_description": "",
+      "embed_url": "",
+      "blurhash": "UUOM,H?QwERj~M9jsjxtROxtt7RjIwxSbcj^",
+      "published_at": null
+    },
+    "poll": null
+  },
+  {
+    "id": "111018270397014747",
+    "created_at": "2023-09-06T12:46:10.073Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111018270397014747",
+    "url": "https://mastodon.social/@Josh412/111018270397014747",
+    "replies_count": 0,
+    "reblogs_count": 1,
+    "favourites_count": 2,
+    "edited_at": null,
+    "content": "<p>Good morning 🌱🏵️🌲</p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [
+      {
+        "id": "111018268480987778",
+        "type": "image",
+        "url": "https://files.mastodon.social/media_attachments/files/111/018/268/480/987/778/original/c0e7eeea8aa83709.jpg",
+        "preview_url": "https://files.mastodon.social/media_attachments/files/111/018/268/480/987/778/small/c0e7eeea8aa83709.jpg",
+        "remote_url": null,
+        "preview_remote_url": null,
+        "text_url": null,
+        "meta": {
+          "original": {
+            "width": 2499,
+            "height": 3319,
+            "size": "2499x3319",
+            "aspect": 0.7529376318168123
+          },
+          "small": {
+            "width": 416,
+            "height": 553,
+            "size": "416x553",
+            "aspect": 0.7522603978300181
+          }
+        },
+        "description": "Small orange and yellow flowers",
+        "blurhash": "UJGj=}KhEgK3-AFv%1xF39oe;h#:%1$jXRoy"
+      }
+    ],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": null,
+    "poll": null
+  },
+  {
+    "id": "111014166380867729",
+    "created_at": "2023-09-05T19:22:27.777Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111014166380867729",
+    "url": "https://mastodon.social/@Josh412/111014166380867729",
+    "replies_count": 0,
+    "reblogs_count": 0,
+    "favourites_count": 0,
+    "edited_at": null,
+    "content": "<p>We watched Triple Frontier on the Netflix yesterday, was surprisingly good.</p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": null,
+    "poll": null
+  },
+  {
+    "id": "111012357948115218",
+    "created_at": "2023-09-05T11:42:33.262Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111012357948115218",
+    "url": "https://mastodon.social/@Josh412/111012357948115218",
+    "replies_count": 0,
+    "reblogs_count": 0,
+    "favourites_count": 0,
+    "edited_at": null,
+    "content": "<p>Good morning 🌱🌺🌲</p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [
+      {
+        "id": "111012355633272848",
+        "type": "image",
+        "url": "https://files.mastodon.social/media_attachments/files/111/012/355/633/272/848/original/d05ab328da38f96d.jpg",
+        "preview_url": "https://files.mastodon.social/media_attachments/files/111/012/355/633/272/848/small/d05ab328da38f96d.jpg",
+        "remote_url": null,
+        "preview_remote_url": null,
+        "text_url": null,
+        "meta": {
+          "original": {
+            "width": 3319,
+            "height": 2499,
+            "size": "3319x2499",
+            "aspect": 1.3281312525010005
+          },
+          "small": {
+            "width": 553,
+            "height": 416,
+            "size": "553x416",
+            "aspect": 1.3293269230769231
+          }
+        },
+        "description": "Pink and blue and yellow, very full zinnia flower ",
+        "blurhash": "UiGGxnEv1V,xoKWBbHoM5|w~$,S1WYjbj?bH"
+      }
+    ],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": null,
+    "poll": null
+  },
+  {
+    "id": "111008311808850665",
+    "created_at": "2023-09-04T18:33:34.084Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": null,
+    "uri": "https://mastodon.social/users/Josh412/statuses/111008311808850665/activity",
+    "url": "https://mastodon.social/users/Josh412/statuses/111008311808850665/activity",
+    "replies_count": 0,
+    "reblogs_count": 0,
+    "favourites_count": 0,
+    "edited_at": null,
+    "content": "",
+    "reblog": {
+      "id": "111007533623531565",
+      "created_at": "2023-09-04T15:15:37.000Z",
+      "in_reply_to_id": null,
+      "in_reply_to_account_id": null,
+      "sensitive": false,
+      "spoiler_text": "",
+      "visibility": "public",
+      "language": "en",
+      "uri": "https://fosstodon.org/users/josh412/statuses/111007533496876464",
+      "url": "https://fosstodon.org/@josh412/111007533496876464",
+      "replies_count": 0,
+      "reblogs_count": 1,
+      "favourites_count": 1,
+      "edited_at": "2023-09-04T18:33:11.000Z",
+      "content": "<p>Stop<br>  programming computers</p><p>     Sand was never meant to think.<br>  <br>                 this is very cruel to rocks</p>",
+      "reblog": null,
+      "account": {
+        "id": "109276821229626548",
+        "username": "josh412",
+        "acct": "josh412@fosstodon.org",
+        "display_name": "Josh Pollock 🌱🌵🌲",
+        "locked": false,
+        "bot": false,
+        "discoverable": true,
+        "group": false,
+        "created_at": "2022-11-02T00:00:00.000Z",
+        "note": "<p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh. I toot about software development and the internet. I do other types of Josh posting <span class=\"h-card\"><a href=\"https://mastodon.social/@Josh412\" class=\"u-url mention\" rel=\"nofollow noopener noreferrer\" target=\"_blank\">@<span>Josh412</span></a></span> and Bluesky </p><p>👉 New eBook for WordPress developers: <a href=\"https://pluginmachine.com/course/refactoring-wordpress-plugins/\" rel=\"nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">pluginmachine.com/course/refac</span><span class=\"invisible\">toring-wordpress-plugins/</span></a> 👀</p><p>🌱 he/him🌵 vegan he/him 🌲</p>",
+        "url": "https://fosstodon.org/@josh412",
+        "uri": "https://fosstodon.org/users/josh412",
+        "avatar": "https://files.mastodon.social/cache/accounts/avatars/109/276/821/229/626/548/original/89f57d0f4d9102ec.png",
+        "avatar_static": "https://files.mastodon.social/cache/accounts/avatars/109/276/821/229/626/548/original/89f57d0f4d9102ec.png",
+        "header": "https://files.mastodon.social/cache/accounts/headers/109/276/821/229/626/548/original/1abbfd0466356e17.png",
+        "header_static": "https://files.mastodon.social/cache/accounts/headers/109/276/821/229/626/548/original/1abbfd0466356e17.png",
+        "followers_count": 370,
+        "following_count": 298,
+        "statuses_count": 254,
+        "last_status_at": "2023-09-04",
+        "emojis": [],
+        "fields": [
+          {
+            "name": "eBook: Refactoring WordPress Plugins Part 1",
+            "value": "<a href=\"https://pluginmachine.com/course/refactoring-wordpress-plugins/\" rel=\"nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">pluginmachine.com/course/refac</span><span class=\"invisible\">toring-wordpress-plugins/</span></a>",
+            "verified_at": null
+          },
+          {
+            "name": "Website",
+            "value": "<a href=\"https://joshpress.net\" rel=\"nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+            "verified_at": null
+          },
+          {
+            "name": "Photos (CC-0)",
+            "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" rel=\"nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+            "verified_at": null
+          },
+          {
+            "name": "Bluesky",
+            "value": "<a href=\"https://bsky.app/profile/josh412.com\" rel=\"nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+            "verified_at": null
+          }
+        ]
+      },
+      "media_attachments": [
+        {
+          "id": "111007533568046545",
+          "type": "image",
+          "url": "https://files.mastodon.social/cache/media_attachments/files/111/007/533/568/046/545/original/be1688d6865970a9.jpg",
+          "preview_url": "https://files.mastodon.social/cache/media_attachments/files/111/007/533/568/046/545/small/be1688d6865970a9.jpg",
+          "remote_url": "https://cdn.fosstodon.org/media_attachments/files/111/007/518/199/433/872/original/8716a5ca6cde0ee6.jpg",
+          "preview_remote_url": null,
+          "text_url": null,
+          "meta": {
+            "original": {
+              "width": 1920,
+              "height": 1080,
+              "size": "1920x1080",
+              "aspect": 1.7777777777777777
+            },
+            "small": {
+              "width": 640,
+              "height": 360,
+              "size": "640x360",
+              "aspect": 1.7777777777777777
+            }
+          },
+          "description": "Image of sand that has text over it that says:\n\nStop programming computers\n\n Sand was never meant to think.\n  \n  this is very cruel to rocks",
+          "blurhash": "U8L4c?9a%24;bIxZ^*^*~VNH-:j[IWt7Rjay"
+        }
+      ],
+      "mentions": [],
+      "tags": [],
+      "emojis": [],
+      "card": null,
+      "poll": null
+    },
+    "application": null,
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": null,
+    "poll": null
+  },
+  {
+    "id": "111007120413135489",
+    "created_at": "2023-09-04T13:30:34.815Z",
+    "in_reply_to_id": "111001415093931952",
+    "in_reply_to_account_id": "425078",
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111007120413135489",
+    "url": "https://mastodon.social/@Josh412/111007120413135489",
+    "replies_count": 0,
+    "reblogs_count": 0,
+    "favourites_count": 0,
+    "edited_at": null,
+    "content": "<p><a href=\"https://wordpress.org/photos/photo/41664f2996/\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/photo/416</span><span class=\"invisible\">64f2996/</span></a></p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": {
+      "url": "https://wordpress.org/photos/photo/41664f2996/",
+      "title": "41664f2996",
+      "description": "A very fully flowering pink zinnia",
+      "language": "en",
+      "type": "link",
+      "author_name": "",
+      "author_url": "",
+      "provider_name": "WordPress.org",
+      "provider_url": "",
+      "html": "",
+      "width": 768,
+      "height": 1020,
+      "image": "https://files.mastodon.social/cache/preview_cards/images/071/996/133/original/75c5fa15d655cd78.jpg",
+      "image_description": "",
+      "embed_url": "",
+      "blurhash": "UeF5zJWZI.WBWSa$jdof53f9s:s;xvj[fjWB",
+      "published_at": null
+    },
+    "poll": null
+  },
+  {
+    "id": "111007118553251769",
+    "created_at": "2023-09-04T13:30:06.443Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111007118553251769",
+    "url": "https://mastodon.social/@Josh412/111007118553251769",
+    "replies_count": 0,
+    "reblogs_count": 0,
+    "favourites_count": 0,
+    "edited_at": null,
+    "content": "<p>Good morning 🌱🌺🌲</p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [
+      {
+        "id": "111007113693407899",
+        "type": "image",
+        "url": "https://files.mastodon.social/media_attachments/files/111/007/113/693/407/899/original/8e5ed9a43bd87c4f.jpg",
+        "preview_url": "https://files.mastodon.social/media_attachments/files/111/007/113/693/407/899/small/8e5ed9a43bd87c4f.jpg",
+        "remote_url": null,
+        "preview_remote_url": null,
+        "text_url": null,
+        "meta": {
+          "original": {
+            "width": 2499,
+            "height": 3319,
+            "size": "2499x3319",
+            "aspect": 0.7529376318168123
+          },
+          "small": {
+            "width": 416,
+            "height": 553,
+            "size": "416x553",
+            "aspect": 0.7522603978300181
+          }
+        },
+        "description": "The back of the purple Dahlia flower ",
+        "blurhash": "UDC?o{m-t-r$x{Dzb]R$0_R3$,WROlM]NKf$"
+      },
+      {
+        "id": "111007117320377668",
+        "type": "image",
+        "url": "https://files.mastodon.social/media_attachments/files/111/007/117/320/377/668/original/f27b549fd8750143.jpg",
+        "preview_url": "https://files.mastodon.social/media_attachments/files/111/007/117/320/377/668/small/f27b549fd8750143.jpg",
+        "remote_url": null,
+        "preview_remote_url": null,
+        "text_url": null,
+        "meta": {
+          "original": {
+            "width": 2499,
+            "height": 3319,
+            "size": "2499x3319",
+            "aspect": 0.7529376318168123
+          },
+          "small": {
+            "width": 416,
+            "height": 553,
+            "size": "416x553",
+            "aspect": 0.7522603978300181
+          }
+        },
+        "description": "Big purple flower poking out behind leaves ",
+        "blurhash": "UECZ%}DiFowg?XnPWAV?AP%4,wSw%Ko|aesp"
+      }
+    ],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": null,
+    "poll": null
+  },
+  {
+    "id": "111003987103809398",
+    "created_at": "2023-09-04T00:13:44.314Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111003987103809398",
+    "url": "https://mastodon.social/@Josh412/111003987103809398",
+    "replies_count": 0,
+    "reblogs_count": 0,
+    "favourites_count": 0,
+    "edited_at": null,
+    "content": "<p>&quot;Though the movie was a near nonentity in the mainstream box office, Smith had cut out the middleman by self-distributing and could sell tickets at a premium for those special appearances, so he made back his budget. And a new business model was born. Kevin Smith was no longer a pitchman for Kevin Smith films. Instead, his films were excuses for people to go out and see Kevin Smith.&quot;</p><p><a href=\"https://www.vulture.com/2017/09/kevin-smith-red-state.html\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" translate=\"no\"><span class=\"invisible\">https://www.</span><span class=\"ellipsis\">vulture.com/2017/09/kevin-smit</span><span class=\"invisible\">h-red-state.html</span></a></p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": null,
+    "poll": null
+  },
+  {
+    "id": "111003857253554921",
+    "created_at": "2023-09-03T23:40:42.953Z",
+    "in_reply_to_id": "110970347924721211",
+    "in_reply_to_account_id": "425078",
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111003857253554921",
+    "url": "https://mastodon.social/@Josh412/111003857253554921",
+    "replies_count": 0,
+    "reblogs_count": 0,
+    "favourites_count": 0,
+    "edited_at": null,
+    "content": "<p>The book I read before that was Blindsight by Peter Watts. I like books like this where there are two timelines, one on the ship and one explaining how the narrator got on the ship, this book is like that. I also like books with aliens have fundamentally different biology. This is one of those books.</p><p><a href=\"https://en.m.wikipedia.org/wiki/Blindsight_(Watts_novel)\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">en.m.wikipedia.org/wiki/Blinds</span><span class=\"invisible\">ight_(Watts_novel)</span></a></p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": {
+      "url": "https://en.m.wikipedia.org/wiki/Blindsight_(Watts_novel)",
+      "title": "Blindsight (Watts novel) - Wikipedia",
+      "description": "",
+      "language": "en",
+      "type": "link",
+      "author_name": "",
+      "author_url": "",
+      "provider_name": "",
+      "provider_url": "",
+      "html": "",
+      "width": 225,
+      "height": 337,
+      "image": "https://files.mastodon.social/cache/preview_cards/images/046/141/765/original/7f4e02a2e692fb7c.jpg",
+      "image_description": "",
+      "embed_url": "",
+      "blurhash": "UG7dhC%NIUM{wgaeR*jsMHM_o}t7xYt7ozWV",
+      "published_at": null
+    },
+    "poll": null
+  },
+  {
+    "id": "111002495396616389",
+    "created_at": "2023-09-03T17:54:22.671Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111002495396616389",
+    "url": "https://mastodon.social/@Josh412/111002495396616389",
+    "replies_count": 0,
+    "reblogs_count": 0,
+    "favourites_count": 2,
+    "edited_at": "2023-09-03T22:16:47.575Z",
+    "content": "<p>If you have been wondering when insurers or the federal government will stop paying for climate change related disasters, turns out now is when insurers stop offering new coverage where hurricanes and wildfires are more common <br /><a href=\"https://wapo.st/45T2qGa\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">wapo.st/45T2qGa</span><span class=\"invisible\"></span></a></p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": {
+      "url": "https://www.washingtonpost.com/business/2023/09/03/natural-disaster-climate-insurance/",
+      "title": "Home insurers cut natural disasters from policies as climate risks grow",
+      "description": "Major insurers say they will cut out damage caused by hurricanes, wind and hail from policies underwriting property along coastlines and in wildfire country.",
+      "language": "en",
+      "type": "link",
+      "author_name": "Jacob Bogage",
+      "author_url": "https://www.washingtonpost.com/people/jacob-bogage/",
+      "provider_name": "The Washington Post",
+      "provider_url": "",
+      "html": "",
+      "width": 1440,
+      "height": 960,
+      "image": "https://files.mastodon.social/cache/preview_cards/images/071/907/133/original/a612ecd2e85d32b0.jpeg",
+      "image_description": "",
+      "embed_url": "",
+      "blurhash": "U4BpX+00.R_4E0D$D%D%K2-:nB%KNW%Oi_o#",
+      "published_at": "2023-09-03T11:30:00.096Z"
+    },
+    "poll": null
+  },
+  {
+    "id": "111002356082290023",
+    "created_at": "2023-09-03T17:18:56.901Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111002356082290023",
+    "url": "https://mastodon.social/@Josh412/111002356082290023",
+    "replies_count": 0,
+    "reblogs_count": 1,
+    "favourites_count": 0,
+    "edited_at": "2023-09-04T14:34:37.198Z",
+    "content": "<p>This is a very neat reconstruction of Tenochtitlan</p><p><a href=\"https://tenochtitlan.thomaskole.nl/\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">tenochtitlan.thomaskole.nl/</span><span class=\"invisible\"></span></a></p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": {
+      "url": "https://tenochtitlan.thomaskole.nl/index.html",
+      "title": "a portrait of Tenochtitlan",
+      "description": "a 3D reconstruction of the capital of the Aztec Empire",
+      "language": null,
+      "type": "link",
+      "author_name": "",
+      "author_url": "",
+      "provider_name": "",
+      "provider_url": "",
+      "html": "",
+      "width": 1200,
+      "height": 630,
+      "image": "https://files.mastodon.social/cache/preview_cards/images/071/854/709/original/fd868d61d9a98964.jpg",
+      "image_description": "",
+      "embed_url": "",
+      "blurhash": "UBBg9+%NM{s:_4xaV@ozxbf8WXoeD%WUxuWB",
+      "published_at": null
+    },
+    "poll": null
+  },
+  {
+    "id": "111001844786693177",
+    "created_at": "2023-09-03T15:08:55.146Z",
+    "in_reply_to_id": "111001801743400111",
+    "in_reply_to_account_id": "425078",
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111001844786693177",
+    "url": "https://mastodon.social/@Josh412/111001844786693177",
+    "replies_count": 0,
+    "reblogs_count": 1,
+    "favourites_count": 1,
+    "edited_at": null,
+    "content": "<p>&quot;over 90 percent of the event’s carbon footprint comes not from the fires themselves but from travel to and from Black Rock City, according to a 2020 environmental sustainability report from the Burning Man Organization. Another 5 percent comes from gas- and diesel-burning generators that keep lights and air conditioners on during the festival&quot;</p><p><a href=\"https://www.vox.com/technology/2023/8/30/23852215/burning-man-climate-protest-block-road\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" translate=\"no\"><span class=\"invisible\">https://www.</span><span class=\"ellipsis\">vox.com/technology/2023/8/30/2</span><span class=\"invisible\">3852215/burning-man-climate-protest-block-road</span></a></p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": {
+      "url": "https://www.vox.com/technology/2023/8/30/23852215/burning-man-climate-protest-block-road",
+      "title": "Burning Man’s climate protesters block road to Black Rock City",
+      "description": "Building a temporary city of 80,000 people in the desert is actually bad for the planet, the climate protesters said.",
+      "language": "en",
+      "type": "link",
+      "author_name": "Adam Clark Estes",
+      "author_url": "",
+      "provider_name": "Vox",
+      "provider_url": "",
+      "html": "",
+      "width": 1200,
+      "height": 628,
+      "image": "https://files.mastodon.social/cache/preview_cards/images/071/552/684/original/b0d5308ae9c4f1a3.jpg",
+      "image_description": "A fire at the Burning Man festival",
+      "embed_url": "",
+      "blurhash": "UsH_iA9Gofxu~pD%oexuIqM{axt7IpfjRjof",
+      "published_at": "2023-08-30T15:45:00.000Z"
+    },
+    "poll": null
+  },
+  {
+    "id": "111001801743400111",
+    "created_at": "2023-09-03T14:57:58.357Z",
+    "in_reply_to_id": "111001655274556607",
+    "in_reply_to_account_id": "425078",
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111001801743400111",
+    "url": "https://mastodon.social/@Josh412/111001801743400111",
+    "replies_count": 1,
+    "reblogs_count": 0,
+    "favourites_count": 1,
+    "edited_at": null,
+    "content": "<p>That whole article about the environmental impacts of Burning Man, is pretty long,  but doesn&#39;t even mention the airport for Burning Man, where &quot;about 880 flights have operated in the past week or so, but many of those were charters&quot;</p><p><a href=\"https://www.avweb.com/aviation-news/burning-man-airport-closed-number-of-stranded-aircraft-unclear/\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" translate=\"no\"><span class=\"invisible\">https://www.</span><span class=\"ellipsis\">avweb.com/aviation-news/burnin</span><span class=\"invisible\">g-man-airport-closed-number-of-stranded-aircraft-unclear/</span></a></p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": {
+      "url": "https://www.avweb.com/aviation-news/burning-man-airport-closed-number-of-stranded-aircraft-unclear/",
+      "title": "Burning Man Airport Closed, Number Of Stranded Aircraft Unclear - AVweb",
+      "description": "An unknown number of aircraft are stranded at Black Rock City Airport (NV88), the pop-up desert strip that serves the massive Burning Man event in Nevada. The airport, a 6,000-foot strip on the playa a few miles from the main event, was closed late Friday when a major rainfall turned it and the festival into […]",
+      "language": "en",
+      "type": "link",
+      "author_name": "",
+      "author_url": "",
+      "provider_name": "AVweb",
+      "provider_url": "",
+      "html": "",
+      "width": 1838,
+      "height": 1256,
+      "image": "https://files.mastodon.social/cache/preview_cards/images/071/917/624/original/dece3e5cdb400fe1.png",
+      "image_description": "",
+      "embed_url": "",
+      "blurhash": "UAK-E.~W4:xuxuxZRjWBE2WBa#xtxsR+a}xZ",
+      "published_at": "2023-09-03T04:30:39.000Z"
+    },
+    "poll": null
+  },
+  {
+    "id": "111001655274556607",
+    "created_at": "2023-09-03T14:20:43.423Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111001655274556607",
+    "url": "https://mastodon.social/@Josh412/111001655274556607",
+    "replies_count": 1,
+    "reblogs_count": 0,
+    "favourites_count": 1,
+    "edited_at": null,
+    "content": "<p>&quot;Some longtime Burners have developed respiratory ailments from breathing particulate matter that’s more than 10 times the EPA standard. In fact, data show the playa during Burning Man has worse air quality than the most polluted cities on Earth. And the plume extends for many miles beyond the playa, potentially harming nearby communities.&quot;<br /><a href=\"https://www.rgj.com/story/opinion/voices/2019/04/18/burning-man-embrace-environmental-protection-black-rock-desert/3501500002/\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" translate=\"no\"><span class=\"invisible\">https://www.</span><span class=\"ellipsis\">rgj.com/story/opinion/voices/2</span><span class=\"invisible\">019/04/18/burning-man-embrace-environmental-protection-black-rock-desert/3501500002/</span></a></p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": {
+      "url": "https://eu.rgj.com/story/opinion/voices/2019/04/18/burning-man-embrace-environmental-protection-black-rock-desert/3501500002/",
+      "title": "Burning Man needs to recognize impact to playa, say environmentalists",
+      "description": "The event has always been an evolution. The next iteration should  minimize harm to the desert, wildlife and the air we breathe.",
+      "language": "en",
+      "type": "link",
+      "author_name": "Patrick Donnelly and Steven T. Jones, Reno Gazette Journal",
+      "author_url": "",
+      "provider_name": "Reno Gazette Journal",
+      "provider_url": "",
+      "html": "",
+      "width": 1200,
+      "height": 673,
+      "image": "https://files.mastodon.social/cache/preview_cards/images/071/915/337/original/fe0e8b9d50e08305.jpeg",
+      "image_description": "",
+      "embed_url": "",
+      "blurhash": "UOF4MyxZ0$R+,pxYJARk0$RkxZofbbNHsAt6",
+      "published_at": "2019-04-18T12:00:01.000Z"
+    },
+    "poll": null
+  },
+  {
+    "id": "111001415093931952",
+    "created_at": "2023-09-03T13:19:38.560Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/111001415093931952",
+    "url": "https://mastodon.social/@Josh412/111001415093931952",
+    "replies_count": 1,
+    "reblogs_count": 0,
+    "favourites_count": 0,
+    "edited_at": null,
+    "content": "<p>Good morning 🌱🌺🌲</p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [
+      {
+        "id": "111001413035214224",
+        "type": "image",
+        "url": "https://files.mastodon.social/media_attachments/files/111/001/413/035/214/224/original/d21317d4c6d74b31.jpg",
+        "preview_url": "https://files.mastodon.social/media_attachments/files/111/001/413/035/214/224/small/d21317d4c6d74b31.jpg",
+        "remote_url": null,
+        "preview_remote_url": null,
+        "text_url": null,
+        "meta": {
+          "original": {
+            "width": 2499,
+            "height": 3319,
+            "size": "2499x3319",
+            "aspect": 0.7529376318168123
+          },
+          "small": {
+            "width": 416,
+            "height": 553,
+            "size": "416x553",
+            "aspect": 0.7522603978300181
+          },
+          "focus": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "description": "Big, light pink zinnia flower, with yellow crown ",
+        "blurhash": "UeF5zJa%I.WBWSa$jdof53f9s.s;xvj[fjWB"
+      },
+      {
+        "id": "111001413007636510",
+        "type": "image",
+        "url": "https://files.mastodon.social/media_attachments/files/111/001/413/007/636/510/original/60ee5bddfb1aa1c5.jpg",
+        "preview_url": "https://files.mastodon.social/media_attachments/files/111/001/413/007/636/510/small/60ee5bddfb1aa1c5.jpg",
+        "remote_url": null,
+        "preview_remote_url": null,
+        "text_url": null,
+        "meta": {
+          "original": {
+            "width": 2499,
+            "height": 3319,
+            "size": "2499x3319",
+            "aspect": 0.7529376318168123
+          },
+          "small": {
+            "width": 416,
+            "height": 553,
+            "size": "416x553",
+            "aspect": 0.7522603978300181
+          }
+        },
+        "description": "Big, light pink zinnia flower, with yellow crown ",
+        "blurhash": "UIIp_Yxb5itP7ARi-Xxa2QR%V=n+}^RP-YRi"
+      }
+    ],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": null,
+    "poll": null
+  },
+  {
+    "id": "110998878519129261",
+    "created_at": "2023-09-03T02:34:33.498Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/110998878519129261",
+    "url": "https://mastodon.social/@Josh412/110998878519129261",
+    "replies_count": 0,
+    "reblogs_count": 0,
+    "favourites_count": 0,
+    "edited_at": null,
+    "content": "<p>Reading this obituary about Jimmy Buffett. The number of businesses and records this guy did is impressive.<br />I hope he gets to be a cheeseburger now.<br /><a href=\"https://www.inquirer.com/obituaries/jimmy-buffett-margaritaville-singer-obit-dies-20230902.html\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" translate=\"no\"><span class=\"invisible\">https://www.</span><span class=\"ellipsis\">inquirer.com/obituaries/jimmy-</span><span class=\"invisible\">buffett-margaritaville-singer-obit-dies-20230902.html</span></a></p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": {
+      "url": "https://www.inquirer.com/obituaries/jimmy-buffett-margaritaville-singer-obit-dies-20230902.html",
+      "title": "Jimmy Buffett, 76, ‘Margaritaville’ singer who turned beach-bum life into an empire, dies",
+      "description": "“Margaritaville” singer-songwriter Jimmy Buffett has died at age 76",
+      "language": "en",
+      "type": "link",
+      "author_name": "Mark Kennedy",
+      "author_url": "",
+      "provider_name": "The Philadelphia Inquirer",
+      "provider_url": "",
+      "html": "",
+      "width": 760,
+      "height": 507,
+      "image": "https://files.mastodon.social/cache/preview_cards/images/071/879/771/original/169ab4e92d472501.jpg",
+      "image_description": "",
+      "embed_url": "",
+      "blurhash": "UgIgyqxgH]MeQ{V~xwog9ZIoo}x[%MX5RPa$",
+      "published_at": "2023-09-02T17:24:35.000Z"
+    },
+    "poll": null
+  },
+  {
+    "id": "110998823981965585",
+    "created_at": "2023-09-03T02:20:41.326Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/110998823981965585",
+    "url": "https://mastodon.social/@Josh412/110998823981965585",
+    "replies_count": 0,
+    "reblogs_count": 0,
+    "favourites_count": 1,
+    "edited_at": null,
+    "content": "<p>&quot;Our results suggest that the quality of comments was highest in the middle phase. There was a great improvement after the shift from easy or disposable anonymity to what we call “durable pseudonyms”. But instead of improving further after the shift to the real-name phase, the quality of comments actually got worse – not as bad as in the first phase, but still worse by our measure.&quot;<br /><a href=\"https://theconversation.com/online-anonymity-study-found-stable-pseudonyms-created-a-more-civil-environment-than-real-user-names-171374\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">theconversation.com/online-ano</span><span class=\"invisible\">nymity-study-found-stable-pseudonyms-created-a-more-civil-environment-than-real-user-names-171374</span></a></p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": {
+      "url": "https://theconversation.com/online-anonymity-study-found-stable-pseudonyms-created-a-more-civil-environment-than-real-user-names-171374",
+      "title": "Online anonymity: study found 'stable pseudonyms' created a more civil environment than real user names ",
+      "description": "A higher quality discussion emerged among commenters allowed to use personas instead of their real names.",
+      "language": "en",
+      "type": "link",
+      "author_name": "",
+      "author_url": "",
+      "provider_name": "The Conversation",
+      "provider_url": "",
+      "html": "",
+      "width": 1356,
+      "height": 668,
+      "image": "https://files.mastodon.social/cache/preview_cards/images/036/886/973/original/cee9a643d4a733e8.jpg",
+      "image_description": "",
+      "embed_url": "",
+      "blurhash": "UXB_DHABI:t71I,@xGR*]kJTNbbHJ8w_sojZ",
+      "published_at": null
+    },
+    "poll": null
+  },
+  {
+    "id": "110997157986829985",
+    "created_at": "2023-09-02T19:17:00.256Z",
+    "in_reply_to_id": "110995759845765529",
+    "in_reply_to_account_id": "425078",
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/110997157986829985",
+    "url": "https://mastodon.social/@Josh412/110997157986829985",
+    "replies_count": 0,
+    "reblogs_count": 0,
+    "favourites_count": 1,
+    "edited_at": null,
+    "content": "<p><a href=\"https://wordpress.org/photos/photo/41364ef6e4/\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/photo/413</span><span class=\"invisible\">64ef6e4/</span></a></p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": {
+      "url": "https://wordpress.org/photos/photo/41364ef6e4/",
+      "title": "41364ef6e4",
+      "description": "Pink zinnia flower that is starting to curl up",
+      "language": "en",
+      "type": "link",
+      "author_name": "",
+      "author_url": "",
+      "provider_name": "WordPress.org",
+      "provider_url": "",
+      "html": "",
+      "width": 768,
+      "height": 1020,
+      "image": "https://files.mastodon.social/cache/preview_cards/images/071/861/248/original/d3bc65e4d9aa308f.jpg",
+      "image_description": "",
+      "embed_url": "",
+      "blurhash": "UQEM8^SvE{o1?dn+WUV@5is;wJbYRiWUspae",
+      "published_at": null
+    },
+    "poll": null
+  },
+  {
+    "id": "110995759845765529",
+    "created_at": "2023-09-02T13:21:26.320Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/110995759845765529",
+    "url": "https://mastodon.social/@Josh412/110995759845765529",
+    "replies_count": 1,
+    "reblogs_count": 0,
+    "favourites_count": 1,
+    "edited_at": null,
+    "content": "<p>Good morning 🌱🌺🌲</p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [
+      {
+        "id": "110981562476056724",
+        "type": "image",
+        "url": "https://files.mastodon.social/media_attachments/files/110/981/562/476/056/724/original/995bcaef1f3f7241.jpg",
+        "preview_url": "https://files.mastodon.social/media_attachments/files/110/981/562/476/056/724/small/995bcaef1f3f7241.jpg",
+        "remote_url": null,
+        "preview_remote_url": null,
+        "text_url": null,
+        "meta": {
+          "original": {
+            "width": 2499,
+            "height": 3319,
+            "size": "2499x3319",
+            "aspect": 0.7529376318168123
+          },
+          "small": {
+            "width": 416,
+            "height": 553,
+            "size": "416x553",
+            "aspect": 0.7522603978300181
+          }
+        },
+        "description": "A pink Zinnia, with the petals withering inward",
+        "blurhash": "UQEM5:SvE{o1?dn,WUV@5is;wJbYRiWUspae"
+      }
+    ],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": null,
+    "poll": null
+  },
+  {
+    "id": "110989870562430355",
+    "created_at": "2023-09-01T12:23:42.997Z",
+    "in_reply_to_id": null,
+    "in_reply_to_account_id": null,
+    "sensitive": false,
+    "spoiler_text": "",
+    "visibility": "public",
+    "language": "en",
+    "uri": "https://mastodon.social/users/Josh412/statuses/110989870562430355",
+    "url": "https://mastodon.social/@Josh412/110989870562430355",
+    "replies_count": 0,
+    "reblogs_count": 1,
+    "favourites_count": 0,
+    "edited_at": null,
+    "content": "<p>Good morning 🌱🌺🌲</p>",
+    "reblog": null,
+    "application": {
+      "name": "Tusky",
+      "website": "https://tusky.app"
+    },
+    "account": {
+      "id": "425078",
+      "username": "Josh412",
+      "acct": "Josh412",
+      "display_name": "Josh Pollock 🌱🌵🌲",
+      "locked": false,
+      "bot": false,
+      "discoverable": false,
+      "group": false,
+      "created_at": "2018-08-16T00:00:00.000Z",
+      "note": "<p>I toot a good morning photo of flowers or my dog or the sky or whatever and toot links to stuff I read with quotes. I try to keep software development toots to @josh412@fosston.org and use this account and Bluesky for Josh posting.</p><p>PHP and JavaScript developer/ Dog Enthusiast from Pittsburgh 🌱 he/him 🌵vegan 🌵</p>",
+      "url": "https://mastodon.social/@Josh412",
+      "uri": "https://mastodon.social/users/Josh412",
+      "avatar": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "avatar_static": "https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png",
+      "header": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "header_static": "https://files.mastodon.social/accounts/headers/000/425/078/original/6d4487ca08648649.png",
+      "followers_count": 231,
+      "following_count": 220,
+      "statuses_count": 1294,
+      "last_status_at": "2023-09-06",
+      "noindex": false,
+      "emojis": [],
+      "roles": [],
+      "fields": [
+        {
+          "name": "Website",
+          "value": "<a href=\"https://joshpress.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">joshpress.net</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Photos",
+          "value": "<a href=\"https://wordpress.org/photos/author/shelob9/\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">wordpress.org/photos/author/sh</span><span class=\"invisible\">elob9/</span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Bluesky",
+          "value": "<a href=\"https://bsky.app/profile/josh412.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">bsky.app/profile/josh412.com</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        },
+        {
+          "name": "Mastodon",
+          "value": "<a href=\"https://fosstodon.org/josh412\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\" translate=\"no\"><span class=\"invisible\">https://</span><span class=\"\">fosstodon.org/josh412</span><span class=\"invisible\"></span></a>",
+          "verified_at": null
+        }
+      ]
+    },
+    "media_attachments": [
+      {
+        "id": "110981552808966368",
+        "type": "image",
+        "url": "https://files.mastodon.social/media_attachments/files/110/981/552/808/966/368/original/b5582bba1022b10c.jpg",
+        "preview_url": "https://files.mastodon.social/media_attachments/files/110/981/552/808/966/368/small/b5582bba1022b10c.jpg",
+        "remote_url": null,
+        "preview_remote_url": null,
+        "text_url": null,
+        "meta": {
+          "original": {
+            "width": 2499,
+            "height": 3319,
+            "size": "2499x3319",
+            "aspect": 0.7529376318168123
+          },
+          "small": {
+            "width": 416,
+            "height": 553,
+            "size": "416x553",
+            "aspect": 0.7522603978300181
+          }
+        },
+        "description": "A very pink Zinnia flower with yellow crown",
+        "blurhash": "UmFzdhr[ATsDO9f5s;ae1YWUxGS1sqbHfPo2"
+      }
+    ],
+    "mentions": [],
+    "tags": [],
+    "emojis": [],
+    "card": null,
+    "poll": null
+  }
+]
