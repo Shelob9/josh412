@@ -1,7 +1,11 @@
 name = "tooter"
-main = "src/worker.js"
+main = "src/index.ts"
+#main = "src/worker.js"
 compatibility_date = "2023-09-04"
-
+[[kv_namespaces]]
+binding = "KV"
+id = "419991e62cdd45e6b1acbc45fadf0204"
+preview_id = "c00a0570cd4b4f0083936400ef3b77d0"
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Note: Use secrets to store sensitive data.
 # Docs: https://developers.cloudflare.com/workers/platform/environment-variables
