@@ -1,3 +1,4 @@
+import { Classification, Classification_Match, Classification_Source, classifySources } from "./classify";
 import { getAccount, getStatuses } from "./social/mastodon";
 import { Status } from "./social/types/mastodon";
 
@@ -19,6 +20,84 @@ interface InjestArgs {
     network: string,
 }
 
+const createClassification = (searches: string[], all: boolean, id: string): Classification => {
+    return {
+        searches: searches.map(search => {
+            return {
+                search,
+                where: 'contains',
+                all: false,
+            }
+        }),
+        all,
+        id,
+    }
+}
+const classifications : Classification[] = [
+    createClassification([
+        'good morning',
+        'Good Morning',
+        'Good morning',
+        'good Morning',
+        'gm',
+        'GM',
+    ],false,'gm'),
+    createClassification([
+        'Good Night',
+        'good night',
+        'Good night',
+        'good Night',
+        'gn',
+        'GN',
+    ],false,'gn'),
+    createClassification([
+        'dog',
+        'Dog',
+        'dogs',
+        'Dogs',
+    ],false,'dog'),
+
+];
+
+export  const classifyStatuses = async (
+    statuses: Status[],
+    kv: KVNamespace,
+    network: string,
+) => {
+
+
+    const _sources : Classification_Source[] = statuses.map(
+        (status:Status) => {
+            return {
+                id: status.id.toString(),
+                text: status.content,
+                sourcetype: network,
+            }
+        }
+    );
+    const sources : Classification_Source[] = [
+        {
+            id: 'gmhtml',
+            text: '<p>Good Morning</p>',
+            sourcetype: network,
+        },
+        {
+            id: 'gmnohtml',
+            text: 'Good Morning',
+            sourcetype: network,
+        }
+    ];
+
+
+    const results = classifySources(sources,classifications);
+    return results;
+    return results.map((match:Classification_Match) => {
+        return {
+            source: match.source.text,
+            classifications,
+        };
+    });
+}
 
 export async function saveStatuses({
     kv,
@@ -74,7 +153,7 @@ export class StatusDataApi {
         this.network = network;
         this.kv = kv;
     }
-    async getSavedSatuses(cursor?:string){
+    async getSavedSatuses(cursor?:string): Promise<Status[]>{
         const keys = await this.kv.list({
             prefix: makeSocialPostKey(this.network,''),
             limit: 100,

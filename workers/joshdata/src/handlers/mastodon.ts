@@ -1,5 +1,5 @@
 import { json } from "drizzle-orm/mysql-core";
-import { saveStatuses, saveStatusFunctions, StatusDataApi } from "../injest";
+import { classifyStatuses, saveStatuses, saveStatusFunctions, StatusDataApi } from "../injest";
 import { jsonReponse } from "../responseFactory";
 const network = 'mastodon';
 
@@ -28,6 +28,8 @@ export const getToots = async ({kv,cursor}: {
 
 }
 
+
+
 export const injestToots = async ({kv,instanceUrl,username,stage}: {
     kv: KVNamespace,
     instanceUrl: string,
@@ -55,8 +57,11 @@ export const injestToots = async ({kv,instanceUrl,username,stage}: {
             break;
 
         default:
+            const api = new StatusDataApi(network,kv);
+            const statuses = await api.getSavedSatuses(undefined);
+            const results = classifyStatuses(statuses,kv,network);
             return jsonReponse({
-                4:42
+                results
             },200);
             break;
             break;

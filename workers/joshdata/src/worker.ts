@@ -3,6 +3,7 @@ import { INSERT_CLASSIFICATION, classifications } from './db/schema';
 import {  getAccount, getStatus, getStatuses } from './social/mastodon';
 import { Status } from './social/types/mastodon'
 import { getToots, injestToots } from './handlers/mastodon';
+import { classifyStatuses } from './injest';
 export interface Env {
 	KV: KVNamespace;
 	DB1: D1Database,
@@ -105,12 +106,13 @@ export default {
 			if( '/api/mastodon/injest' == url.pathname ){
 				const username = 'josh412';
 				const instanceUrl = 'https://mastodon.social/';
+				const stage =  url.searchParams.has('classify') ? 'classify': 'save';
 
 				const results = await injestToots({
 					kv: KV,
 					instanceUrl,
 					username,
-					stage: 'save',
+					stage,
 				});
 				return results;
 			}
