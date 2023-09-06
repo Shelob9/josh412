@@ -19,6 +19,7 @@ interface InjestArgs {
     network: string,
 }
 
+
 export async function saveStatuses({
     kv,
     instanceUrl,
@@ -31,7 +32,7 @@ export async function saveStatuses({
         saveStatus,
         setIsDone,
         isDone,
-    } = saveStatusApi(network,kv);
+    } = saveStatusFunctions(network,kv);
     let done = await isDone();
     const lastId = await getLastId();
     if( done ){
@@ -50,7 +51,7 @@ export async function saveStatuses({
             await saveStatus(status);
         }
     )
-    if( newLastId ){
+    if( newLastId && newLastId !== lastId ){
         await storeLastId(newLastId);
 
     }else{
@@ -66,7 +67,46 @@ export async function saveStatuses({
     }
 }
 
-export const saveStatusApi = (network:string,kv:KVNamespace )  => {
+export class StatusDataApi {
+    network: string;
+    kv: KVNamespace;
+    constructor(network:string,kv:KVNamespace ){
+        this.network = network;
+        this.kv = kv;
+    }
+    async getSavedSatuses(cursor?:string){
+        const keys = await this.kv.list({
+            prefix: makeSocialPostKey(this.network,''),
+            limit: 100,
+            cursor,
+        });
+        const statuses = await Promise.all(
+            keys.keys.map(
+                async (key:{name:string}) => {
+                    const data = await this.kv.get(key.name);
+                    //@ts-ignore
+                    return JSON.parse(data);
+                }
+            ));
+
+
+            return  {
+                complete: keys.list_complete,
+                cursor: keys.list_complete ? undefined : keys.cursor,
+                statuses,
+            };
+    }
+    async saveStatus(status:  Status ){
+        await this.kv.put(
+            makeSocialPostKey(this.network,status.id),
+            JSON.stringify(status)
+        );
+    }
+
+}
+export const saveStatusFunctions = (network:string,kv:KVNamespace )  => {
+    const api = new StatusDataApi(network,kv);
+
     const getLastId = async () : Promise<string|false> => {
         const lastId = await kv.get(makeInjestLastKey(network));
         if( 'done' === lastId ){
@@ -79,12 +119,7 @@ export const saveStatusApi = (network:string,kv:KVNamespace )  => {
         await kv.put(makeInjestLastKey(network),newValue);
     }
 
-    const saveStatus = async (status:  Status ) => {
-        await kv.put(
-            makeSocialPostKey(network,status.id),
-            JSON.stringify(status)
-        );
-    }
+
 
     const setIsDone = async () => {
         await kv.put(makeInjestLastKey(network),'done');
@@ -97,7 +132,7 @@ export const saveStatusApi = (network:string,kv:KVNamespace )  => {
     return {
         getLastId,
         storeLastId,
-        saveStatus,
+        saveStatus: api.saveStatus,
         setIsDone,
         isDone,
     }

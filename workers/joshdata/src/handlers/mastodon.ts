@@ -1,5 +1,7 @@
+import { json } from "drizzle-orm/mysql-core";
+import { saveStatuses, saveStatusFunctions, StatusDataApi } from "../injest";
 import { jsonReponse } from "../responseFactory";
-import { saveStatuses } from "../injest";
+const network = 'mastodon';
 
 
 export const classifyToots = () => {
@@ -15,13 +17,24 @@ export const makeInjestLastKey = (network:string) => {
     return `meta_socialpost:${network}:lastid`;
 }
 
+export const getToots = async ({kv,cursor}: {
+    kv: KVNamespace,
+    cursor?:string,
+}): Promise<Response> => {
+    const api = new StatusDataApi(network,kv);
+    const statuses = await api.getSavedSatuses(cursor);
+    return jsonReponse(statuses,200);
+
+
+}
+
 export const injestToots = async ({kv,instanceUrl,username,stage}: {
     kv: KVNamespace,
     instanceUrl: string,
     username: string,
     stage: 'save'|'classify',
-}) => {
-    const network = 'mastodon';
+}): Promise<Response> => {
+
     switch (stage) {
         case 'save':
             const  {

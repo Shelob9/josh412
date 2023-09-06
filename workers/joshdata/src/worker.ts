@@ -2,7 +2,7 @@ import { DrizzleD1Database, drizzle } from 'drizzle-orm/d1';
 import { INSERT_CLASSIFICATION, classifications } from './db/schema';
 import {  getAccount, getStatus, getStatuses } from './social/mastodon';
 import { Status } from './social/types/mastodon'
-import { injestToots } from './handlers/injestToots';
+import { getToots, injestToots } from './handlers/mastodon';
 export interface Env {
 	KV: KVNamespace;
 	DB1: D1Database,
@@ -92,45 +92,15 @@ const jsonReponse = (data: any,status:number) => {
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		const {DB1,KV,AUTH_SECRET} = env;
+		const {KV} = env;
 		const url = new URL(request.url);
-		const db = drizzle(DB1);
-
-
-
-		const hasAuth = request.headers.has('Authorization') || url.searchParams.has('auth');
-
-
-		async function processStatus (toot: Status){
-			const key = `socialpost:mastodon:status:${toot.id}`;
-			await KV.put(key,JSON.stringify(toot));
-		}
 		try {
 			if( '/api/mastodon' == url.pathname ){
-				const cursor = url.searchParams.get('cursor');
-				const keys = await KV.list({
-					prefix: 'socialpost:mastodon:status',
-					limit:1,
-					cursor,
+				const result = await getToots({
+					kv: KV,
+					cursor: url.searchParams.get('cursor') ?? undefined,
 				});
-				const statuses = await Promise.all(
-					keys.keys.map(
-						async (key:{name:string}) => {
-							const data = await KV.get(key.name);
-							//@ts-ignore
-							return JSON.parse(data);
-						}
-					));
-
-				return jsonReponse({
-					statuses,
-					complete: keys.list_complete,
-					//@ts-ignore
-					cursor: keys.cursor ? keys.cursor : null,
-					cacheStatus: keys.cacheStatus,
-					//@ts-ignore
-					next: keys.cursor ? `${url.origin}${url.pathname}?cursor=${keys.cursor}` : null,
-				},200);
+				return result;
 			}
 			if( '/api/mastodon/injest' == url.pathname ){
 				const username = 'josh412';
