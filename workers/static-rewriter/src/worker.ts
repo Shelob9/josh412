@@ -29,6 +29,7 @@ export default {
 		const url = new URL(request.url);
 		const path = url.pathname;
 		const exits = await BUCKET.get(path);
+
 		if (exits) {
 			const object = await BUCKET.get(path);
 
@@ -39,7 +40,7 @@ export default {
 			const headers = new Headers();
 			object.writeHttpMetadata(headers);
 			headers.set('etag', object.httpEtag);
-
+			headers.set( 'x-josh412-static', 'true' );
 			return new Response(object.body, {
 			  headers,
 			});
@@ -59,8 +60,10 @@ export default {
 			NEW_URL
 		)).transform(res);
 
-		await BUCKET.put(path,res);
+		const copy = res.clone();
 
-		return res;
+		const blob = await res.blob();
+		await BUCKET.put(path,blob);
+		return copy;
 	},
 };
