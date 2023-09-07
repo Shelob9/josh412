@@ -13,12 +13,14 @@ jobs:
         with:
           node-version: 18
       
-      - run: npm i
+      - name: install joshdata 
+        run: npm i
+        working-directory: workers/joshdata
         
-      - uses: mattallty/jest-github-action@v1
-        env:
-           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-            working-directory: "workers/joshdata"
+      - name: test
+        run: npm run test
+        working-directory: workers/joshdata
+        
+        
 
   
