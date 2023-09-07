@@ -57,5 +57,20 @@ describe('dataApi', () => {
         const storedClassification = await kv.get(classificationKeys[0]);
         expect(JSON.parse(storedClassification)).toContain(key);
     });
+test('storeItem with multiple classificationKeys', async () => {
+    const api = await dataApi({ kv });
+    const sourceType = 'test';
+    const classificationKeys = ['test1', 'test2'];
+    const data = { test: 'data' };
+    const key = await api.storeItem(sourceType, classificationKeys, data);
+    const storedData = await kv.get(key);
+    expect(JSON.parse(storedData)).toEqual(data);
+    for (let i = 0; i < classificationKeys.length; i++) {
+        const storedClassification = await kv.get(classificationKeys[i]);
+        expect(JSON.parse(storedClassification)).toContain(key);
+    }
+});
+
+	
 
 });
