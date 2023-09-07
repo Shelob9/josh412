@@ -153,7 +153,11 @@ export class StatusDataApi {
         this.network = network;
         this.kv = kv;
     }
-    async getSavedSatuses(cursor?:string): Promise<Status[]>{
+    async getSavedSatuses(cursor?:string): Promise<{
+        statuses: Status[];
+        complete: boolean;
+        cursor: string|false;
+    }>{
         const keys = await this.kv.list({
             prefix: makeSocialPostKey(this.network,''),
             limit: 100,
@@ -171,7 +175,7 @@ export class StatusDataApi {
 
             return  {
                 complete: keys.list_complete,
-                cursor: keys.list_complete ? undefined : keys.cursor,
+                cursor: keys.list_complete ? false : keys.cursor,
                 statuses,
             };
     }

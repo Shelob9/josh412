@@ -5,15 +5,6 @@ export interface Env {
 	BUCKET: R2Bucket;
 }
 
-const makeJsonRespnse = (data:any, status:number) => {
-	return new Response(JSON.stringify(data),
-	{
-	  status,
-	  headers: {
-		"content-type": "text/json;charset=UTF-8",
-	  }
-	});
-  }
 
 
 export default {
