@@ -10,7 +10,6 @@ export default {
     }
     if (request.url.indexOf("/xrpc/app.bsky.feed.getFeedSkeleton") > -1) {
       return await getFeedSkeleton(request, env);
-    }
     if( request.url.indexOf("/search") > -1){
       //get q from query string
       const url = new URL(request.url);

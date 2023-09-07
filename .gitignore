@@ -259,3 +259,5 @@ dist
 .pnp.*
 workers/joshdata/src/db/local.db
 workers/joshdata/.wrangler/
+workers/static-rewriter/.wrangler/
+workers/*/.wrangler/
