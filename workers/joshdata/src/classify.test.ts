@@ -96,11 +96,9 @@ describe('classifySources', () => {
     const matches = classifySources(sources, [
       CLASSIFICATION_GM,
     ]);
-    expect(matches.length).toBe(2);
-    expect(matches[0].classifications).toEqual([CLASSIFICATION_GM_ID]);
-    expect(matches[0].source).toEqual('gmhtml');
-    expect(matches[1].classifications).toEqual([CLASSIFICATION_GM_ID]);
-    expect(matches[1].source).toEqual('gmnohtml');
+    expect(Object.keys(matches).length).toBe(2);
+    expect(matches['gmhtml']).toEqual([CLASSIFICATION_GM_ID]);
+    expect(matches['gmnohtml']).toEqual([CLASSIFICATION_GM_ID]);
   });
 
   test( 'CLASSIFICATION_GM with gm', () => {
@@ -118,9 +116,8 @@ describe('classifySources', () => {
     ], [
       CLASSIFICATION_GM,
     ]);
-    expect(matches.length).toBe(1);
-    expect(matches[0].classifications).toEqual([CLASSIFICATION_GM_ID]);
-    expect(matches[0].source).toEqual('gmhtml');
+    expect(Object.keys(matches).length).toBe(1);
+    expect(matches['gmhtml']).toEqual([CLASSIFICATION_GM_ID]);
   });
 
 

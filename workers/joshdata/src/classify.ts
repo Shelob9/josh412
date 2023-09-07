@@ -36,14 +36,16 @@ export type Classification_Source = {
 	sourcetype:string;
 };
 
-export type Classification_Match = {
-  source: string;
-  classifications: string[];
+export type Classification_Matches = {
+  //key is source id,
+  //value is array of classification ids
+  [key:string]:string[]
 }
 
 
-export function classifySources(sources: Classification_Source[], classifications: Classification[]): Classification_Match[] {
-  const matches: Classification_Match[] = [];
+
+export function classifySources(sources: Classification_Source[], classifications: Classification[]): Classification_Matches {
+  const matches: Classification_Matches = {};
 
   // iterate over each source
   sources.forEach(source => {
@@ -67,10 +69,7 @@ export function classifySources(sources: Classification_Source[], classification
 
     // if there are any matched classifications, add a new match with the source and the matched classifications
     if (matchedClassifications.length > 0) {
-      matches.push({
-        source: source.id,
-        classifications: matchedClassifications
-      });
+      matches[source.id] = matchedClassifications;
     }
   });
   return matches;
