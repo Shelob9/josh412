@@ -20,44 +20,7 @@ interface InjestArgs {
     network: string,
 }
 
-const createClassification = (searches: string[], all: boolean, id: string): Classification => {
-    return {
-        searches: searches.map(search => {
-            return {
-                search,
-                where: 'contains',
-                all: false,
-            }
-        }),
-        all,
-        id,
-    }
-}
-const classifications : Classification[] = [
-    createClassification([
-        'good morning',
-        'Good Morning',
-        'Good morning',
-        'good Morning',
-        'gm',
-        'GM',
-    ],false,'gm'),
-    createClassification([
-        'Good Night',
-        'good night',
-        'Good night',
-        'good Night',
-        'gn',
-        'GN',
-    ],false,'gn'),
-    createClassification([
-        'dog',
-        'Dog',
-        'dogs',
-        'Dogs',
-    ],false,'dog'),
 
-];
 
 export  const classifyStatuses = async (
     statuses: Status[],

@@ -1,6 +1,8 @@
-type Where = 'starts' | 'ends' | 'contains' | 'exact';
+import { Classification, Classificatuon_Search } from "./classifications";
 
-export function searchString(subject: string, search: string | string[], where: Where, all = false): boolean {
+export type SearchWhere = 'starts' | 'ends' | 'contains' | 'exact';
+
+export function searchString(subject: string, search: string | string[], where: SearchWhere, all = false): boolean {
   if (Array.isArray(search)) {
     if (all) {
       return search.every(s => searchString(subject, s, where));
@@ -22,18 +24,7 @@ export function searchString(subject: string, search: string | string[], where: 
     }
   }
 }
-export type Classification = {
-	// search(es) to run.
-  searches: {
-    search: string | string[];
-	  where: Where;
-		all: boolean;
-	}[];
-	// If all searches, or just one must match
-	all: boolean;
-	// classification id
-	id: string;
-};
+
 
 export type Classification_Source = {
 	//id of item it is stored in
@@ -46,9 +37,10 @@ export type Classification_Source = {
 };
 
 export type Classification_Match = {
-  source: Classification_Source;
+  source: string;
   classifications: string[];
 }
+
 
 export function classifySources(sources: Classification_Source[], classifications: Classification[]): Classification_Match[] {
   const matches: Classification_Match[] = [];
@@ -60,7 +52,7 @@ export function classifySources(sources: Classification_Source[], classification
     // iterate over each classification
     classifications.forEach(classification => {
       // check if all searches match the source text
-      const allSearchesMatch = classification.searches.every(search => {
+      const allSearchesMatch = classification.searches.every((search:Classificatuon_Search) => {
         return searchString(source.text, search.search, search.where, search.all);
       });
 
@@ -76,7 +68,7 @@ export function classifySources(sources: Classification_Source[], classification
     // if there are any matched classifications, add a new match with the source and the matched classifications
     if (matchedClassifications.length > 0) {
       matches.push({
-        source: source,
+        source: source.id,
         classifications: matchedClassifications
       });
     }

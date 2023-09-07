@@ -1,4 +1,5 @@
-import { Classification, Classification_Source, classifySources, searchString } from './classify';
+import { CLASSIFICATIONS, CLASSIFICATION_GM, CLASSIFICATION_GM_ID } from './classifications';
+import {  Classification_Source, classifySources, searchString } from './classify';
 
 describe('searchString function', () => {
   const subject = 'Hello, world!';
@@ -72,102 +73,55 @@ describe('searchString function with array', () => {
 });
 
 describe('classifySources', () => {
+  const network = 'mastodon';
   const sources : Classification_Source[] = [
     {
-      id: '1',
-      text: 'Hello, world!',
-      sourcetype: 'test',
+        id: 'gmhtml',
+        text: '<p>Good Morning</p>',
+        sourcetype: network,
     },
     {
-      id: '2',
-      text: 'This is a test string.',
-      sourcetype: 'test',
+      id: 'notmatch',
+      text: 'This is a test string',
+      sourcetype: network,
     },
-  ];
-  test( 'should return an empty array when there are no matches', () => {
-    const classifications : Classification[] = [
-      {
-        searches: [
-          {
-            search: 'test',
-            where: 'exact',
-            all: false,
-          },
-        ],
-        all: false,
-        id: 'test',
-      },
-    ];
-    expect(classifySources(sources, classifications)).toEqual([]);
+    {
+        id: 'gmnohtml',
+        text: 'Good Morning',
+        sourcetype: network,
+    }
+];
+  //it finds both good morning sources
+  test('CLASSIFICATION_GM match two', () => {
+    const matches = classifySources(sources, [
+      CLASSIFICATION_GM,
+    ]);
+    expect(matches.length).toBe(2);
+    expect(matches[0].classifications).toEqual([CLASSIFICATION_GM_ID]);
+    expect(matches[0].source).toEqual('gmhtml');
+    expect(matches[1].classifications).toEqual([CLASSIFICATION_GM_ID]);
+    expect(matches[1].source).toEqual('gmnohtml');
   });
-  test( 'should return an array of matches when there are matches', () => {
-    const classifications : Classification[] = [
+
+  test( 'CLASSIFICATION_GM with gm', () => {
+    const matches = classifySources([
       {
-        searches: [
-          {
-            search: 'Hello',
-            where: 'contains',
-            all: false,
-          },
-        ],
-        all: false,
-        id: 'test',
-      },
-    ];
-    expect(classifySources(sources, classifications)).toEqual([
-      {
-        source: sources[0],
-        classifications: [classifications[0].id],
-      },
+        id: 'gmhtml',
+        text: '<p>gm</p>',
+        sourcetype: network,
+    },
+    {
+      id: 'notmatch',
+      text: 'This is a test string',
+      sourcetype: network,
+    },
+    ], [
+      CLASSIFICATION_GM,
     ]);
-  }
-  );
-  test( 'should return an array of matches when there are multiple matches', () => {
-    const classifications : Classification[] = [
-      {
-        searches: [
-          {
-            search: 'Hello',
-            where: 'contains',
-            all: false,
-          },
-        ],
-        all: false,
-        id: 'test1',
-      },
-      {
-        searches: [
-          {
-            search: 'food and stuff',
-            where: 'exact',
-            all: false,
-          },
-        ],
-        all: false,
-        id: 'test2',
-      },
-      {
-        searches: [
-          {
-            search: 'test',
-            where: 'contains',
-            all: false,
-          },
-        ],
-        all: false,
-        id: 'test3',
-      },
-    ];
-    expect(classifySources(sources, classifications)).toEqual([
-      {
-        source: sources[0],
-        classifications: ["test1"],
-      },
-      {
-        source: sources[1],
-        classifications: ["test3"],
-      },
-    ]);
-  } );
+    expect(matches.length).toBe(1);
+    expect(matches[0].classifications).toEqual([CLASSIFICATION_GM_ID]);
+    expect(matches[0].source).toEqual('gmhtml');
+  });
+
 
 });

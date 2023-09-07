@@ -1,6 +1,4 @@
 
-
-
 type SourceType = string;
 
 // make a unique ID
@@ -16,11 +14,10 @@ const makeKey = (sourceType: SourceType, uid? : string) => {
     uid = uid ?? generateUid();
     return `${sourceType}:${uid}`;
 }
-export async function dataApi({
-    kv,
-}: {
-    kv: KVNamespace,
-}) {
+//NOT USED
+export async function dataApi(
+    kv: KVNamespace
+) {
 
     // store one item in KV
     async function storeItemInKV(sourceType: SourceType, data: any, key?: string) {
