@@ -1,15 +1,9 @@
-import { Classification, Classification_Match, Classification_Source, classifySources } from "./classify";
+import { CLASSIFICATIONS,Classification } from "./classifications";
+import {  Classification_Source,Classification_Matches, classifySources } from "./classify";
+import { StatusDataApi, makeInjestLastKey } from "./dataApi";
 import { getAccount, getStatuses } from "./social/mastodon";
 import { Status } from "./social/types/mastodon";
 
-//@todo move to dataApi?
-export const makeSocialPostKey = (network:string, id: string) => {
-    return `socialpost:${network}:${id}`;
-}
-
-export const makeInjestLastKey = (network:string) => {
-    return `meta_socialpost:${network}:lastid`;
-}
 
 
 
@@ -27,39 +21,27 @@ export  const classifyStatuses = async (
     kv: KVNamespace,
     network: string,
 ) => {
+    const dataApi = new StatusDataApi(network,kv);
 
-
-    const _sources : Classification_Source[] = statuses.map(
-        (status:Status) => {
+    const sources : Classification_Source[] = statuses.map(
+        ({id,content}:Status) => {
             return {
-                id: status.id.toString(),
-                text: status.content,
+                id,
+                text:content,
                 sourcetype: network,
             }
         }
     );
-    const sources : Classification_Source[] = [
-        {
-            id: 'gmhtml',
-            text: '<p>Good Morning</p>',
-            sourcetype: network,
-        },
-        {
-            id: 'gmnohtml',
-            text: 'Good Morning',
-            sourcetype: network,
+
+    const results = classifySources(sources,CLASSIFICATIONS);
+
+    //loop through results
+    Object.keys(results).forEach(
+        (async (sourceid:string) => {
+            const matches : string[] =  results[sourceid];
+
         }
-    ];
-
-
-    const results = classifySources(sources,classifications);
-    return results;
-    return results.map((match:Classification_Match) => {
-        return {
-            source: match.source.text,
-            classifications,
-        };
-    });
+    ));
 }
 
 export async function saveStatuses({
@@ -67,104 +49,24 @@ export async function saveStatuses({
     instanceUrl,
     username,
     network,
-}: InjestArgs){
-    const {
-        getLastId,
-        storeLastId,
-        saveStatus,
-        setIsDone,
-        isDone,
-    } = saveStatusFunctions(network,kv);
-    let done = await isDone();
-    const lastId = await getLastId();
-    if( done ){
-        return {
-            lastId,
-            newLastId: lastId,
-            done,
-        }
-    }
-    const account = await getAccount(instanceUrl,username);
-    const statuses = await getStatuses(instanceUrl,account.id,lastId ? parseInt(lastId,10) : undefined);
-    // @ts-ignore
-    const newLastId = statuses[statuses.length - 1].id.toString() as string;
-    statuses.map(
-        async (status:Status) => {
-            await saveStatus(status);
-        }
-    )
-    if( newLastId && newLastId !== lastId ){
-        await storeLastId(newLastId);
-
-    }else{
-        //mark done
-        await setIsDone();
-        done = true;
-
-    }
-    return {
-        lastId,
-        newLastId,
-        done,
-    }
-}
-
-export class StatusDataApi {
-    network: string;
-    kv: KVNamespace;
-    constructor(network:string,kv:KVNamespace ){
-        this.network = network;
-        this.kv = kv;
-    }
-    async getSavedSatuses(cursor?:string): Promise<{
-        statuses: Status[];
-        complete: boolean;
-        cursor: string|false;
-    }>{
-        const keys = await this.kv.list({
-            prefix: makeSocialPostKey(this.network,''),
-            limit: 100,
-            cursor,
-        });
-        const statuses = await Promise.all(
-            keys.keys.map(
-                async (key:{name:string}) => {
-                    const data = await this.kv.get(key.name);
-                    //@ts-ignore
-                    return JSON.parse(data);
-                }
-            ));
-
-
-            return  {
-                complete: keys.list_complete,
-                cursor: keys.list_complete ? false : keys.cursor,
-                statuses,
-            };
-    }
-    async saveStatus(status:  Status ){
-        await this.kv.put(
-            makeSocialPostKey(this.network,status.id),
-            JSON.stringify(status)
-        );
-    }
-
-}
-export const saveStatusFunctions = (network:string,kv:KVNamespace )  => {
+}: InjestArgs): Promise<{
+    lastId: string|false|null,
+    newLastId: string,
+    done: boolean,
+}>{
     const api = new StatusDataApi(network,kv);
 
-    const getLastId = async () : Promise<string|false> => {
+    const getLastId = async () : Promise<string|false|null> => {
         const lastId = await kv.get(makeInjestLastKey(network));
         if( 'done' === lastId ){
             return false;
         }
-        return lastId ? lastId : '0';
+        return lastId ? lastId : null;
     }
 
     const storeLastId = async (newValue: string) => {
         await kv.put(makeInjestLastKey(network),newValue);
     }
-
 
 
     const setIsDone = async () => {
@@ -175,11 +77,34 @@ export const saveStatusFunctions = (network:string,kv:KVNamespace )  => {
         const lastId = await getLastId();
         return 'done' === lastId;
     }
+    let done = await isDone();
+    const lastId = await getLastId();
+    if( done ){
+        return {
+            lastId,
+            newLastId: lastId ? lastId : '',
+            done,
+        }
+    }
+    const accountId = 425078;
+    const statuses = await getStatuses(instanceUrl,accountId,lastId ? lastId : undefined);
+
+    const newLastId = statuses[statuses.length - 1].id.toString() as string;
+    statuses.map(
+        async (status:Status) => {
+            await api.saveStatus(status);
+        }
+    )
+    if( newLastId && newLastId !== lastId ){
+        await storeLastId(newLastId);
+    }else{
+        //mark done
+        await setIsDone();
+        done = true;
+    }
     return {
-        getLastId,
-        storeLastId,
-        saveStatus: api.saveStatus,
-        setIsDone,
-        isDone,
+        lastId,
+        newLastId,
+        done,
     }
 }

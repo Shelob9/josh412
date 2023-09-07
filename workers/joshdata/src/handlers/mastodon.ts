@@ -1,7 +1,8 @@
-import { classifyStatuses, saveStatuses, StatusDataApi } from "../injest";
+import { classifyStatuses, saveStatuses } from "../injest";
 import { jsonReponse } from "../responseFactory";
 import { createHandler, handlerInputArgs } from "./createHandler";
 import { Env } from "../env";
+import { StatusDataApi } from "../dataApi";
 const network = 'mastodon';
 
 
@@ -27,6 +28,7 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
         const instanceUrl = "https://mastodon.social";
         const username = "@josh412";
         const accountId = 425078;
+
         const stage = url.searchParams.has('classify') ? 'classify': 'save';
 
         switch (stage) {

@@ -41,9 +41,6 @@ export type Classification_Matches = {
   //value is array of classification ids
   [key:string]:string[]
 }
-
-
-
 export function classifySources(sources: Classification_Source[], classifications: Classification[]): Classification_Matches {
   const matches: Classification_Matches = {};
 

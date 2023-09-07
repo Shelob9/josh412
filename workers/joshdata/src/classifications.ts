@@ -1,9 +1,9 @@
 import { SearchWhere } from "./classify";
 
 export type Classificatuon_Search = {
-        search: string | string[];
-        where: SearchWhere;
-        all: boolean;
+    search: string | string[];
+    where: SearchWhere;
+    all: boolean;
 }
 export type Classification = {
 	// search(es) to run.
@@ -26,11 +26,11 @@ export const createClassification = (searches: string[], all: boolean, id: strin
         all,
         id,
     }
-  }
-  //one constant for each ID
-  export const CLASSIFICATION_GM_ID = 'gm';
-    export const CLASSIFICATION_GN_ID = 'gn';
-    export const CLASSIFICATION_DOG_ID = 'dog';
+}
+//one constant for each ID
+export const CLASSIFICATION_GM_ID = 'gm';
+export const CLASSIFICATION_GN_ID = 'gn';
+export const CLASSIFICATION_DOG_ID = 'dog';
 
 export const CLASSIFICATION_IDS = {
     CLASSIFICATION_GM_ID: 'gm',

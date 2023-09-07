@@ -8,9 +8,8 @@ import { Status } from "./types/mastodon";
 export function getStatuses(
     instanceUrl: string,
     accountId:number,
-    maxId?:number,
+    maxId?:string,
 ): Promise<Status[]>{
-
     const statuses = fetch(`${instanceUrl}/api/v1/accounts/${accountId}/statuses?limit=40${maxId ? `&max_id=${maxId}` : ''}`).then(res => res.json())
         .catch(err => {
             console.error(err);

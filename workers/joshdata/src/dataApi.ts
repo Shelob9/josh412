@@ -1,104 +1,167 @@
+import { Status } from "./social/types/mastodon";
 
-type SourceType = string;
-
-// make a unique ID
-function generateUid(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
+export const makeSourceType = (network:string) => {
+    return `socialpost:${network}`;
+}
+export const makeSocialPostKey = (network:string, id: string) => {
+    return `${makeSourceType(network)}:${id}`;
 }
 
-// make key for kv
-const makeKey = (sourceType: SourceType, uid? : string) => {
-    uid = uid ?? generateUid();
-    return `${sourceType}:${uid}`;
+export const makeInjestLastKey = (network:string) => {
+    return `meta_socialpost:injest:${network}:lastid`;
 }
-//NOT USED
-export async function dataApi(
-    kv: KVNamespace
-) {
 
-    // store one item in KV
-    async function storeItemInKV(sourceType: SourceType, data: any, key?: string) {
-        if( ! key ){
-            key = makeKey(sourceType);
+export type SavedStatusMetaData ={
+    itemtype: string;
+    itemid: string;
+    classificationids?: string[];
+};
+
+export type SavedClassification = {
+    id: string;
+    itemids: string[];
+}
+
+export class StatusDataApi {
+    network: string;
+    kv: KVNamespace;
+    constructor(network:string,kv:KVNamespace ){
+        this.network = network;
+        this.kv = kv;
+    }
+    async getSavedStatus (id: string): Promise<{
+        status: Status|null;
+        classificationids: string[];
+    }> {
+        const data = await this.kv.get(makeSocialPostKey(this.network,id));
+        if( !data ){
+            return {
+                status: null,
+                classificationids: [],
+            };
         }
-        await kv.put(key, JSON.stringify(data));
-        return key;
-    }
 
 
-
-    //Store classification for item
-    async function storeItemClassification(classificationKey: string, itemKey: string): Promise<string[]> {
-        const saved = await kv.get(classificationKey);
-        const classification : string[] = saved ? JSON.parse(saved) : [];
-        if( ! classification.includes(itemKey) ){
-            classification.push(itemKey);
-            await kv.put(classificationKey, JSON.stringify(classification));
+        return {
+            classificationids: [],
+            //@ts-ignore
+            status: this.prepareStatus(
+               JSON.parse(data)
+           ),
         }
-        return classification;
-    }
-
-    //Remove classification for item
-    async function removeItemClassification(classificationKey: string, itemKey: string): Promise<string[]> {
-        const saved = await kv.get(classificationKey);
-        const classification : string[] = saved ? JSON.parse(saved) : [];
-        if( classification.includes(itemKey) ){
-            classification.splice(classification.indexOf(itemKey),1);
-            await kv.put(classificationKey, JSON.stringify(classification));
-        }
-        return classification;
-    }
-
-    // get keys opf items with classification
-    async function getKeysOfItemsWithClassification(classificationKey: string): Promise<string[]> {
-        const keys = await kv.get(classificationKey);
-        return keys ? JSON.parse(keys) : [];
 
     }
-
-    //get all items with classification
-    async function getItemsWithClassification(classificationKey: string): Promise<any[]> {
-        const keys = await getKeysOfItemsWithClassification(classificationKey);
-        const items = await Promise.all(
-            keys.map(
-                async (key: string) => {
-                    const data = await kv.get(key);
-                    if( data ){
-                        return JSON.parse(data);
+    async getSavedSatuses(cursor?:string): Promise<{
+        statuses: Status[];
+        complete: boolean;
+        cursor: string|false;
+    }>{
+        const keys = await this.kv.list({
+            prefix: makeSourceType(this.network),
+            limit: 1000,
+            cursor,
+        });
+        const statuses = await Promise.all(
+            keys.keys.map(
+                async (key:{name:string}) => {
+                    const data = await this.kv.get(key.name);
+                    if( !data ){
+                        return null;
                     }
-                    return null;
+                    //@ts-ignore
+                    return this.prepareStatus(
+                        JSON.parse(data)
+                    );
                 }
-            )
-            //remove nulls
-            .filter(item => item)
+            ));
+
+
+            return  {
+                complete: keys.list_complete,
+                cursor: keys.list_complete ? false : keys.cursor,
+                statuses: statuses.filter( (status:Status|null) => {
+                    return status !== null;
+                }) as Status[],
+            };
+    }
+
+    private prepareStatus(status: Status): Status {
+        return {
+            ...status,
+            // @ts-ignore
+            account: {
+                id: status.account.id,
+                username: status.account.username,
+                display_name: status.account.display_name,
+                avatar: status.account.avatar,
+                url: status.account.url,
+            },
+        };
+    }
+    async saveStatus(status:  Status, classificationids?:string[]){
+        const metadata: SavedStatusMetaData = {
+            itemtype: makeSourceType(this.network),
+            itemid: status.id,
+            classificationids
+        };
+        await this.kv.put(
+            makeSocialPostKey(this.network,status.id),
+            JSON.stringify(this.prepareStatus(status)),
+            {
+                metadata
+            }
+
         );
-        return items;
     }
 
 
+    private makeClassificationKey( classificationId:string){
+        return `classification:${classificationId}`;
+    }
 
-    async function storeItem(sourceType: SourceType,classificationKeys: string[], data: any, key?: string) {
-        const kvKey = await storeItemInKV(sourceType, data, key);
-
-        if( classificationKeys.length > 0 ){
-            await Promise.all(
-                classificationKeys.map(
-                    async (classificationKey: string) => {
-                        await storeItemClassification(classificationKey, kvKey);
-                    })
+    async getClassification(classificationId:string): Promise<SavedClassification> {
+        const exists = await this.kv.get(this.makeClassificationKey(classificationId));
+        let classification : SavedClassification;
+        if( !exists ){
+            classification = {
+                id: classificationId,
+                itemids: [],
+            };
+            await this.kv.put(
+                this.makeClassificationKey(classificationId),
+                JSON.stringify(classification),
             );
+        }else{
+            classification = JSON.parse(exists);
         }
-        return kvKey;
+        return classification;
 
     }
 
-    return {
-        storeItem,
-        getItemsWithClassification,
-        getKeysOfItemsWithClassification,
-        storeItemClassification,
+
+    private async saveClassification (classification: SavedClassification) {
+        await this.kv.put(
+            this.makeClassificationKey(classification.id),
+            JSON.stringify(classification),
+        );
     }
+
+    private async updateClassification(classificationid:string,statusId:string) {
+        const classification = await this.getClassification(classificationid);
+        classification.itemids.push(statusId);
+        await this.saveClassification(classification);
+    }
+
+    async saveClassifications (statusId:string, classifications: string[],parentid?:string) {
+        const status = await this.getSavedStatus(statusId);
+        if( status ){
+            throw new Error(`Status ${statusId} does not exist`);
+        }
+        classifications.forEach( async (classificationid:string) => {
+            await this.updateClassification(classificationid,statusId);
+        });
+        await this.saveStatus(status,classifications);
+
+    }
+
 }
