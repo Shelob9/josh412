@@ -1,4 +1,4 @@
-import { CLASSIFICATIONS, CLASSIFICATION_GM, CLASSIFICATION_GM_ID } from './classifications';
+import { CLASSIFICATIONS, CLASSIFICATION_GM, CLASSIFICATION_GM_ID, CLASSIFICATION_GN_ID } from './classifications';
 import {  Classification_Source, classifySources, searchString } from './classify';
 
 describe('searchString function', () => {
@@ -120,5 +120,32 @@ describe('classifySources', () => {
     expect(matches['gmhtml']).toEqual([CLASSIFICATION_GM_ID]);
   });
 
+  test( 'With all classifications', () => {
+    const matches = classifySources([
+      ...sources,
+      {
+        id: 'gnhtml',
+        text: '<p>gn</p>',
+        sourcetype: network,
+      },
+      //not matching
+      {
+        id: 'notmatch',
+        text: 'This is a test string',
+        sourcetype: network,
+      },
+      {
+        id: 'gnnohtml',
+        text: 'Good Night',
+        sourcetype: network,
+      }
+    ], CLASSIFICATIONS);
+    expect(Object.keys(matches).length).toBe(4);
+    expect(matches['gnhtml']).toEqual([CLASSIFICATION_GN_ID]);
+    expect(matches['gnnohtml']).toEqual([CLASSIFICATION_GN_ID]);
+    expect(matches['gmhtml']).toEqual([CLASSIFICATION_GM_ID]);
+    expect(matches['gmnohtml']).toEqual([CLASSIFICATION_GM_ID]);
+
+  } );
 
 });
