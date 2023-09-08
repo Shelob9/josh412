@@ -10,8 +10,11 @@ preview_id = "c00a0570cd4b4f0083936400ef3b77d0"
 
 [[d1_databases]]
 binding = "DB1"
-database_name = "josh412-dgb"
-database_id = "8c72c8d9-c20f-44d2-88e9-c65b787a6495"
+database_name = "josh412-02"
+database_id = "06b68e8f-0a21-42d6-9673-6dfffabfd1c0"
+migrations_table = "d1_migrations" # Customize this value to change your applied migrations table name
+migrations_dir = "migrations"
+
 
 [[r2_buckets]]
 binding = "DATABUCKET"

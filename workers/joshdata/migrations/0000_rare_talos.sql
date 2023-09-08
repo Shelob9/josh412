@@ -1,15 +1,13 @@
-DROP TABLE IF EXISTS `classifications`;
 CREATE TABLE `classifications` (
+	`id` integer PRIMARY KEY NOT NULL,
 	`slug` text NOT NULL,
 	`termid` text NOT NULL,
 	`itemid` text NOT NULL,
 	`subtype` text,
 	`created` integer NOT NULL,
-	`updated` integer NOT NULL,
-	PRIMARY KEY(`itemid`, `slug`, `termid`)
+	`updated` integer NOT NULL
 );
 --> statement-breakpoint
-DROP TABLE IF EXISTS `links`;
 CREATE TABLE `links` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`url` text NOT NULL,
@@ -17,7 +15,6 @@ CREATE TABLE `links` (
 	`sourceid` text
 );
 --> statement-breakpoint
-DROP TABLE IF EXISTS `media`;
 CREATE TABLE `media` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`url` text NOT NULL,
@@ -30,6 +27,8 @@ CREATE TABLE `media` (
 	`json` blob
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `classifications_unique_idx` ON `classifications` (`slug`,`termid`,`itemid`);--> statement-breakpoint
+CREATE INDEX `classifications_slug_idx` ON `classifications` (`slug`);--> statement-breakpoint
 CREATE INDEX `classifications_itemtype_idx` ON `classifications` (`termid`);--> statement-breakpoint
 CREATE INDEX `classifications_itemid_idx` ON `classifications` (`itemid`);--> statement-breakpoint
 CREATE INDEX `classifications_itemtype_itemid_idx` ON `classifications` (`termid`,`itemid`);--> statement-breakpoint

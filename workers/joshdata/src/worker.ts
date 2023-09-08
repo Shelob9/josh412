@@ -1,11 +1,12 @@
 import { DrizzleD1Database, drizzle } from 'drizzle-orm/d1';
-import { INSERT_CLASSIFICATION, INSERT_CLASSIFICATION_NO_TS, TABLE_classifications } from './db/schema';
+import { SAVED_CLASSIFICATION, INSERT_CLASSIFICATION, TABLE_classifications } from './db/schema';
 import {  getAccount, getStatus, getStatuses } from './social/mastodon';
 import { Status } from './social/types/mastodon'
 import { getToots, injestToots } from './handlers/mastodon';
 import { Router } from '@tsndr/cloudflare-worker-router'
 import { jsonReponse } from './responseFactory';
 import { Env } from './env';
+import { eq, sql } from 'drizzle-orm';
 // Initialize router
 const router = new Router<Env>()
 
@@ -26,30 +27,28 @@ router.get('/api/hi', async ({ req }: {req: Request}) => {
 });
 router.get('/api/test', async ({ env }: {env: Env}) => {
 	const db = await drizzle(env.DB1);
-	// type that is INSERT_CLASSIFICATION without created and updated
-	const insert = async (
-		classification: INSERT_CLASSIFICATION_NO_TS
-	) => {
-		const now = new Date;
 
-		return db.insert(TABLE_classifications).values({
-			...classification,
-			created: now,
-			updated: now,
-		}).run();
-	  }
+	try {
+		const one = await db.select().from(TABLE_classifications)
+			.where(eq(TABLE_classifications.slug, 'test')
+		).limit(1);
 
-	await insert({
-		slug: 'test',
-		itemtype: 'test',
-		itemid: 'test',
-
-	});
-	const all = await db.select().from(TABLE_classifications).all();
+		const results = await db.select().from(TABLE_classifications).all();
+	//const all = await db.select().from(TABLE_classifications).all();
 	return jsonReponse({
 		hi: 'Roy',
-		all,
-	},420);
+		//result,
+		results,
+		one
+	},200);
+	} catch (error) {
+		return jsonReponse({
+			// @ts-ignore
+			e: error.message,
+		},400);
+	}
+
+
 });
 router.get('/api/' , async ({ req }: {req: Request}) => {
 	return jsonReponse({

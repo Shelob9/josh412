@@ -1,4 +1,7 @@
+import { DrizzleD1Database } from "drizzle-orm/d1";
 import { Status } from "./social/types/mastodon";
+import { INSERT_CLASSIFICATION, SAVED_CLASSIFICATION, TABLE_classifications } from "./db/schema";
+import { eq } from "drizzle-orm";
 
 export const makeSourceType = (network:string) => {
     return `socialpost:${network}`;
@@ -14,36 +17,33 @@ export const makeInjestLastKey = (network:string) => {
 export type SavedStatusMetaData ={
     itemtype: string;
     itemid: string;
-    classificationids?: string[];
 };
 
-export type SavedClassification = {
-    id: string;
-    itemids: string[];
-}
 
 export class StatusDataApi {
     network: string;
     kv: KVNamespace;
-    constructor(network:string,kv:KVNamespace ){
+    d1: DrizzleD1Database;
+    constructor(network:string,kv:KVNamespace,d1: DrizzleD1Database ){
         this.network = network;
         this.kv = kv;
+        this.d1 = d1;
     }
     async getSavedStatus (id: string): Promise<{
         status: Status|null;
-        classificationids: string[];
+        //classifications: string[];
     }> {
         const data = await this.kv.get(makeSocialPostKey(this.network,id));
         if( !data ){
             return {
                 status: null,
-                classificationids: [],
+                //classifications: [],
             };
         }
 
 
         return {
-            classificationids: [],
+            //classifications: [],
             //@ts-ignore
             status: this.prepareStatus(
                JSON.parse(data)
@@ -102,7 +102,6 @@ export class StatusDataApi {
         const metadata: SavedStatusMetaData = {
             itemtype: makeSourceType(this.network),
             itemid: status.id,
-            classificationids
         };
         await this.kv.put(
             makeSocialPostKey(this.network,status.id),
@@ -112,55 +111,65 @@ export class StatusDataApi {
             }
 
         );
-    }
-
-
-    private makeClassificationKey( classificationId:string){
-        return `classification:${classificationId}`;
-    }
-
-    async getClassification(classificationId:string): Promise<SavedClassification> {
-        const exists = await this.kv.get(this.makeClassificationKey(classificationId));
-        let classification : SavedClassification;
-        if( !exists ){
-            classification = {
-                id: classificationId,
-                itemids: [],
-            };
-            await this.kv.put(
-                this.makeClassificationKey(classificationId),
-                JSON.stringify(classification),
-            );
-        }else{
-            classification = JSON.parse(exists);
+        if( classificationids ){
+            await this.saveClassifications(status.id,classificationids);
         }
-        return classification;
 
     }
 
 
-    private async saveClassification (classification: SavedClassification) {
-        await this.kv.put(
-            this.makeClassificationKey(classification.id),
-            JSON.stringify(classification),
-        );
-    }
+    //Functions for classifications, which are stored in d1
 
-    private async updateClassification(classificationid:string,statusId:string) {
-        const classification = await this.getClassification(classificationid);
-        classification.itemids.push(statusId);
-        await this.saveClassification(classification);
-    }
-
-    async saveClassifications (statusId:string, classifications: string[],parentid?:string) {
-        const status = await this.getSavedStatus(statusId);
-        if( status ){
-            throw new Error(`Status ${statusId} does not exist`);
-        }
-        classifications.forEach( async (classificationid:string) => {
-            await this.updateClassification(classificationid,statusId);
+    async createClassification(classification:INSERT_CLASSIFICATION): Promise<void> {
+        const now = new Date;
+        await this.d1.insert(TABLE_classifications).values({
+            ...classification,
+            created: now,
+            updated: now,
         });
-        await this.saveStatus(status,classifications);
+    }
+
+    async getOrCreateClassification(classification:INSERT_CLASSIFICATION): Promise<SAVED_CLASSIFICATION> {
+        const existing = await this.d1.select().from(TABLE_classifications).where(
+            eq(TABLE_classifications.slug,classification.slug)
+        ).limit(1);
+        if( existing.length > 0 ){
+            return existing[0];
+        }
+        await this.createClassification(classification);
+        return await this.getOrCreateClassification(classification);
+    }
+
+
+
+
+
+
+    /**
+     *
+     * @param statusId ID of status to save for
+     * @param classifications Array of classification slugs to save
+     * @param subtype Optional. Use for subtype of classification if passed
+     */
+    async saveClassifications (statusId:string, classifications: string[],subtype?:string) {
+        const {
+            status: savedStatus,
+            //classifications: savedClassifications,
+         } = await this.getSavedStatus(statusId);
+        if( ! savedStatus ){
+            throw new Error(`Status not found: ${statusId}`);
+        }
+        classifications.map(
+            async (slug:string) => {
+                const classification = await this.getOrCreateClassification({
+                    slug,
+                    subtype,
+                    itemid: statusId,
+                    itemtype: makeSourceType(this.network),
+                });
+                return classification.id;
+            }
+        );
 
     }
 

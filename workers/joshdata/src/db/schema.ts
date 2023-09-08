@@ -3,6 +3,8 @@ import { sqliteTable, integer,index, text,blob, primaryKey, uniqueIndex } from '
 
 // classifications by taxonomy and tag
 export const TABLE_classifications = sqliteTable('classifications', {
+    //primary key
+    id: integer('id').notNull().primaryKey(),
   //The classification's unique ID, which is defined in code
     slug: text( 'slug' ).notNull(),
     //What content type is this classification for?
@@ -18,11 +20,12 @@ export const TABLE_classifications = sqliteTable('classifications', {
     updated: integer('updated', { mode:'timestamp_ms'  }).notNull(),
 }, (table) => {
   return {
-    pk: primaryKey(
-			table.slug,
-			table.itemtype,
-			table.itemid,
-		),
+    unique: uniqueIndex("classifications_unique_idx").on(
+      table.slug,
+      table.itemtype,
+      table.itemid,
+    ),
+    slug: index("classifications_slug_idx").on(table.slug),
     itemtype: index("classifications_itemtype_idx").on(table.itemtype),
     itemid: index("classifications_itemid_idx").on(table.itemid),
     itemtype_itemid: index( 'classifications_itemtype_itemid_idx' ).on(
@@ -42,8 +45,8 @@ export const TABLE_classifications = sqliteTable('classifications', {
 });
 
 export type SELECT_CLASSIFICATIONS = typeof TABLE_classifications.$inferSelect;
-export type INSERT_CLASSIFICATION = typeof TABLE_classifications.$inferInsert;
-export type INSERT_CLASSIFICATION_NO_TS = Omit<INSERT_CLASSIFICATION, 'created' | 'updated'>;
+export type SAVED_CLASSIFICATION = typeof TABLE_classifications.$inferInsert;
+export type INSERT_CLASSIFICATION = Omit<SAVED_CLASSIFICATION, 'created' | 'updated'>;
 
 
 // links to external urls
