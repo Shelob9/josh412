@@ -1,20 +1,20 @@
 import { SearchWhere } from "./classify";
 
-export type Classificatuon_Search = {
+export type Classifier_Search_Params = {
     search: string | string[];
     where: SearchWhere;
     all: boolean;
 }
-export type Classification = {
+export type Classifier_Params = {
 	// search(es) to run.
-    searches: Classificatuon_Search[];
+    searches: Classifier_Search_Params[];
 	// If all searches, or just one must match
 	all: boolean;
 	// classification id
 	id: string;
 };
 
-export const createClassification = (searches: string[], all: boolean, id: string): Classification => {
+export const createClassifier = (searches: string[], all: boolean, id: string): Classifier_Params => {
     return {
         searches: searches.map(search => {
             return {
@@ -38,7 +38,7 @@ export const CLASSIFICATION_IDS = {
     CLASSIFICATION_DOG_ID:'dog',
 
 }
-export const CLASSIFICATION_GM = createClassification([
+export const CLASSIFICATION_GM = createClassifier([
     'good morning',
     'Good Morning',
     'Good morning',
@@ -46,9 +46,9 @@ export const CLASSIFICATION_GM = createClassification([
     'gm',
     'GM',
 ],false,CLASSIFICATION_GM_ID);
-export const CLASSIFICATIONS : Classification[] = [
+export const CLASSIFICATIONS : Classifier_Params[] = [
     CLASSIFICATION_GM,
-    createClassification([
+    createClassifier([
         'Good Night',
         'good night',
         'Good night',
@@ -56,7 +56,7 @@ export const CLASSIFICATIONS : Classification[] = [
         'gn',
         'GN',
     ],false,CLASSIFICATION_GN_ID),
-    createClassification([
+    createClassifier([
         'dog',
         'Dog',
         'dogs',

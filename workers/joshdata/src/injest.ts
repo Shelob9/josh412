@@ -1,4 +1,4 @@
-import { CLASSIFICATIONS,Classification } from "./classifications";
+import { CLASSIFICATIONS,Classifier_Params } from "./classifications";
 import {  Classification_Source,Classification_Matches, classifySources } from "./classify";
 import { StatusDataApi, makeInjestLastKey } from "./dataApi";
 import { getAccount, getStatuses } from "./social/mastodon";

@@ -1,4 +1,4 @@
-import { Classification, Classificatuon_Search } from "./classifications";
+import { Classifier_Params, Classifier_Search_Params } from "./classifications";
 
 export type SearchWhere = 'starts' | 'ends' | 'contains' | 'exact';
 
@@ -41,7 +41,7 @@ export type Classification_Matches = {
   //value is array of classification ids
   [key:string]:string[]
 }
-export function classifySources(sources: Classification_Source[], classifications: Classification[]): Classification_Matches {
+export function classifySources(sources: Classification_Source[], classifications: Classifier_Params[]): Classification_Matches {
   const matches: Classification_Matches = {};
 
   // iterate over each source
@@ -51,7 +51,7 @@ export function classifySources(sources: Classification_Source[], classification
     // iterate over each classification
     classifications.forEach(classification => {
       // check if all searches match the source text
-      const allSearchesMatch = classification.searches.every((search:Classificatuon_Search) => {
+      const allSearchesMatch = classification.searches.every((search:Classifier_Search_Params) => {
         return searchString(source.text, search.search, search.where, search.all);
       });
 
