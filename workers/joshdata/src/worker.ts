@@ -1,5 +1,5 @@
 import { DrizzleD1Database, drizzle } from 'drizzle-orm/d1';
-import { INSERT_CLASSIFICATION, classifications } from './db/schema';
+import { INSERT_CLASSIFICATION, INSERT_CLASSIFICATION_NO_TS, TABLE_classifications } from './db/schema';
 import {  getAccount, getStatus, getStatuses } from './social/mastodon';
 import { Status } from './social/types/mastodon'
 import { getToots, injestToots } from './handlers/mastodon';
@@ -24,6 +24,33 @@ router.get('/api/hi', async ({ req }: {req: Request}) => {
 		hi: 'Roy',
 	},420);
 });
+router.get('/api/test', async ({ env }: {env: Env}) => {
+	const db = await drizzle(env.DB1);
+	// type that is INSERT_CLASSIFICATION without created and updated
+	const insert = async (
+		classification: INSERT_CLASSIFICATION_NO_TS
+	) => {
+		const now = new Date;
+
+		return db.insert(TABLE_classifications).values({
+			...classification,
+			created: now,
+			updated: now,
+		}).run();
+	  }
+
+	await insert({
+		slug: 'test',
+		itemtype: 'test',
+		itemid: 'test',
+
+	});
+	const all = await db.select().from(TABLE_classifications).all();
+	return jsonReponse({
+		hi: 'Roy',
+		all,
+	},420);
+});
 router.get('/api/' , async ({ req }: {req: Request}) => {
 	return jsonReponse({
 		routes: {
@@ -33,6 +60,10 @@ router.get('/api/' , async ({ req }: {req: Request}) => {
 			'/api/mastodon/injest': 'injest toots',
 		}
 	},200);
+});
+//redirect root to /api
+router.get('/', async ({ req }: {req: Request}) => {
+	return Response.redirect('/api/', 301);
 });
 
 export default {

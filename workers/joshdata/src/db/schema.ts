@@ -1,80 +1,53 @@
 import { sqliteTable, integer,index, text,blob, primaryKey, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
-/**
- * Custom column type for big integer columns
- * @see https://orm.drizzle.team/docs/column-types/sqlite#bigint
- * @param column Column name
- * @returns
- */
-const bigInt = (column: string) =>  blob(column, { mode: 'bigint' });
-/**
- * Custom column type for boolean columns
- * @see https://orm.drizzle.team/docs/column-types/sqlite#boolean
- * @param column Column name
- * @returns
- */
-const boolean = (column: string) => integer(column, { mode: 'boolean' });
-// classifications by taxonomy and tag
-export const classifications = sqliteTable('classifications', {
-    txid: blob('txid', { mode: 'bigint' }).notNull(),
-    termid: integer('termid').notNull(),
-	  source: text('source').notNull(),
-	  sourceid: text('sourceid')
-      .notNull(),
 
+// classifications by taxonomy and tag
+export const TABLE_classifications = sqliteTable('classifications', {
+  //The classification's unique ID, which is defined in code
+    slug: text( 'slug' ).notNull(),
+    //What content type is this classification for?
+    itemtype: text('termid').notNull(),
+    //What is unique ID of the content item?
+    itemid: text('itemid').notNull(),
+    //OPtional, subtype of the item
+    subtype: text('subtype'),
+    // created at in ms
+    // https://github.com/drizzle-team/drizzle-orm/blob/main/drizzle-orm/src/sqlite-core/README.md#column-types
+    created: integer('created', { mode:'timestamp_ms'  }).notNull(),
+   // updated at in ms
+    updated: integer('updated', { mode:'timestamp_ms'  }).notNull(),
 }, (table) => {
   return {
     pk: primaryKey(
-			table.txid,
-			table.termid,
-			table.source,
-			table.sourceid,
+			table.slug,
+			table.itemtype,
+			table.itemid,
 		),
+    itemtype: index("classifications_itemtype_idx").on(table.itemtype),
+    itemid: index("classifications_itemid_idx").on(table.itemid),
+    itemtype_itemid: index( 'classifications_itemtype_itemid_idx' ).on(
+      table.itemtype,
+      table.itemid
+    ),
+    itemtype_subtype: index( 'classifications_itemtype_subtype_idx' ).on(
+      table.itemtype,
+      table.subtype
+    ),
+    itemtype_subtype_itemid: index( 'classifications_itemtype_subtype_itemid_idx' ).on(
+      table.itemtype,
+      table.subtype,
+      table.itemid
+    ),
   };
 });
 
-export type SELECT_CLASSIFICATIONS = typeof classifications.$inferSelect;
-export type INSERT_CLASSIFICATION = typeof classifications.$inferInsert;
+export type SELECT_CLASSIFICATIONS = typeof TABLE_classifications.$inferSelect;
+export type INSERT_CLASSIFICATION = typeof TABLE_classifications.$inferInsert;
+export type INSERT_CLASSIFICATION_NO_TS = Omit<INSERT_CLASSIFICATION, 'created' | 'updated'>;
 
-// taxonomies
-export const taxonomies = sqliteTable('taxonomies', {
-  txid: blob('txid', { mode: 'bigint' }).primaryKey(),
-  slug: text('slug'),
-  label: text('label'),
-  private: boolean('private')
-}, (table) => {
-  return {
-    slugIndex: uniqueIndex('slug_idx').on(table.slug),
-    labelIndex: uniqueIndex('label_idx').on(table.label),
-  }
-});
-// Type for select queries
-export type SelectTaxonomy = typeof taxonomies.$inferSelect;
-
-// Type for insert queries
-export type NewTaxonomy = typeof taxonomies.$inferInsert;
-
-// taxonomy terms
-export const terms = sqliteTable('terms', {
-  termid: blob('termid', { mode: 'bigint' }).primaryKey(),
-  slug: text('slug'),
-  label: text('label'),
-  private: blob('private', { mode: 'bigint' }),//boolean('private')
-}, (table) => {
-  return {
-    slugIndex: uniqueIndex('terms_slug_idx').on(table.slug),
-    labelIndex: uniqueIndex('terms_label_idx').on(table.label),
-  }
-});
-
-// Type for select queries
-export type Term = typeof terms.$inferSelect;
-
-// Type for insert queries
-export type NewTerm = typeof terms.$inferInsert;
 
 // links to external urls
-export const links = sqliteTable('links', {
+export const TABLE_links = sqliteTable('links', {
     id: integer('id').notNull().primaryKey(),
 	  url: text('url').notNull(),
 	  source: text('source'),
@@ -89,11 +62,11 @@ export const links = sqliteTable('links', {
   };
 });
 
-export type SELECT_LINKS = typeof links.$inferSelect;
-export type INSERT_LINK = typeof links.$inferInsert;
+export type SELECT_LINKS = typeof TABLE_links.$inferSelect;
+export type INSERT_LINK = typeof TABLE_links.$inferInsert;
 
-// images
-export const images = sqliteTable('images', {
+// media
+export const TABLE_media = sqliteTable('media', {
     id: integer('id').notNull().primaryKey(),
     url: text('url').notNull(),
 	  description: text('description'),
@@ -111,13 +84,13 @@ export const images = sqliteTable('images', {
 			}>()
 }, (table) => {
   return {
-    url: index("images_url_idx").on(table.url),
-		source: index("images_source_idx").on(
+    url: index("media_url_idx").on(table.url),
+		source: index("media_source_idx").on(
 			table.source,
 			table.sourceid
 		),
   };
 });
 
-export type SELECT_IMAGES = typeof images.$inferSelect;
-export type INSERT_IMAGE = typeof images.$inferInsert;
+export type SELECT_IMAGES = typeof TABLE_media.$inferSelect;
+export type INSERT_IMAGE = typeof TABLE_media.$inferInsert;
