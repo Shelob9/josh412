@@ -1,4 +1,4 @@
-import { CLASSIFICATIONS,Classifier_Params } from "./classifications";
+import { CLASSIFIERS,Classifier_Params } from "./classifications";
 import {  Classification_Source,Classification_Matches, classifySources } from "./classify";
 import { StatusDataApi, makeInjestLastKey } from "./dataApi";
 import { getAccount, getStatuses } from "./social/mastodon";
@@ -33,7 +33,7 @@ export  const classifyStatuses = async (
         }
     );
 
-    const results = classifySources(sources,CLASSIFICATIONS);
+    const results = classifySources(sources,CLASSIFIERS);
 
     //loop through results
     Object.keys(results).forEach(

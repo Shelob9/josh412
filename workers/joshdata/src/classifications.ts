@@ -28,26 +28,26 @@ export const createClassifier = (searches: string[], all: boolean, id: string): 
     }
 }
 //one constant for each ID
-export const CLASSIFICATION_GM_ID = 'gm';
-export const CLASSIFICATION_GN_ID = 'gn';
-export const CLASSIFICATION_DOG_ID = 'dog';
+export const CLASSIFIER_GM_ID = 'gm';
+export const CLASSIFIER_GN_ID = 'gn';
+export const CLASSIFIER_DOG_ID = 'dog';
 
 export const CLASSIFICATION_IDS = {
-    CLASSIFICATION_GM_ID: 'gm',
-    CLASSIFICATION_GN_ID: 'gn',
-    CLASSIFICATION_DOG_ID:'dog',
+    CLASSIFIER_GM_ID: 'gm',
+    CLASSIFIER_GN_ID: 'gn',
+    CLASSIFIER_DOG_ID:'dog',
 
 }
-export const CLASSIFICATION_GM = createClassifier([
+export const CLASSIFIER_GM = createClassifier([
     'good morning',
     'Good Morning',
     'Good morning',
     'good Morning',
     'gm',
     'GM',
-],false,CLASSIFICATION_GM_ID);
-export const CLASSIFICATIONS : Classifier_Params[] = [
-    CLASSIFICATION_GM,
+],false,CLASSIFIER_GM_ID);
+export const CLASSIFIERS : Classifier_Params[] = [
+    CLASSIFIER_GM,
     createClassifier([
         'Good Night',
         'good night',
@@ -55,12 +55,12 @@ export const CLASSIFICATIONS : Classifier_Params[] = [
         'good Night',
         'gn',
         'GN',
-    ],false,CLASSIFICATION_GN_ID),
+    ],false,CLASSIFIER_GN_ID),
     createClassifier([
         'dog',
         'Dog',
         'dogs',
         'Dogs',
-    ],false,CLASSIFICATION_DOG_ID),
+    ],false,CLASSIFIER_DOG_ID),
 
 ];

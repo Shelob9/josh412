@@ -1,4 +1,4 @@
-import { CLASSIFICATIONS, CLASSIFICATION_GM, CLASSIFICATION_GM_ID, CLASSIFICATION_GN_ID } from './classifications';
+import { CLASSIFIERS, CLASSIFIER_GM, CLASSIFIER_GM_ID, CLASSIFIER_GN_ID } from './classifications';
 import {  Classification_Source, classifySources, searchString } from './classify';
 
 describe('searchString function', () => {
@@ -94,11 +94,11 @@ describe('classifySources', () => {
   //it finds both good morning sources
   test('CLASSIFICATION_GM match two', () => {
     const matches = classifySources(sources, [
-      CLASSIFICATION_GM,
+      CLASSIFIER_GM,
     ]);
     expect(Object.keys(matches).length).toBe(2);
-    expect(matches['gmhtml']).toEqual([CLASSIFICATION_GM_ID]);
-    expect(matches['gmnohtml']).toEqual([CLASSIFICATION_GM_ID]);
+    expect(matches['gmhtml']).toEqual([CLASSIFIER_GM_ID]);
+    expect(matches['gmnohtml']).toEqual([CLASSIFIER_GM_ID]);
   });
 
   test( 'CLASSIFICATION_GM with gm', () => {
@@ -114,10 +114,10 @@ describe('classifySources', () => {
       sourcetype: network,
     },
     ], [
-      CLASSIFICATION_GM,
+      CLASSIFIER_GM,
     ]);
     expect(Object.keys(matches).length).toBe(1);
-    expect(matches['gmhtml']).toEqual([CLASSIFICATION_GM_ID]);
+    expect(matches['gmhtml']).toEqual([CLASSIFIER_GM_ID]);
   });
 
   test( 'With all classifications', () => {
@@ -139,12 +139,12 @@ describe('classifySources', () => {
         text: 'Good Night',
         sourcetype: network,
       }
-    ], CLASSIFICATIONS);
+    ], CLASSIFIERS);
     expect(Object.keys(matches).length).toBe(4);
-    expect(matches['gnhtml']).toEqual([CLASSIFICATION_GN_ID]);
-    expect(matches['gnnohtml']).toEqual([CLASSIFICATION_GN_ID]);
-    expect(matches['gmhtml']).toEqual([CLASSIFICATION_GM_ID]);
-    expect(matches['gmnohtml']).toEqual([CLASSIFICATION_GM_ID]);
+    expect(matches['gnhtml']).toEqual([CLASSIFIER_GN_ID]);
+    expect(matches['gnnohtml']).toEqual([CLASSIFIER_GN_ID]);
+    expect(matches['gmhtml']).toEqual([CLASSIFIER_GM_ID]);
+    expect(matches['gmnohtml']).toEqual([CLASSIFIER_GM_ID]);
 
   } );
 
