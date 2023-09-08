@@ -19,6 +19,19 @@ export type SavedStatusMetaData ={
     itemid: string;
 };
 
+export class DataService {
+    kv: KVNamespace;
+    d1: DrizzleD1Database;
+    constructor(kv:KVNamespace,d1: DrizzleD1Database ){
+        this.kv = kv;
+        this.d1 = d1;
+    }
+
+    async getStatusApi(network:string): Promise<StatusDataApi> {
+        return new StatusDataApi(network,this.kv,this.d1);
+    }
+
+}
 
 export class StatusDataApi {
     network: string;
