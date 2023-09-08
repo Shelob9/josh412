@@ -1,4 +1,4 @@
-import { CLASSIFIERS, CLASSIFIER_GM, CLASSIFIER_GM_ID, CLASSIFIER_GN_ID } from './classifications';
+import { CLASSIFIERS, CLASSIFIER_GM, CLASSIFIER_GM_ID, CLASSIFIER_GN_ID } from './classifiers';
 import {  Classification_Source, classifySources, searchString } from './classify';
 
 describe('searchString function', () => {

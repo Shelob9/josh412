@@ -1,4 +1,4 @@
-import { Classifier_Params, Classifier_Search_Params } from "./classifications";
+import { Classifier_Params, Classifier_Search_Params } from "./classifiers";
 
 export type SearchWhere = 'starts' | 'ends' | 'contains' | 'exact';
 
