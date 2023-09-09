@@ -64,14 +64,14 @@ export class StatusDataApi {
         }
 
     }
-    async getSavedSatuses(cursor?:string): Promise<{
+    async getSavedSatuses(cursor?:string, limit?: number): Promise<{
         statuses: Status[];
         complete: boolean;
         cursor: string|false;
     }>{
         const keys = await this.kv.list({
             prefix: makeSourceType(this.network),
-            limit: 1000,
+            limit: limit ? limit : 1000,
             cursor,
         });
         const statuses = await Promise.all(
