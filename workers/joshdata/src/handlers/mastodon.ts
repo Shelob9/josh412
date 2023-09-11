@@ -1,61 +1,70 @@
-import { classifyStatuses, saveStatuses } from "../injest";
-import { jsonReponse } from "../responseFactory";
 import { createHandler, handlerInputArgs } from "./createHandler";
 import { Env } from "../env";
-import { StatusDataApi } from "../dataApi";
+import { DataService, StatusDataApi } from "../dataApi";
+import { jsonReponse } from "../responseFactory";
+import { Classification_Source, classifySources } from "../classify";
+import { Status } from "../social/types/mastodon";
+import { CLASSIFIERS } from "../classifiers";
 const network = 'mastodon';
 
+const instanceUrl = "https://mastodon.social";
+const username = "@josh412";
+const accountId = 425078;
 
 
 export const getToots = async ({env,req}: handlerInputArgs): Promise<Response> => {
-
-    return createHandler(env,req,async (env: Env, url: URL, request: Request) => {
-        const {KV} = env;
+    return createHandler(env,req,async (data,url,req) => {
         const cursor = url.searchParams.get('cursor') ?? undefined;
-        const api = new StatusDataApi(network,KV);
-        const statuses = await api.getSavedSatuses(cursor);
+        const api = await data.getStatusApi(network);
+        const statuses = await api.getSavedSatuses(instanceUrl,cursor);
         return jsonReponse(statuses,200);
     });
-
 }
 
 
 
 export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response> => {
 
-    return createHandler(env,req,async (env: Env, url: URL, request: Request) => {
-        const kv = env.KV;
-        const instanceUrl = "https://mastodon.social";
-        const username = "@josh412";
-        const accountId = 425078;
+    return createHandler(env,req,async (data,url,req) =>  {
 
         const stage = url.searchParams.has('classify') ? 'classify': 'save';
-
+        const cursor = url.searchParams.get('cursor') ?? undefined;
         switch (stage) {
             case 'save':
                 const  {
                     lastId,
-                    newLastId,
                     done,
-                } = await saveStatuses({
-                    kv,
+                } = await data.injestSocialPosts({
+                    network,
                     instanceUrl,
-                    username,
-                    network
+                    accountId
                 });
                 return jsonReponse({
                     lastId,
-                    newLastId,
                     done,
                 },200);
                 break;
 
         default:
-            const api = new StatusDataApi(network,kv);
-            const {statuses} = await api.getSavedSatuses(undefined);
-            const results = classifyStatuses(statuses,kv,network);
+            const api = await data.getStatusApi(network);
+            const {statuses,cursor:sCursor,complete} = await api.getSavedSatuses(instanceUrl,cursor);
+            const sources : Classification_Source[] = statuses.map(
+                ({id,content}:Status) => {
+                    return {
+                        id,
+                        text:content,
+                        sourcetype: network,
+                    }
+                }
+            );
+
+            const {classifications} = classifySources(sources,CLASSIFIERS);
+                //@todo SAVE the classifications
             return jsonReponse({
-                results
+                cursor,
+                sCursor,
+                complete,
+                classifications
             },200);
             break;
             break;

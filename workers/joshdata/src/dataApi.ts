@@ -1,17 +1,35 @@
-import { DrizzleD1Database } from "drizzle-orm/d1";
+import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { Status } from "./social/types/mastodon";
 import { INSERT_CLASSIFICATION, SAVED_CLASSIFICATION, TABLE_classifications } from "./db/schema";
 import { eq } from "drizzle-orm";
+import { Env } from "./env";
+import { getStatuses } from "./social/mastodon";
 
-export const makeSourceType = (network:string) => {
-    return `socialpost:${network}`;
+type NETWORK_INSTANCE = {
+    network: string;
+    instanceUrl: string;
 }
-export const makeSocialPostKey = (network:string, id: string) => {
-    return `${makeSourceType(network)}:${id}`;
+type NETWORK_INSTANCE_ID = {
+    network: string;
+    instanceUrl: string;
+    id: string;
 }
 
-export const makeInjestLastKey = (network:string) => {
-    return `meta_socialpost:injest:${network}:lastid`;
+export const makeSourceType = ({
+    network,
+    instanceUrl,
+}: NETWORK_INSTANCE) => {
+    if( instanceUrl.startsWith('https://') ){
+        instanceUrl = instanceUrl.replace('https://', '' );
+    }
+    return `socialpost:${network}:${instanceUrl}`;
+}
+export const makeSocialPostKey = ({network,instanceUrl,id}:NETWORK_INSTANCE_ID) => {
+    return `${makeSourceType({network,instanceUrl})}:${id}`;
+}
+
+export const makeInjestLastKey = ({network,instanceUrl}:NETWORK_INSTANCE) => {
+    return `meta_socialpost:injest:${makeSourceType({network,instanceUrl})}:lastid`;
 }
 
 export type SavedStatusMetaData ={
@@ -22,16 +40,135 @@ export type SavedStatusMetaData ={
 export class DataService {
     kv: KVNamespace;
     d1: DrizzleD1Database;
-    constructor(kv:KVNamespace,d1: DrizzleD1Database ){
-        this.kv = kv;
-        this.d1 = d1;
+    constructor(env: Env ){
+        this.kv = env.KV
+        this.d1 = drizzle(env.DB1);
     }
 
     async getStatusApi(network:string): Promise<StatusDataApi> {
         return new StatusDataApi(network,this.kv,this.d1);
     }
 
+    async getSocialInjestTrack(network:string,instanceUrl:string): Promise<SocialInjestTrack> {
+        return new SocialInjestTrack(network,instanceUrl,this.kv);
+    }
+
+    async getSavedStatuses({
+        network,
+        instanceUrl,
+        cursor,
+    }:{
+        network:string,
+        instanceUrl: string,
+        cursor?:string
+    }): Promise<{
+        statuses: Status[];
+
+    }> {
+        const api = await this.getStatusApi(network);
+        const {statuses} = await api.getSavedSatuses(
+            instanceUrl,
+            cursor
+        );
+        return {
+            statuses,
+        };
+
+    }
+
+    async injestSocialPosts({
+        network,
+        instanceUrl,
+        accountId,
+        stopAfter,
+
+    }:
+    {
+        network:string,
+        instanceUrl:string,
+        accountId:number,
+        stopAfter?: number,
+
+    }): Promise<{
+        lastId: string|false|null;
+        done: boolean;
+    }> {
+        const api = await this.getStatusApi(network);
+        const track = await this.getSocialInjestTrack(network,instanceUrl);
+        let lastId = await track.getLastId();
+        let done = await track.isDone();
+        const statuses = await getStatuses(
+            instanceUrl,
+            accountId,
+            lastId ? lastId : undefined,
+        );
+        if( ! statuses ){
+            return {
+                lastId: null,
+                done: true,
+            };
+        }
+        for( const status of statuses ){
+            await api.saveStatus(status,{
+                instanceUrl,
+            });
+
+        }
+        if( statuses.length === 1 ){
+            await track.setIsDone();
+            return {
+                lastId: statuses[0].id,
+                done: true,
+            };
+        }
+        lastId = statuses[statuses.length-1].id;
+        await track.storeLastId(lastId);
+        done = await track.isDone();
+
+        return {
+            lastId,
+            done,
+        };
+    }
 }
+
+export class SocialInjestTrack {
+    network: string;
+    instanceUrl: string;
+    kv: KVNamespace;
+
+    static DONE_FLAG: string = 'done';
+    constructor(network:string,instanceUrl:string,kv:KVNamespace){
+        this.network = network;
+        this.instanceUrl = instanceUrl;
+        this.kv = kv;
+    }
+    async getLastId(): Promise<string|false|null> {
+        const lastId = await this.kv.get(makeInjestLastKey({network:this.network,instanceUrl:this.instanceUrl}));
+        if( SocialInjestTrack.DONE_FLAG === lastId ){
+            return false;
+        }
+        return lastId ? lastId : null;
+    }
+
+    async storeLastId(newValue: string) {
+        await this.kv.put(makeInjestLastKey({network:this.network,instanceUrl:this.instanceUrl}),newValue);
+    }
+
+    async setIsDone() {
+        await this.kv.put(
+            makeInjestLastKey({network:this.network,instanceUrl:this.instanceUrl}),
+            SocialInjestTrack.DONE_FLAG
+        );
+    }
+
+    async isDone() {
+        const lastId = await this.getLastId();
+        return SocialInjestTrack.DONE_FLAG === lastId;
+    }
+}
+
+
 
 export class StatusDataApi {
     network: string;
@@ -42,11 +179,18 @@ export class StatusDataApi {
         this.kv = kv;
         this.d1 = d1;
     }
-    async getSavedStatus (id: string): Promise<{
+    async getSavedStatus ({statusId,instanceUrl}: {
+        statusId: string;
+        instanceUrl:string;
+    }): Promise<{
         status: Status|null;
         //classifications: string[];
     }> {
-        const data = await this.kv.get(makeSocialPostKey(this.network,id));
+        const data = await this.kv.get(makeSocialPostKey({
+            network:this.network,
+            instanceUrl,
+            id:statusId,
+        }));
         if( !data ){
             return {
                 status: null,
@@ -64,14 +208,14 @@ export class StatusDataApi {
         }
 
     }
-    async getSavedSatuses(cursor?:string, limit?: number): Promise<{
+    async getSavedSatuses(instanceUrl:string,cursor?:string): Promise<{
         statuses: Status[];
         complete: boolean;
         cursor: string|false;
     }>{
         const keys = await this.kv.list({
-            prefix: makeSourceType(this.network),
-            limit: limit ? limit : 1000,
+            prefix: makeSourceType({network:this.network,instanceUrl:instanceUrl}),
+            limit: 1000,
             cursor,
         });
         const statuses = await Promise.all(
@@ -111,13 +255,25 @@ export class StatusDataApi {
             },
         };
     }
-    async saveStatus(status:  Status, classificationids?:string[]){
+    async saveStatus(status:  Status, {
+        instanceUrl,
+        classificationids,
+    }:{
+        instanceUrl:string,classificationids?:string[]
+    }){
         const metadata: SavedStatusMetaData = {
-            itemtype: makeSourceType(this.network),
+            itemtype: makeSourceType({
+                network:this.network,
+                instanceUrl,
+            }),
             itemid: status.id,
         };
         await this.kv.put(
-            makeSocialPostKey(this.network,status.id),
+            makeSocialPostKey({
+                network:this.network,
+                instanceUrl: status.account.url,
+                id: status.id,
+            }),
             JSON.stringify(this.prepareStatus(status)),
             {
                 metadata
@@ -125,7 +281,11 @@ export class StatusDataApi {
 
         );
         if( classificationids ){
-            await this.saveClassifications(status.id,classificationids);
+            await this.saveClassifications({
+                statusId:status.id,
+                classifications: classificationids,
+                instanceUrl
+            });
         }
 
     }
@@ -154,21 +314,22 @@ export class StatusDataApi {
     }
 
 
-
-
-
-
     /**
      *
      * @param statusId ID of status to save for
      * @param classifications Array of classification slugs to save
      * @param subtype Optional. Use for subtype of classification if passed
      */
-    async saveClassifications (statusId:string, classifications: string[],subtype?:string) {
+    async saveClassifications ({
+        statusId,
+        classifications,
+        subtype,
+        instanceUrl,
+    }:{statusId:string, classifications: string[],instanceUrl:string;subtype?:string}) {
         const {
             status: savedStatus,
             //classifications: savedClassifications,
-         } = await this.getSavedStatus(statusId);
+         } = await this.getSavedStatus({statusId,instanceUrl});
         if( ! savedStatus ){
             throw new Error(`Status not found: ${statusId}`);
         }
@@ -178,7 +339,10 @@ export class StatusDataApi {
                     slug,
                     subtype,
                     itemid: statusId,
-                    itemtype: makeSourceType(this.network),
+                    itemtype: makeSourceType({
+                        network: this.network,
+                        instanceUrl: savedStatus.account.url,
+                    }),
                 });
                 return classification.id;
             }
