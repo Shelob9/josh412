@@ -174,5 +174,29 @@ describe('classifySources', () => {
     });
   } );
 
+  test( 'With all classifications and gm', () => {
+    const sources = [
+      {
+          "id": "109",
+          "text": "<p>Good morning</p>",
+          "sourcetype": "mastodon"
+      },
+      {
+        "id": "209",
+        "text": "<p>I finished reading </p>",
+        "sourcetype": "mastodon"
+    }
+    ];
+    const matches = classifySources(sources, CLASSIFIERS);
+    expect(matches).toEqual({
+      "109": [
+        "gm"
+      ],
+      "209": [
+        "books",
+      ]
+    });
+  } );
+
 
 });

@@ -15,11 +15,12 @@ export type Classifier_Params = {
 };
 
 export const createClassifier = (searches: string[], all: boolean, id: string): Classifier_Params => {
+    const where = 'contains';
     return {
         searches: searches.map(search => {
             return {
                 search,
-                where: 'contains',
+                where,
                 all: false,
             }
         }),
@@ -34,6 +35,12 @@ export const CLASSIFIER_DOG_ID = 'dog';
 export const CLASSIFIER_WP_ID = 'code_wp';
 export const CLASSIFIER_JS_ID = 'code_js';
 export const CLASSIFIER_PHP_ID = 'code_php';
+//books
+export const CLASSIFIER_BOOKS_ID = 'books';
+//AI
+export const CLASSIFIER_AI_ID = 'ai';
+//environment
+export const CLASSIFIER_ENV_ID = 'env';
 
 export const CLASSIFICATION_IDS = {
     CLASSIFIER_GM_ID: CLASSIFIER_GM_ID,
@@ -42,6 +49,9 @@ export const CLASSIFICATION_IDS = {
     CLASSIFIER_WP_ID: CLASSIFIER_WP_ID,
     CLASSIFIER_JS_ID: CLASSIFIER_JS_ID,
     CLASSIFIER_PHP_ID: CLASSIFIER_PHP_ID,
+    CLASSIFIER_BOOKS_ID: CLASSIFIER_BOOKS_ID,
+    CLASSIFIER_AI_ID: CLASSIFIER_AI_ID,
+    CLASSIFIER_ENV_ID: CLASSIFIER_ENV_ID,
 }
 export const CLASSIFIER_GM = createClassifier([
     'good morning',
@@ -77,9 +87,16 @@ export const CLASSIFIER_PHP = createClassifier([
     'php',
     'PHP',
     'Laravel',
-    'Composer',
     'composer'
 ],false,CLASSIFIER_PHP_ID);
+export const CLASSIFIER_BOOKS = createClassifier([
+    'books',
+    'Books',
+    'Finished reading',
+    'finished reading',
+    'Book',
+    'book',
+], false, CLASSIFIER_BOOKS_ID);
 
 export const CLASSIFIERS : Classifier_Params[] = [
     CLASSIFIER_GM,
@@ -102,5 +119,23 @@ export const CLASSIFIERS : Classifier_Params[] = [
         'Macy',
         'macy',
     ],false,CLASSIFIER_DOG_ID),
+    CLASSIFIER_WP,
+    CLASSIFIER_JS,
+    CLASSIFIER_PHP,
+    CLASSIFIER_BOOKS,
+    createClassifier([
+        'AI',
+        'ai',
+        'OpenAI',
+        'GPT-3',
+        'GPT3',
+        'chat-gpt',
+        'Hugging Face',
+        'LLM',
+        'llm',
+        'Large Language Model',
+        'Copilot',
+        'copilot',
+    ],false,CLASSIFIER_AI_ID),
 
 ];
