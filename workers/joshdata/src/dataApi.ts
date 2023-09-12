@@ -31,7 +31,7 @@ export const makeSocialPostKey = ({network,instanceUrl,id,accountId}:{
     id: string;
     accountId: string;
 }) => {
-    return `${makeSourceType({network,instanceUrl})}:A_${accountId}${id}`;
+    return `${makeSourceType({network,instanceUrl})}:A_${accountId}:${id}`;
 }
 
 export const makeInjestLastKey = ({network,instanceUrl,accountId}:{
@@ -64,6 +64,8 @@ export class DataService {
     async getSocialInjestTrack(network:string,instanceUrl:string): Promise<SocialInjestTrack> {
         return new SocialInjestTrack(network,instanceUrl,this.kv);
     }
+
+
 
     async getSavedStatuses({
         network,
@@ -215,35 +217,35 @@ export class StatusDataApi {
         this.kv = kv;
         this.d1 = d1;
     }
-    async getSavedStatus ({statusId,instanceUrl,accountId}: {
-        statusId: string;
+    async  getSavedSatus({instanceUrl,accountId,statusId}:{
         instanceUrl:string;
         accountId:string;
+        statusId:string;
     }): Promise<{
         status: Status|null;
-        //classifications: string[];
-    }> {
-        const data = await this.kv.get(makeSocialPostKey({
+        key: string;
+    }>{
+        const key = makeSocialPostKey({
             network:this.network,
-            instanceUrl,
-            id:statusId,
+            instanceUrl: instanceUrl,
+            id: statusId,
             accountId,
-        }));
+        });
+        const data = await this.kv.get(key);
         if( !data ){
             return {
                 status: null,
-                //classifications: [],
-            };
+                key: key,
+            }
         }
-
-
         return {
-            //classifications: [],
             //@ts-ignore
             status: this.prepareStatus(
-               JSON.parse(data)
-           ),
+                JSON.parse(data)
+            ),
+            key: key,
         }
+
 
     }
     async getSavedSatuses(instanceUrl:string,cursor?:string): Promise<{

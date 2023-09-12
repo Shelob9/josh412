@@ -5,6 +5,7 @@ import { jsonReponse } from "../responseFactory";
 import { Classification_Source, classifySources } from "../classify";
 import { Status } from "../social/types/mastodon";
 import { CLASSIFIERS } from "../classifiers";
+import { json } from "drizzle-orm/mysql-core";
 const network = 'mastodon';
 
 const instanceUrl = "https://mastodon.social";
@@ -30,6 +31,31 @@ type ResponseStatus = {
     },
     reblog?:ResponseStatus
 };
+
+export const getStatus = async ({env,req}: handlerInputArgs): Promise<Response> => {
+    return createHandler(env,req,async (data,url,req) => {
+        //get last segment of url
+        const statusId = url.pathname.split('/').pop() as string;
+
+        if( ! statusId ) {
+            return jsonReponse({
+                error:'no id',
+            },400);
+        }
+        const api = await data.getStatusApi(network);
+        const {status,key} = await api.getSavedSatus({
+            instanceUrl,
+            statusId,
+            accountId: accountId.toString(),
+        });
+        return jsonReponse({
+            statusId,
+            status,
+            key,
+        },status ? 200 : 404);
+    });
+
+}
 
 export const deleteToots = async ({env,req}: handlerInputArgs): Promise<Response> => {
     return createHandler(env,req,async (data,url,req) => {
@@ -97,7 +123,7 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
                     network,
                     instanceUrl,
                     accountId,
-                    stopAfter:4
+                    stopAfter:1
                 });
                 return jsonReponse({
                     lastId,
@@ -119,14 +145,26 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
                 }
             );
 
-            const {classifications} = classifySources(sources,CLASSIFIERS);
-                //@todo SAVE the classifications
+                console.log({sources})
+            const classifications = classifySources(sources,CLASSIFIERS);
+            //loop through, update each status with classifications
+            Object.keys(classifications).forEach(async (statusId:string) => {
+                const classificationids = classifications[statusId];
+                await api.saveClassifications({
+                    statusId,
+                    classifications:classificationids,
+                    subtype:network,
+                    instanceUrl,
+                    accountId: accountId.toString(),
+                });
+            });
             return jsonReponse({
                 cursor,
                 sCursor,
                 complete,
                 classifications,
-                stage
+                stage,
+                //sources
             },200);
             break;
     }
