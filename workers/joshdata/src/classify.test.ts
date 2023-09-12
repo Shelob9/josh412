@@ -148,4 +148,31 @@ describe('classifySources', () => {
 
   } );
 
+  test( 'With all classifications and gm', () => {
+    const sources = [
+      {
+          "id": "109467285531018674",
+          "text": "<p>Good morning</p>",
+          "sourcetype": "mastodon"
+      },
+      {
+        "id": "209",
+        "text": "<p>Good morning tacos Good night spoons</p>",
+        "sourcetype": "mastodon"
+    }
+    ];
+    const matches = classifySources(sources, CLASSIFIERS);
+    expect(Object.keys(matches).length).toBe(2);
+    expect(matches).toEqual({
+      "109467285531018674": [
+        "gm"
+      ],
+      "209": [
+        "gm",
+        "gn"
+      ]
+    });
+  } );
+
+
 });
