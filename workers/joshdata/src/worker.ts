@@ -2,7 +2,7 @@ import { DrizzleD1Database, drizzle } from 'drizzle-orm/d1';
 import { SAVED_CLASSIFICATION, INSERT_CLASSIFICATION, TABLE_classifications } from './db/schema';
 import {  getAccount, getStatus, getStatuses } from './social/mastodon';
 import { Status } from './social/types/mastodon'
-import { getToots, injestToots } from './handlers/mastodon';
+import { deleteToots, getToots, injestToots } from './handlers/mastodon';
 import { Router } from '@tsndr/cloudflare-worker-router'
 import { jsonReponse } from './responseFactory';
 import { Env } from './env';
@@ -19,7 +19,7 @@ router.use(({ env, req }) => {
 })
 
 router.get('/api/mastodon' , getToots );
-
+router.get('/api/mastodon/d' , deleteToots );
 //?classify=1
 router.get('/api/mastodon/injest' , injestToots );
 router.get('/api/hi', async ({ req }: {req: Request}) => {

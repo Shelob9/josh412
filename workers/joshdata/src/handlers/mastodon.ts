@@ -30,6 +30,17 @@ type ResponseStatus = {
     },
     reblog?:ResponseStatus
 };
+
+export const deleteToots = async ({env,req}: handlerInputArgs): Promise<Response> => {
+    return createHandler(env,req,async (data,url,req) => {
+
+        const api = await data.getStatusApi(network);
+        await api.deleteAllStatuses(instanceUrl);
+        return jsonReponse({
+            deleted:true,
+        },200);
+    });
+}
 export const getToots = async ({env,req}: handlerInputArgs): Promise<Response> => {
     const prepareStatus = (status:Status) : ResponseStatus => {
         return {
@@ -91,6 +102,7 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
                 return jsonReponse({
                     lastId,
                     done,
+                    stage,
                 },200);
                 break;
 
@@ -113,9 +125,9 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
                 cursor,
                 sCursor,
                 complete,
-                classifications
+                classifications,
+                stage
             },200);
-            break;
             break;
     }
 

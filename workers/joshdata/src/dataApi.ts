@@ -9,6 +9,7 @@ type NETWORK_INSTANCE = {
     network: string;
     instanceUrl: string;
 }
+
 type NETWORK_INSTANCE_ID = {
     network: string;
     instanceUrl: string;
@@ -24,17 +25,28 @@ export const makeSourceType = ({
     }
     return `socialpost:${network}:${instanceUrl}`;
 }
-export const makeSocialPostKey = ({network,instanceUrl,id}:NETWORK_INSTANCE_ID) => {
-    return `${makeSourceType({network,instanceUrl})}:${id}`;
+export const makeSocialPostKey = ({network,instanceUrl,id,accountId}:{
+    network: string;
+    instanceUrl: string;
+    id: string;
+    accountId: string;
+}) => {
+    return `${makeSourceType({network,instanceUrl})}:A_${accountId}${id}`;
 }
 
-export const makeInjestLastKey = ({network,instanceUrl}:NETWORK_INSTANCE) => {
-    return `meta_socialpost:injest:${makeSourceType({network,instanceUrl})}:lastid`;
+export const makeInjestLastKey = ({network,instanceUrl,accountId}:{
+    accountId:string,
+    network: string,
+    instanceUrl: string,
+}) => {
+    return `meta_socialpost:injest:${makeSourceType({network,instanceUrl})}:A_${accountId}:lastid`;
 }
 
 export type SavedStatusMetaData ={
     itemtype: string;
     itemid: string;
+    accountId: string;
+    instanceUrl: string;
 };
 
 export class DataService {
@@ -95,35 +107,46 @@ export class DataService {
     }> {
         const api = await this.getStatusApi(network);
         const track = await this.getSocialInjestTrack(network,instanceUrl);
-        let lastId = await track.getLastId();
-        let done = await track.isDone();
-        const statuses = await getStatuses(
-            instanceUrl,
-            accountId,
-            lastId ? lastId : undefined,
-        );
-        if( ! statuses ){
-            return {
-                lastId: null,
-                done: true,
-            };
-        }
-        for( const status of statuses ){
-            await api.saveStatus(status,{
+        let lastId = await track.getLastId(accountId.toString());
+        let done = await track.isDone(accountId.toString());
+        let itterations = 0;
+        while( !done ){
+            const statuses = await getStatuses(
                 instanceUrl,
-            });
+                accountId,
+                lastId ? lastId : undefined,
+            );
+            if( ! statuses ){
+                return {
+                    lastId: null,
+                    done: true,
+                };
+            }
+            for( const status of statuses ){
+                await api.saveStatus(status,{
+                    instanceUrl,
+                    accountId: accountId.toString(),
+                });
 
+            }
+            if( statuses.length === 1 ){
+                await track.setIsDone(accountId.toString());
+                return {
+                    lastId: statuses[0].id,
+                    done: true,
+                };
+            }
+            lastId = statuses[statuses.length-1].id;
+            await track.storeLastId(accountId.toString(),lastId);
+            done = await track.isDone(accountId.toString());
+            itterations++;
+            if( stopAfter && itterations >= stopAfter ){
+                return {
+                    lastId,
+                    done,
+                };
+            }
         }
-        if( statuses.length === 1 ){
-            await track.setIsDone();
-            return {
-                lastId: statuses[0].id,
-                done: true,
-            };
-        }
-        lastId = statuses[statuses.length-1].id;
-        await track.storeLastId(lastId);
-        done = await track.isDone();
 
         return {
             lastId,
@@ -143,27 +166,40 @@ export class SocialInjestTrack {
         this.instanceUrl = instanceUrl;
         this.kv = kv;
     }
-    async getLastId(): Promise<string|false|null> {
-        const lastId = await this.kv.get(makeInjestLastKey({network:this.network,instanceUrl:this.instanceUrl}));
+    async getLastId(accountId:string): Promise<string|false|null> {
+        const lastId = await this.kv.get(makeInjestLastKey({
+            network:this.network,
+            instanceUrl:this.instanceUrl,
+            accountId
+        }));
         if( SocialInjestTrack.DONE_FLAG === lastId ){
             return false;
         }
         return lastId ? lastId : null;
     }
 
-    async storeLastId(newValue: string) {
-        await this.kv.put(makeInjestLastKey({network:this.network,instanceUrl:this.instanceUrl}),newValue);
+    async storeLastId(accountId:string,newValue: string) {
+        await this.kv.put(makeInjestLastKey(
+            {
+                network:this.network,
+                instanceUrl:this.instanceUrl,
+                accountId
+            }),newValue);
     }
 
-    async setIsDone() {
+    async setIsDone(accountId:string) {
         await this.kv.put(
-            makeInjestLastKey({network:this.network,instanceUrl:this.instanceUrl}),
+            makeInjestLastKey({
+                network:this.network,
+                instanceUrl:this.instanceUrl,
+                accountId
+            }),
             SocialInjestTrack.DONE_FLAG
         );
     }
 
-    async isDone() {
-        const lastId = await this.getLastId();
+    async isDone(accountId:string) {
+        const lastId = await this.getLastId(accountId);
         return SocialInjestTrack.DONE_FLAG === lastId;
     }
 }
@@ -179,9 +215,10 @@ export class StatusDataApi {
         this.kv = kv;
         this.d1 = d1;
     }
-    async getSavedStatus ({statusId,instanceUrl}: {
+    async getSavedStatus ({statusId,instanceUrl,accountId}: {
         statusId: string;
         instanceUrl:string;
+        accountId:string;
     }): Promise<{
         status: Status|null;
         //classifications: string[];
@@ -190,6 +227,7 @@ export class StatusDataApi {
             network:this.network,
             instanceUrl,
             id:statusId,
+            accountId,
         }));
         if( !data ){
             return {
@@ -255,24 +293,47 @@ export class StatusDataApi {
             },
         };
     }
+
+    async deleteAllStatuses(instanceUrl:string): Promise<void> {
+        let keys = await this.kv.list({
+            prefix: makeSourceType({network:this.network,instanceUrl:instanceUrl}),
+            limit: 1000,
+        });
+
+        await Promise.all(
+            keys.keys.map(
+                async (key:{name:string}) => {
+                    await this.kv.delete(key.name);
+                }
+            ));
+
+    }
+
     async saveStatus(status:  Status, {
         instanceUrl,
+        accountId,
         classificationids,
     }:{
-        instanceUrl:string,classificationids?:string[]
+        instanceUrl:string,
+        accountId:string;
+        classificationids?:string[]
     }){
         const metadata: SavedStatusMetaData = {
             itemtype: makeSourceType({
                 network:this.network,
                 instanceUrl,
+
             }),
             itemid: status.id,
+            accountId,
+            instanceUrl,
         };
         await this.kv.put(
             makeSocialPostKey({
                 network:this.network,
                 instanceUrl: status.account.url,
                 id: status.id,
+                accountId,
             }),
             JSON.stringify(this.prepareStatus(status)),
             {
@@ -284,7 +345,8 @@ export class StatusDataApi {
             await this.saveClassifications({
                 statusId:status.id,
                 classifications: classificationids,
-                instanceUrl
+                instanceUrl,
+                accountId,
             });
         }
 
@@ -325,11 +387,18 @@ export class StatusDataApi {
         classifications,
         subtype,
         instanceUrl,
-    }:{statusId:string, classifications: string[],instanceUrl:string;subtype?:string}) {
+        accountId,
+    }:{
+        statusId:string,
+        classifications: string[],
+        instanceUrl:string;
+        accountId:string,
+        subtype?:string
+    }) {
         const {
             status: savedStatus,
             //classifications: savedClassifications,
-         } = await this.getSavedStatus({statusId,instanceUrl});
+         } = await this.getSavedStatus({statusId,instanceUrl,accountId});
         if( ! savedStatus ){
             throw new Error(`Status not found: ${statusId}`);
         }
