@@ -410,7 +410,8 @@ export class StatusDataApi {
                     slug,
                     subtype,
                     itemid: statusId,
-                    itemtype: makeSourceType({
+                    itemtype: `socialpost`,
+										subtype: makeSourceType({
                         network: this.network,
                         instanceUrl: savedStatus.account.url,
                     }),
