@@ -1,9 +1,11 @@
+import  { AtpSessionData, AtpSessionEvent, BskyAgent, RichText } from '@atproto/api';
+import { jsonResponse } from './utils';
+import { stripHtml } from "string-strip-html";
 
 export interface Env {
 	KV: KVNamespace;
 }
-import  { AtpSessionData, AtpSessionEvent, BskyAgent, RichText } from '@atproto/api';
-import { jsonResponse } from './utils';
+
 
 
 export async function login({ service, identifier, password,kv }: {
@@ -201,15 +203,18 @@ export default {
 						status: '400',
 					});
 				}
-				const {text} = data;
-				const rt = new RichText({ text })
+				const text = stripHtml(data.text).result;
+				const rt = new RichText({
+					text,
+				})
 				await rt.detectFacets(agent)
 				const postRecord = {
 					$type: 'app.bsky.feed.post',
 					text: rt.text,
 					facets: rt.facets,
 					createdAt: new Date().toISOString(),
-					lang: 'en'
+					lang: 'en',
+
 				};
 				const results = await agent.post(postRecord);
 				return jsonResponse({
