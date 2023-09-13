@@ -9,7 +9,6 @@ import { json } from "drizzle-orm/mysql-core";
 const network = 'mastodon';
 
 const instanceUrl = "https://mastodon.social";
-const username = "@josh412";
 const accountId = 425078;
 
 type ResponseStatus = {
@@ -43,7 +42,7 @@ export const getStatus = async ({env,req}: handlerInputArgs): Promise<Response> 
             },400);
         }
         const api = await data.getStatusApi(network);
-        const {status,key} = await api.getSavedSatus({
+        const {status,key} = await api.getSavedStatus({
             instanceUrl,
             statusId,
             accountId: accountId.toString(),
