@@ -68,40 +68,18 @@ export const deleteToots = async ({env,req}: handlerInputArgs): Promise<Response
     });
 }
 export const getToots = async ({env,req}: handlerInputArgs): Promise<Response> => {
-    const prepareStatus = (status:Status) : ResponseStatus => {
-        return {
-            id:status.id,
-            content:status.content,
-            url:status.url,
-            created_at:status.created_at,
-            id_reply_to_id:status.in_reply_to_id,
-            id_reply_to_account_id:status.in_reply_to_account_id,
-            replies_count:status.replies_count,
-            reblogs_count:status.reblogs_count,
-            media_attachments: status.media_attachments ?? [ ],
-            mentions: status.mentions ?? [ ],
-            account: {
-                id:status.account.id,
-                username:status.account.username,
-                display_name:status.account.display_name,
-                url:status.account.url,
-            },
-            reblog: status.reblog ? prepareStatus(status.reblog) : undefined,
-        }
-    }
+
     return createHandler(env,req,async (data,url,req) => {
         const cursor = url.searchParams.get('cursor') ?? undefined;
         const api = await data.getStatusApi(network);
         const {statuses,complete,cursor:sCursor} = await api.getSavedSatuses(instanceUrl,cursor);
-        const returnData = statuses.map(
-            (status:Status) => prepareStatus(status)
-        );
+
         return jsonReponse({
             cursor,
             sCursor,
             complete,
             next:sCursor ? `http://${url.host}/api/mastodon?cursor=${sCursor}` : false,
-            statuses: returnData,
+            statuses,
         },200);
     });
 }
@@ -119,6 +97,7 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
                 const  {
                     lastId,
                     done,
+                    statuses:toots,
                 } = await data.injestSocialPosts({
                     network,
                     instanceUrl,
@@ -129,6 +108,7 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
                     lastId,
                     done,
                     stage,
+                    toots
                 },200);
                 break;
 

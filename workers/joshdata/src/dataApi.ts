@@ -66,30 +66,6 @@ export class DataService {
     }
 
 
-
-    async getSavedStatuses({
-        network,
-        instanceUrl,
-        cursor,
-    }:{
-        network:string,
-        instanceUrl: string,
-        cursor?:string
-    }): Promise<{
-        statuses: Status[];
-
-    }> {
-        const api = await this.getStatusApi(network);
-        const {statuses} = await api.getSavedSatuses(
-            instanceUrl,
-            cursor
-        );
-        return {
-            statuses,
-        };
-
-    }
-
     async injestSocialPosts({
         network,
         instanceUrl,
@@ -106,51 +82,46 @@ export class DataService {
     }): Promise<{
         lastId: string|false|null;
         done: boolean;
+        statuses?: Status[];
     }> {
         const api = await this.getStatusApi(network);
         const track = await this.getSocialInjestTrack(network,instanceUrl);
+        await track.reset(accountId.toString());
         let lastId = await track.getLastId(accountId.toString());
         let done = await track.isDone(accountId.toString());
-        let itterations = 0;
-        while( !done ){
-            const statuses = await getStatuses(
+        const statuses = await getStatuses(
+            instanceUrl,
+            accountId,
+            lastId ? lastId : undefined,
+        );
+        if( ! statuses ){
+            return {
+                lastId: null,
+                done: true,
+            };
+        }
+        for( const status of statuses ){
+            await api.saveStatus(status,{
                 instanceUrl,
-                accountId,
-                lastId ? lastId : undefined,
-            );
-            if( ! statuses ){
-                return {
-                    lastId: null,
-                    done: true,
-                };
-            }
-            for( const status of statuses ){
-                await api.saveStatus(status,{
-                    instanceUrl,
-                    accountId: accountId.toString(),
-                });
+                accountId: accountId.toString(),
+            });
 
-            }
-            if( statuses.length === 1 ){
-                await track.setIsDone(accountId.toString());
-                return {
-                    lastId: statuses[0].id,
-                    done: true,
-                };
-            }
-            lastId = statuses[statuses.length-1].id;
+        }
+        if( statuses.length === 1 ){
+            await track.setIsDone(accountId.toString());
+            return {
+                lastId:statuses[0].id,
+                done: true,
+            };
+        }
+        lastId = statuses[statuses.length-1].id;
+        if( lastId ){
             await track.storeLastId(accountId.toString(),lastId);
             done = await track.isDone(accountId.toString());
-            itterations++;
-            if( stopAfter && itterations >= stopAfter ){
-                return {
-                    lastId,
-                    done,
-                };
-            }
         }
 
         return {
+            statuses,
             lastId,
             done,
         };
@@ -167,6 +138,13 @@ export class SocialInjestTrack {
         this.network = network;
         this.instanceUrl = instanceUrl;
         this.kv = kv;
+    }
+    async reset(accountId:string) {
+        await this.kv.delete(makeInjestLastKey({
+            network:this.network,
+            instanceUrl:this.instanceUrl,
+            accountId
+        }));
     }
     async getLastId(accountId:string): Promise<string|false|null> {
         const lastId = await this.kv.get(makeInjestLastKey({
@@ -241,7 +219,8 @@ export class StatusDataApi {
         return {
             //@ts-ignore
             status: this.prepareStatus(
-                JSON.parse(data)
+                JSON.parse(data),
+                key
             ),
             key: key,
         }
@@ -267,7 +246,8 @@ export class StatusDataApi {
                     }
                     //@ts-ignore
                     return this.prepareStatus(
-                        JSON.parse(data)
+                        JSON.parse(data),
+                        key.name
                     );
                 }
             ));
@@ -282,8 +262,9 @@ export class StatusDataApi {
             };
     }
 
-    private prepareStatus(status: Status): Status {
+    private prepareStatus(status: Status,key:string): Status {
         return {
+            key,
             ...status,
             // @ts-ignore
             account: {
@@ -293,6 +274,7 @@ export class StatusDataApi {
                 avatar: status.account.avatar,
                 url: status.account.url,
             },
+
         };
     }
 
@@ -330,14 +312,15 @@ export class StatusDataApi {
             accountId,
             instanceUrl,
         };
+        const key = makeSocialPostKey({
+            network:this.network,
+            instanceUrl: status.account.url,
+            id: status.id,
+            accountId,
+        });
         await this.kv.put(
-            makeSocialPostKey({
-                network:this.network,
-                instanceUrl: status.account.url,
-                id: status.id,
-                accountId,
-            }),
-            JSON.stringify(this.prepareStatus(status)),
+            key,
+            JSON.stringify(this.prepareStatus(status,key)),
             {
                 metadata
             }
