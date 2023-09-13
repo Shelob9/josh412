@@ -1,6 +1,7 @@
 import  { AtpSessionData, AtpSessionEvent, BskyAgent, RichText } from '@atproto/api';
 import { jsonResponse } from './utils';
 import { stripHtml } from "string-strip-html";
+import { postBsykyStatus,getBskyLikes, tryBskyLogin } from './social';
 
 export interface Env {
 	KV: KVNamespace;
@@ -8,63 +9,7 @@ export interface Env {
 
 
 
-export async function login({ service, identifier, password,kv }: {
-  service?: string,
-  identifier: string,
-  password: string,
-  kv: KVNamespace,
-}) {
-	service = service ?? 'https://bsky.social';
-	// Hash for persistent key
-	// Prevents using persited session without password
-	// Or for a different service
-	const digest = await crypto.subtle.digest(
-		{
-		  name: 'SHA-256',
-		},
-		new TextEncoder().encode(`${service.slice(
-			'https://'.length,
-		)}${identifier}${password}`)
-	);
 
-
-	const saveKey = `at-savedsession_3:${new Uint8Array(digest).toString()}`;
-	const agent = new BskyAgent({
-		service: service ?? 'https://bsky.social',
-		persistSession: (evt: AtpSessionEvent, sess?: AtpSessionData) => {
-			if( sess && ! ['created','updated'].includes(evt) ) {
-				kv.put(saveKey, JSON.stringify(sess), {
-					//expire in 1 hour
-					expirationTtl: 60 * 60,
-				});
-			}else{
-				kv.delete(saveKey);
-			}
-		}
-	});
-	const tryLogin = async () => {
-		await agent.login({
-			identifier,
-			password,
-		});
-	};
-	let saved = await kv.get(saveKey);
-	let resumed = false;
-
-	if( saved ) {
-		try {
-			await agent.resumeSession(JSON.parse(saved));
-			resumed = true;
-		} catch (error) {
-			kv.delete(saveKey);
-			await tryLogin();
-		}
-
-	}else{
-		await tryLogin();
-	}
-	return {agent,resumed};
-}
 
 const ALLOWED_USERS = [
 	'josh412.com',
@@ -150,7 +95,7 @@ async function basicAuthentication(request:Request) {
 	}
 	try {
 
-		const {agent,resumed} = await login({
+		const {agent,resumed} = await tryBskyLogin({
 			identifier: user,
 			password: pass,
 			kv: env.KV,
@@ -192,6 +137,7 @@ export default {
 
 		try {
 			const {method} = request;
+			const url = new URL(request.url);
 			if( 'POST' === method ) {
 				const data = await request.json() as {
 					text: string,
@@ -204,34 +150,26 @@ export default {
 					});
 				}
 				const text = stripHtml(data.text).result;
-				const rt = new RichText({
-					text,
-				})
-				await rt.detectFacets(agent)
-				const postRecord = {
-					$type: 'app.bsky.feed.post',
-					text: rt.text,
-					facets: rt.facets,
-					createdAt: new Date().toISOString(),
-					lang: 'en',
 
-				};
-				const results = await agent.post(postRecord);
+				const results = await postBsykyStatus({
+					text,
+					agent,
+				});
 				return jsonResponse({
-					uri: results.uri,
-					cid: results.cid,
+					...results,
 					resumed,
-					facets: rt.facets,
 				});
 
 			}else{
-				const likes = await agent.getActorLikes({
+
+				const likes = await getBskyLikes({
 					actor: 'josh412.com',
+					agent,
+
 				});
 				return jsonResponse({
 					resumed,
-					likesCursor: likes.data.cursor,
-					likes: likes.data.feed,
+					...likes,
 				});
 			}
 
