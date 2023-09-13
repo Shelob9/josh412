@@ -5,14 +5,28 @@ export interface Env {
 import  { AtpSessionData, AtpSessionEvent, BskyAgent, RichText } from '@atproto/api';
 import { jsonResponse } from './utils';
 
+
 export async function login({ service, identifier, password,kv }: {
   service?: string,
   identifier: string,
   password: string,
   kv: KVNamespace,
 }) {
+	service = service ?? 'https://bsky.social';
+	// Hash for persistent key
+	// Prevents using persited session without password
+	// Or for a different service
+	const digest = await crypto.subtle.digest(
+		{
+		  name: 'SHA-256',
+		},
+		new TextEncoder().encode(`${service.slice(
+			'https://'.length,
+		)}${identifier}${password}`)
+	);
 
-	const saveKey = `at-savedsession_2:${service}:${identifier}`;
+
+	const saveKey = `at-savedsession_3:${new Uint8Array(digest).toString()}`;
 	const agent = new BskyAgent({
 		service: service ?? 'https://bsky.social',
 		persistSession: (evt: AtpSessionEvent, sess?: AtpSessionData) => {
@@ -173,7 +187,6 @@ export default {
 				status: rStatus.toString(),
 			});
 		}
-
 
 		try {
 			const {method} = request;
