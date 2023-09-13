@@ -1,24 +1,69 @@
 name: workers
 
 on: [push]
-  
+paths:
+  - 'workers/**'
+
 jobs:
-  test:
+  paths-filter:
+      runs-on: ubuntu-latest
+      outputs:
+        joshdata: ${{ steps.filter.outputs.joshdata }}
+        tooter: ${{ steps.filter.outputs.tooter }}
+      steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            joshdata:
+              - 'workers/joshdata/**'
+            tooter:
+              - 'workers/tooter/**'
+
+      # run only if 'joshdata' files were changed
+      - name: joshdata changed
+        if: steps.filter.outputs.joshdata == 'true'
+        run: echo "joshdata changed"
+
+      # run only if 'tooter' files were changed
+      - name: tooter changed
+        if: steps.filter.outputs.tooter == 'true'
+        run: echo "tooter changed"
+
+  joshdata:
     runs-on: ubuntu-latest
+    needs: paths-filter
+    if: needs.paths-filter.outputs.joshdata == 'true'
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      
-      - name: install joshdata 
+
+      - name: install joshdata
         run: npm i
         working-directory: workers/joshdata
-        
+
       - name: test
         run: npm run test
         working-directory: workers/joshdata
-        
-        
 
-  
+  tooter:
+    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
+    needs: paths-filter
+    if: needs.paths-filter.outputs.tooter == 'true'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: install joshdata
+        run: npm i
+        working-directory: workers/joshdata
+
+      - name: test
+        run: npm run test
+        working-directory: workers/joshdata
