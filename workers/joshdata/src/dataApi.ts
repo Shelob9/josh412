@@ -4,48 +4,8 @@ import { INSERT_CLASSIFICATION, SAVED_CLASSIFICATION, TABLE_classifications } fr
 import { eq } from "drizzle-orm";
 import { Env } from "./env";
 import { getStatuses } from "./social/mastodon";
+import {makeSourceType,makeSocialPostKey,makeInjestLastKey} from './kvUtil';
 
-type NETWORK_INSTANCE = {
-    network: string;
-    instanceUrl: string;
-}
-
-type NETWORK_INSTANCE_ID = {
-    network: string;
-    instanceUrl: string;
-    id: string;
-}
-
-export const makeSourceType = ({
-    network,
-    instanceUrl,
-    accountId,
-}: {
-    network: string;
-    instanceUrl: string;
-    accountId?: string;
-}) => {
-    if( instanceUrl.startsWith('https://') ){
-        instanceUrl = instanceUrl.replace('https://', '' );
-    }
-    return `socialpost:${network}:${instanceUrl}${accountId ? `:A_${accountId}` : ''}`;
-}
-export const makeSocialPostKey = ({network,instanceUrl,id,accountId}:{
-    network: string;
-    instanceUrl: string;
-    id: string;
-    accountId: string;
-}) => {
-    return `${makeSourceType({network,instanceUrl,accountId})}:${id}`;
-}
-
-export const makeInjestLastKey = ({network,instanceUrl,accountId}:{
-    accountId:string,
-    network: string,
-    instanceUrl: string,
-}) => {
-    return `meta_socialpost:injest:${makeSourceType({network,instanceUrl,accountId})}:lastid`;
-}
 
 export type SavedStatusMetaData ={
     itemtype: string;
@@ -332,7 +292,7 @@ export class StatusDataApi {
         };
         const key = makeSocialPostKey({
             network:this.network,
-            instanceUrl: status.account.url,
+            instanceUrl,
             id: status.id,
             accountId,
         });

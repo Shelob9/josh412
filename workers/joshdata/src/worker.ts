@@ -82,20 +82,21 @@ router.get('/api/test', async ({ env }: {env: Env}) => {
 
 
 });
-router.get('/api/' , async ({ req }: {req: Request}) => {
+const rootHandler = async ({ req }: {req: Request}) => {
 	return jsonReponse({
 		routes: {
 			'/api/': 'this',
 			'/api/hi': 'hello',
 			'/api/mastodon': 'all toots',
+			'/api/mastodon/s/:id': 'get toot',
+			'/api/mastodon/d': 'delete toots',
 			'/api/mastodon/injest': 'injest toots',
 		}
 	},200);
-});
+};
+router.get('/api' , rootHandler );
 //redirect root to /api
-router.get('/', async ({ req }: {req: Request}) => {
-	return Response.redirect('/api', 301);
-});
+router.get('/', rootHandler );
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
