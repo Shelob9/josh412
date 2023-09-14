@@ -1,7 +1,7 @@
 import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { Status } from "./social/types/mastodon";
 import { INSERT_CLASSIFICATION, SAVED_CLASSIFICATION, TABLE_classifications } from "./db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Env } from "./env";
 import { getStatuses } from "./social/mastodon";
 import {makeSourceType,makeSocialPostKey,makeInjestLastKey} from './kvUtil';
@@ -157,10 +157,24 @@ export class StatusDataApi {
     network: string;
     kv: KVNamespace;
     d1: DrizzleD1Database;
+    itemType_Social_Post: string = 'socialpost';
     constructor(network:string,kv:KVNamespace,d1: DrizzleD1Database ){
         this.network = network;
         this.kv = kv;
         this.d1 = d1;
+    }
+
+    statusKey ({instanceUrl,accountId,statusId}:{
+        instanceUrl:string;
+        accountId:string;
+        statusId:string;
+    }): string {
+        return makeSocialPostKey({
+            network:this.network,
+            instanceUrl: instanceUrl,
+            id: statusId,
+            accountId,
+        });
     }
     async  getSavedStatus({instanceUrl,accountId,statusId}:{
         instanceUrl:string;
@@ -169,11 +183,11 @@ export class StatusDataApi {
     }): Promise<{
         status: Status|null;
         key: string;
+        classifications?: string[];
     }>{
-        const key = makeSocialPostKey({
-            network:this.network,
-            instanceUrl: instanceUrl,
-            id: statusId,
+        const key = this.statusKey({
+            instanceUrl,
+            statusId,
             accountId,
         });
         const data = await this.kv.get(key);
@@ -183,6 +197,16 @@ export class StatusDataApi {
                 key: key,
             }
         }
+
+        const classifications = await this.d1.select().from(TABLE_classifications)
+            .where(
+                and(
+                    eq(TABLE_classifications.itemtype, this.itemType_Social_Post),
+                    eq(TABLE_classifications.itemid, key ),
+                    eq(TABLE_classifications.subtype, this.network)
+
+                ),
+            ).all();
         return {
             //@ts-ignore
             status: this.prepareStatus(
@@ -190,6 +214,8 @@ export class StatusDataApi {
                 key
             ),
             key: key,
+            //@ts-ignore
+            classifications,
         }
 
 
@@ -306,7 +332,7 @@ export class StatusDataApi {
         );
         if( classificationids ){
             await this.saveClassifications({
-                statusId:status.id,
+                key,
                 classifications: classificationids,
                 instanceUrl,
                 accountId,
@@ -328,9 +354,17 @@ export class StatusDataApi {
     }
 
     async getOrCreateClassification(classification:INSERT_CLASSIFICATION): Promise<SAVED_CLASSIFICATION> {
-        const existing = await this.d1.select().from(TABLE_classifications).where(
-            eq(TABLE_classifications.slug,classification.slug)
-        ).limit(1);
+        const existing = await this.d1.select().from(TABLE_classifications)
+            .where(
+                and(
+                    eq(TABLE_classifications.slug, classification.slug),
+                    eq(TABLE_classifications.itemid, classification.itemid),
+                    eq(TABLE_classifications.itemtype, this.itemType_Social_Post),
+                    eq(TABLE_classifications.subtype, this.network ),
+                ),
+        )
+
+        .limit(1);
         if( existing.length > 0 ){
             return existing[0];
         }
@@ -341,43 +375,42 @@ export class StatusDataApi {
 
     /**
      *
-     * @param statusId ID of status to save for
+     * @param key ID of status to save for
      * @param classifications Array of classification slugs to save
      * @param subtype Optional. Use for subtype of classification if passed
      */
     async saveClassifications ({
-        statusId,
+        key,
         classifications,
         subtype,
         instanceUrl,
         accountId,
     }:{
-        statusId:string,
+        key:string,
         classifications: string[],
         instanceUrl:string;
         accountId:string,
         subtype?:string
-    }) {
-        const {
-            status: savedStatus,
-            //classifications: savedClassifications,
-         } = await this.getSavedStatus({
-            statusId,instanceUrl,accountId
-        });
-        if( ! savedStatus ){
-            throw new Error(`Status not found: ${statusId}`);
-        }
-        classifications.map(
+    }): Promise<string[]> {
+
+        const r : string[] = [];
+        classifications.forEach(
             async (slug:string) => {
                 const classification = await this.getOrCreateClassification({
                     slug,
                     subtype,
-                    itemid: statusId,
-                    itemtype: `socialpost`,
+                    itemid: key,
+                    itemtype: this.itemType_Social_Post
                 });
-                return classification.id;
+                if( ! classification ){
+                    throw new Error(`Classification not found: ${slug}`);
+                }
+                if( classification.slug ){
+                    r.push(classification.slug);
+                }
             }
         );
+        return r;
 
     }
 

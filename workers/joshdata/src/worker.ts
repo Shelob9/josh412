@@ -6,7 +6,8 @@ import { deleteToots, getToots, injestToots,getStatus } from './handlers/mastodo
 import { Router } from '@tsndr/cloudflare-worker-router'
 import { jsonReponse } from './responseFactory';
 import { Env } from './env';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
+import { createHandler } from './handlers/createHandler';
 // Initialize router
 const router = new Router<Env>()
 
@@ -57,7 +58,67 @@ router.get('/api/st', async ({ req }: {req: Request}) => {
 		headers: { "Content-Type": "text/plain" }
 	})
 });
-router.get('/api/test', async ({ env }: {env: Env}) => {
+router.get('/api/test', async ({ env,req }: {env: Env,req: Request}) => {
+	return createHandler(env,req,async (data,url,req) => {
+		const statusId = 110986907620507393;
+		const network = 'mastodon';
+		const api = await data.getStatusApi(network);
+		const {status,key,
+			//classifications
+		} = await api.getSavedStatus({
+			instanceUrl: 'mastodon.social',
+			statusId: statusId.toString(),
+			accountId: '425078',
+		});
+
+
+		const d1 = await drizzle(env.DB1);
+		const now = new Date();
+		const args = {
+			slug:'dog',
+			subtype: network,
+			itemid: key,
+			itemtype: `socialpost`,
+
+
+		}
+
+
+		const cG = await api.getOrCreateClassification(args);
+
+		const instanceUrl = "https://mastodon.social";
+		const accountId = '425078';
+		const classification = await api.getOrCreateClassification({
+			slug:'food',
+			subtype: network,
+			itemid: key,
+			itemtype: api.itemType_Social_Post
+		});
+		const r = await api.saveClassifications({
+			key,
+			classifications: [
+				'gn'
+			],
+				subtype: network,
+				instanceUrl,
+				accountId,
+		})
+		const classifications = await d1.select().from(TABLE_classifications).limit(
+			300
+		)
+		return jsonReponse({
+			r,
+			classifications: classifications ?? [],
+			key,
+			status,
+			classification
+
+		},200);
+
+
+	});
+
+
 	const db = await drizzle(env.DB1);
 
 	try {

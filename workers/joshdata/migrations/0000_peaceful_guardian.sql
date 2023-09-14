@@ -1,5 +1,4 @@
 CREATE TABLE `classifications` (
-	`id` integer PRIMARY KEY NOT NULL,
 	`slug` text NOT NULL,
 	`termid` text NOT NULL,
 	`itemid` text NOT NULL,

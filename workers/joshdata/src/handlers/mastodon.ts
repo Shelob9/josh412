@@ -42,7 +42,7 @@ export const getStatus = async ({env,req}: handlerInputArgs): Promise<Response> 
             },400);
         }
         const api = await data.getStatusApi(network);
-        const {status,key} = await api.getSavedStatus({
+        const {status,key,classifications} = await api.getSavedStatus({
             instanceUrl,
             statusId,
             accountId: accountId.toString(),
@@ -51,6 +51,7 @@ export const getStatus = async ({env,req}: handlerInputArgs): Promise<Response> 
             statusId,
             status,
             key,
+            classifications
         },status ? 200 : 404);
     });
 
@@ -124,18 +125,24 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
                 }
             );
 
-                console.log({sources})
+
             const classifications = classifySources(sources,CLASSIFIERS);
+
+            let insertedIds : number[] = [];
             //loop through, update each status with classifications
             Object.keys(classifications).forEach(async (statusId:string) => {
                 const classificationids = classifications[statusId];
-                await api.saveClassifications({
-                    statusId,
+
+                const r = await api.saveClassifications({
+                    key: api.statusKey({statusId,instanceUrl,accountId:accountId.toString()}),
                     classifications:classificationids,
                     subtype:network,
                     instanceUrl,
                     accountId: accountId.toString(),
                 });
+                if( r ){
+                    insertedIds = insertedIds.concat(r);
+                }
             });
             return jsonReponse({
                 cursor,
@@ -143,6 +150,7 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
                 complete,
                 classifications,
                 stage,
+                insertedIds
                 //sources
             },200);
             break;

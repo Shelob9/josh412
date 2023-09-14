@@ -1,19 +1,12 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "146b72be-faaa-4b0c-a2f3-525b417bd2bb",
+  "id": "e0b6f675-2aea-4116-9e36-1bf6ac2d25c6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "classifications": {
       "name": "classifications",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
         "slug": {
           "name": "slug",
           "type": "text",

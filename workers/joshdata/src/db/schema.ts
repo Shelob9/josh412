@@ -4,7 +4,7 @@ import { sqliteTable, integer,index, text,blob, primaryKey, uniqueIndex } from '
 // classifications by taxonomy and tag
 export const TABLE_classifications = sqliteTable('classifications', {
     //primary key
-    id: integer('id').notNull().primaryKey(),
+    //id: integer('id').notNull().primaryKey(),
   //The classification's unique ID, which is defined in code
     slug: text( 'slug' ).notNull(),
     //What content type is this classification for?
