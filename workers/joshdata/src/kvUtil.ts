@@ -1,30 +1,23 @@
+
+type NETWORK_INSTANCE_ACCOUNT = {
+    network: string;
+    instanceUrl: string;
+    accountId?: string;
+};
 export const makeSourceType = ({
     network,
     instanceUrl,
     accountId,
-}: {
-    network: string;
-    instanceUrl: string;
-    accountId?: string;
-}) => {
+}: NETWORK_INSTANCE_ACCOUNT) => {
     if( instanceUrl.startsWith('https://') ){
         instanceUrl = instanceUrl.replace('https://', '' );
     }
     return `socialpost:${network}:${instanceUrl}${accountId ? `:A_${accountId}` : ''}`;
 }
-export const makeSocialPostKey = ({network,instanceUrl,id,accountId}:{
-    network: string;
-    instanceUrl: string;
-    id: string;
-    accountId: string;
-}) => {
+export const makeSocialPostKey = ({network,instanceUrl,id,accountId}:NETWORK_INSTANCE_ACCOUNT & {id: string}) => {
     return `${makeSourceType({network,instanceUrl,accountId})}:${id}`;
 }
 
-export const makeInjestLastKey = ({network,instanceUrl,accountId}:{
-    accountId:string,
-    network: string,
-    instanceUrl: string,
-}) => {
+export const makeInjestLastKey = ({network,instanceUrl,accountId}:NETWORK_INSTANCE_ACCOUNT) => {
     return `meta_socialpost:injest:${makeSourceType({network,instanceUrl,accountId})}:lastid`;
 }
