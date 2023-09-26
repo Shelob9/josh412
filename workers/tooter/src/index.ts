@@ -1,8 +1,7 @@
 import  { AtpSessionData, AtpSessionEvent, BskyAgent, RichText } from '@atproto/api';
 import { jsonResponse } from './utils';
 import { stripHtml } from "string-strip-html";
-import { postBsykyStatus,getBskyLikes, tryBskyLogin } from './social';
-import {socialTest} from '@social';
+import { postBsykyStatus,getBskyLikes, tryBskyLogin } from '@social';
 export interface Env {
 	KV: KVNamespace;
 }
@@ -23,7 +22,7 @@ const ALLOWED_USERS = [
      */
 async function basicAuthentication(request:Request) {
 	const Authorization = request.headers.get("Authorization") || '';
-	socialTest();
+
 	const [scheme, encoded] = Authorization.split(" ");
 
 	// The Authorization header must start with Basic, followed by a space.
