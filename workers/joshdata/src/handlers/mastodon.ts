@@ -31,7 +31,7 @@ type ResponseStatus = {
     reblog?:ResponseStatus
 };
 
-export const getStatus = async ({env,req}: handlerInputArgs): Promise<Response> => {
+export const getToot = async ({env,req}: handlerInputArgs): Promise<Response> => {
     return createHandler(env,req,async (data,url,req) => {
         //get last segment of url
         const statusId = url.pathname.split('/').pop() as string;

@@ -1,13 +1,12 @@
-import { DrizzleD1Database, drizzle } from 'drizzle-orm/d1';
-import { SAVED_CLASSIFICATION, INSERT_CLASSIFICATION, TABLE_classifications } from './db/schema';
-import {  getAccount, getStatuses } from './social/mastodon';
-import { Status } from './social/types/mastodon'
-import { deleteToots, getToots, injestToots,getStatus } from './handlers/mastodon';
+import {  drizzle } from 'drizzle-orm/d1';
+import { TABLE_classifications } from './db/schema';
+import { deleteToots, getToots, injestToots,getToot } from './handlers/mastodon';
 import { Router } from '@tsndr/cloudflare-worker-router'
 import { jsonReponse } from './responseFactory';
 import { Env } from './env';
 import { and, eq } from 'drizzle-orm';
 import { createHandler } from './handlers/createHandler';
+import {getStatus} from '@social';
 // Initialize router
 const router = new Router<Env>()
 
@@ -20,13 +19,15 @@ router.use(({ env, req }) => {
 })
 
 router.get('/api/mastodon' , getToots );
-router.get('/api/mastodon/s/:id' , getStatus );
+router.get('/api/mastodon/s/:id' , getToot );
 router.get('/api/mastodon/d' , deleteToots );
 //?classify=1
 router.get('/api/mastodon/injest' , injestToots );
 router.get('/api/hi', async ({ req }: {req: Request}) => {
+	const toot = await getStatus('https://mastodon.social','111131517917647244');
 	return jsonReponse({
 		hi: 'Roy',
+		toot,
 	},420);
 });
 router.get('/api/st', async ({ req }: {req: Request}) => {

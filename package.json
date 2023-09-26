@@ -1,0 +1,16 @@
+{
+  "name": "josh412",
+  "version": "1.0.0",
+  "description": "## Run Tests",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "workspaces": [
+    "packages/*",
+    "workers/joshdata",
+    "workers/tooter"
+  ]
+}

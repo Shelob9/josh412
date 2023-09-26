@@ -3,7 +3,7 @@ import { Status } from "./social/types/mastodon";
 import { INSERT_CLASSIFICATION, SAVED_CLASSIFICATION, TABLE_classifications } from "./db/schema";
 import { and, eq } from "drizzle-orm";
 import { Env } from "./env";
-import { getStatuses } from "./social/mastodon";
+import { getStatuses } from "@social";
 import {makeSourceType,makeSocialPostKey,makeInjestLastKey} from './kvUtil';
 
 
