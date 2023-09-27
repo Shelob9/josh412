@@ -1,12 +1,13 @@
 import {  drizzle } from 'drizzle-orm/d1';
 import { TABLE_classifications } from './db/schema';
-import { deleteToots, getToots, injestToots,getToot } from './handlers/mastodon';
+import { deleteToots, getToots, injestToots,getToot, allMastodonClassifications } from './handlers/mastodon';
 import { Router } from '@tsndr/cloudflare-worker-router'
 import { jsonReponse } from './responseFactory';
 import { Env } from './env';
 import { and, eq } from 'drizzle-orm';
 import { createHandler } from './handlers/createHandler';
 import {getStatus} from '@social';
+import { allClassifications } from './handlers/classifications';
 // Initialize router
 const router = new Router<Env>()
 
@@ -18,7 +19,9 @@ router.use(({ env, req }) => {
 	}
 })
 
+router.get('/api/classifications' , allClassifications );
 router.get('/api/mastodon' , getToots );
+router.get('/api/mastodon/classifications', allMastodonClassifications)
 router.get('/api/mastodon/s/:id' , getToot );
 router.get('/api/mastodon/d' , deleteToots );
 //?classify=1
@@ -93,7 +96,7 @@ router.get('/api/test', async ({ env,req }: {env: Env,req: Request}) => {
 			slug:'food',
 			subtype: network,
 			itemid: key,
-			itemtype: api.itemType_Social_Post
+			itemtype: api.itemType
 		});
 		const r = await api.saveClassifications({
 			key,

@@ -2,6 +2,18 @@ import { Classifier_Params, Classifier_Search_Params } from "./classifiers";
 
 export type SearchWhere = 'starts' | 'ends' | 'contains' | 'exact';
 
+export const ITEM_TYPE_SOCIAL_POST = 'social_post';
+export const SOURCE_TYPE_MASTODON = 'mastodon';
+export const SOURCE_TYPE_BLUESKY = 'bluesky';
+
+export const CLASSIFICATION_ITEM_TYPES : string[]= [
+  ITEM_TYPE_SOCIAL_POST
+];
+
+export const CLASSIFICATION_SOURCE_TYPES : string[] = [
+  SOURCE_TYPE_MASTODON,
+  SOURCE_TYPE_BLUESKY,
+];
 export function searchString(subject: string, search: string | string[], where: SearchWhere, all = false): boolean {
   if (Array.isArray(search)) {
     if (all) {

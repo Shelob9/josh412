@@ -1,5 +1,10 @@
 #
 
+##
+
+- `npm run start --workspace=joshdata`
+- `npm run start --workspace=tooter`
+
 ## Run Tests
 
 - In link collection

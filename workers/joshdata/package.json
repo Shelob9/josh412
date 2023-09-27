@@ -7,10 +7,8 @@
     "start": "wrangler dev",
     "test": "jest",
     "migrate": "wrangler d1 migrations apply josh412-02",
-    "migrate:fresh": " drizzle-kit drop && npm run migrate",
     "migrate:generate": "drizzle-kit generate:sqlite",
     "migrate:local": "wrangler d1 migrations apply josh412-02 --local",
-    "migrate:local:drop": "drizzle-kit drop",
     "tail": "wrangler tail --local"
   },
   "devDependencies": {

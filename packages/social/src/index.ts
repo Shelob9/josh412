@@ -8,5 +8,6 @@ export interface Attatchment {
 
 }
 export type Attatchments = Attatchment[];
+export * from './types/mastodon';
 export * from './mastodon';
 export * from './bluesky';

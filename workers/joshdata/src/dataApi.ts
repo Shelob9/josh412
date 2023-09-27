@@ -1,11 +1,12 @@
 import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import { Status } from "./social/types/mastodon";
+import { Status } from "@social";
 import { INSERT_CLASSIFICATION, SAVED_CLASSIFICATION, TABLE_classifications } from "./db/schema";
 import { and, eq } from "drizzle-orm";
 import { Env } from "./env";
 import { getStatuses } from "@social";
 import {makeSourceType,makeSocialPostKey,makeInjestLastKey} from './kvUtil';
-
+import { CLASSIFICATION_SOURCE_TYPES, ITEM_TYPE_SOCIAL_POST } from "./classify";
+export type SAVED_STATUS = Status & {key:string};
 
 export type SavedStatusMetaData ={
     itemtype: string;
@@ -157,11 +158,12 @@ export class StatusDataApi {
     network: string;
     kv: KVNamespace;
     d1: DrizzleD1Database;
-    itemType_Social_Post: string = 'socialpost';
+    itemType: string;
     constructor(network:string,kv:KVNamespace,d1: DrizzleD1Database ){
         this.network = network;
         this.kv = kv;
         this.d1 = d1;
+        this.itemType = ITEM_TYPE_SOCIAL_POST;
     }
 
     statusKey ({instanceUrl,accountId,statusId}:{
@@ -181,7 +183,7 @@ export class StatusDataApi {
         accountId:string;
         statusId:string;
     }): Promise<{
-        status: Status|null;
+        status: SAVED_STATUS|null;
         key: string;
         classifications?: string[];
     }>{
@@ -201,7 +203,7 @@ export class StatusDataApi {
         const classifications = await this.d1.select().from(TABLE_classifications)
             .where(
                 and(
-                    eq(TABLE_classifications.itemtype, this.itemType_Social_Post),
+                    eq(TABLE_classifications.itemtype, this.itemType),
                     eq(TABLE_classifications.itemid, key ),
                     eq(TABLE_classifications.subtype, this.network)
 
@@ -221,7 +223,7 @@ export class StatusDataApi {
 
     }
     async getSavedSatuses(instanceUrl:string,cursor?:string): Promise<{
-        statuses: Status[];
+        statuses: SAVED_STATUS[];
         complete: boolean;
         cursor: string|false;
     }>{
@@ -249,13 +251,13 @@ export class StatusDataApi {
             return  {
                 complete: keys.list_complete,
                 cursor: keys.list_complete ? false : keys.cursor,
-                statuses: statuses.filter( (status:Status|null) => {
+                statuses: statuses.filter( (status:SAVED_STATUS|null) => {
                     return status !== null;
                 }) as Status[],
             };
     }
 
-    private prepareStatus(status: Status,key:string): Status {
+    private prepareStatus(status: Status,key:string): SAVED_STATUS {
         return {
             key,
             ...status,
@@ -353,13 +355,44 @@ export class StatusDataApi {
         });
     }
 
+    async getClassifications(offset?:number,limit?:number,) {
+        try {
+            const classifications = await this.d1.select()
+                .from(TABLE_classifications)
+                .limit(limit ?? 100)
+                .offset(offset??0)
+                .all();
+            return classifications;
+        } catch (error) {
+            console.error('Error fetching classifications:', error);
+            throw error;
+        }
+    }
+
+    async getClassificationsForNetwork(network:string,offset?:number,limit?:number,) {
+        try {
+            const classifications = await this.d1.select()
+                .from(TABLE_classifications)
+                .where(
+                    eq(TABLE_classifications.subtype, network)
+                )
+                .limit(limit ?? 100)
+                .offset(offset??0)
+                .all();
+            return classifications;
+        } catch (error) {
+            console.error('Error fetching classifications:', error);
+            throw error;
+        }
+    }
+
     async getOrCreateClassification(classification:INSERT_CLASSIFICATION): Promise<SAVED_CLASSIFICATION> {
         const existing = await this.d1.select().from(TABLE_classifications)
             .where(
                 and(
                     eq(TABLE_classifications.slug, classification.slug),
                     eq(TABLE_classifications.itemid, classification.itemid),
-                    eq(TABLE_classifications.itemtype, this.itemType_Social_Post),
+                    eq(TABLE_classifications.itemtype, this.itemType),
                     eq(TABLE_classifications.subtype, this.network ),
                 ),
         )
@@ -392,6 +425,10 @@ export class StatusDataApi {
         accountId:string,
         subtype?:string
     }): Promise<string[]> {
+        //subtype must be inCLASSIFICATION_SOURCE_TYPES
+        if( subtype  && ! CLASSIFICATION_SOURCE_TYPES.includes(subtype) ){
+            throw new Error(`Invalid subtype: ${subtype}`);
+        }
 
         const r : string[] = [];
         classifications.forEach(
@@ -400,7 +437,7 @@ export class StatusDataApi {
                     slug,
                     subtype,
                     itemid: key,
-                    itemtype: this.itemType_Social_Post
+                    itemtype: this.itemType
                 });
                 if( ! classification ){
                     throw new Error(`Classification not found: ${slug}`);

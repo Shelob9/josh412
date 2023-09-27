@@ -1,35 +1,38 @@
 import { createHandler, handlerInputArgs } from "./createHandler";
 import { Env } from "../env";
-import { DataService, StatusDataApi } from "../dataApi";
+import { DataService, SAVED_STATUS, StatusDataApi } from "../dataApi";
 import { jsonReponse } from "../responseFactory";
 import { Classification_Source, classifySources } from "../classify";
-import { Status } from "../social/types/mastodon";
-import { CLASSIFIERS } from "../classifiers";
-import { json } from "drizzle-orm/mysql-core";
+import { CLASSIFIERS, CLASSIFIER_GM } from "../classifiers";
+import { SAVED_CLASSIFICATION } from "src/db/schema";
 const network = 'mastodon';
 
 const instanceUrl = "https://mastodon.social";
 const accountId = 425078;
 
-type ResponseStatus = {
-    id:string,
-    content:string,
-    url?:string|null,
-    created_at:string,
-    id_reply_to_id?:string|null,
-    id_reply_to_account_id?:string|null,
-    replies_count:number,
-    reblogs_count:number,
-    media_attachments: any[],
-    mentions: any[],
-    account: {
-        id:string,
-        username:string,
-        display_name:string,
-        url:string,
-    },
-    reblog?:ResponseStatus
+const statusToSource = (status: SAVED_STATUS, network: string): Classification_Source => {
+    const { id, content } = status;
+    return {
+        id,
+        text: content,
+        sourcetype: network,
+    };
 };
+
+const statusesToSources = (statuses: SAVED_STATUS[], network: string): Classification_Source[] => {
+    return statuses.map((status:SAVED_STATUS) => statusToSource(status, network));
+};
+
+export const allMastodonClassifications = async ({env,req}: handlerInputArgs): Promise<Response> => {
+    return createHandler(env,req,async (data,url,req) => {
+        const dataApi = await data.getStatusApi('mastodon');
+        const classifications = await dataApi.getClassifications();
+        return jsonReponse({
+            classifications
+        },200);
+
+    });
+}
 
 export const getToot = async ({env,req}: handlerInputArgs): Promise<Response> => {
     return createHandler(env,req,async (data,url,req) => {
@@ -42,16 +45,23 @@ export const getToot = async ({env,req}: handlerInputArgs): Promise<Response> =>
             },400);
         }
         const api = await data.getStatusApi(network);
+
         const {status,key,classifications} = await api.getSavedStatus({
             instanceUrl,
             statusId,
             accountId: accountId.toString(),
         });
+        if( ! status ) {
+            return jsonReponse({
+                error:'no status',
+            },404);
+        }
+
         return jsonReponse({
             statusId,
             status,
             key,
-            classifications
+            classifications,
         },status ? 200 : 404);
     });
 
@@ -115,33 +125,43 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
         default:
             const api = await data.getStatusApi(network);
             const {statuses,cursor:sCursor,complete} = await api.getSavedSatuses(instanceUrl,cursor);
-            const sources : Classification_Source[] = statuses.map(
-                ({id,content}:Status) => {
-                    return {
-                        id,
-                        text:content,
-                        sourcetype: network,
-                    }
-                }
-            );
+            const sources = statusesToSources(statuses,network);
 
 
             const classifications = classifySources(sources,CLASSIFIERS);
-
-            let insertedIds : number[] = [];
+            const cIds : string[] = [];
+            const errors : {
+                statusId:string,
+                classificationId:string,
+                error:any
+            }[] = [];
             //loop through, update each status with classifications
             Object.keys(classifications).forEach(async (statusId:string) => {
                 const classificationids = classifications[statusId];
 
-                const r = await api.saveClassifications({
-                    key: api.statusKey({statusId,instanceUrl,accountId:accountId.toString()}),
-                    classifications:classificationids,
-                    subtype:network,
-                    instanceUrl,
-                    accountId: accountId.toString(),
-                });
-                if( r ){
-                    insertedIds = insertedIds.concat(r);
+                if( classificationids.length ){
+                    classificationids.forEach(async (classificationId:string) => {
+                        const status = statuses.find(status => status.id === statusId);
+                        if( ! status ){
+                            return;
+                        }
+                        cIds.push(classificationId);
+                        try {
+                            await api.createClassification({
+                                slug:classificationId,
+                                subtype: network,
+                                itemid: status.key,
+                                itemtype: api.itemType
+                            });
+                        } catch (error) {
+                            errors.push({
+                                statusId,
+                                classificationId,
+                                error,
+                            });
+                        }
+
+                    })
                 }
             });
             return jsonReponse({
@@ -150,7 +170,8 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
                 complete,
                 classifications,
                 stage,
-                insertedIds
+                cIds,
+                errors,
                 //sources
             },200);
             break;

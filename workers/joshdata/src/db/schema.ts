@@ -1,18 +1,23 @@
 import { sqliteTable, integer,index, text,blob, primaryKey, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { CLASSIFICATION_ITEM_TYPES,CLASSIFICATION_SOURCE_TYPES } from 'src/classify';
 
 
 // classifications by taxonomy and tag
 export const TABLE_classifications = sqliteTable('classifications', {
-    //primary key
-    //id: integer('id').notNull().primaryKey(),
   //The classification's unique ID, which is defined in code
     slug: text( 'slug' ).notNull(),
-    //What content type is this classification for?
-    itemtype: text('termid').notNull(),
+    //What content type is this classification for? in ['socialpost']
+    itemtype: text('termid',{
+      //@ts-ignore
+      enum: CLASSIFICATION_ITEM_TYPES
+    }).notNull(),
     //What is unique ID of the content item?
     itemid: text('itemid').notNull(),
-    //OPtional, subtype of the item
-    subtype: text('subtype'),
+    //Optional, subtype of the item
+    subtype: text('subtype', {
+      //@ts-ignore
+      enum: CLASSIFICATION_SOURCE_TYPES
+    }),
     // created at in ms
     // https://github.com/drizzle-team/drizzle-orm/blob/main/drizzle-orm/src/sqlite-core/README.md#column-types
     created: integer('created', { mode:'timestamp_ms'  }).notNull(),
