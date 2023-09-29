@@ -1,17 +1,73 @@
-// src/worker.ts
-var worker_default = {
-  async fetch(request, env, ctx) {
+
+interface Env {
+  BUCKET: R2Bucket;
+  AUTH_SECRET: string;
+}
+
+interface Image {
+  key: string;
+  uploaded: Date;
+  size: number;
+  etag: string;
+  httpEtag: string;
+  url: string;
+}
+
+interface ListResponse {
+  message: string;
+  images: Image[];
+}
+
+interface ErrorResponse {
+  message: string;
+  key: string;
+  url: URL;
+}
+
+interface SuccessResponse {
+  message: string;
+  key: string;
+  url: URL;
+}
+
+type ResponseData = ListResponse | ErrorResponse | SuccessResponse;
+
+interface Classification_Source {
+  id: string;
+  text: string;
+  sourcetype: string;
+}
+
+
+
+const worker = {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const { BUCKET, AUTH_SECRET } = env;
     const url = new URL(request.url);
     const key = url.pathname.slice(1);
+    const auth = request.headers.get("Authorization");
+    const expectedAuth = `Bearer ${AUTH_SECRET}`;
+    if (!auth || auth !== expectedAuth) {
+      return new Response(JSON.stringify({
+        message: "unauthorized",
+        auth
+      }), {
+        status: 401,
+        headers: {
+          "content-type": "text/json;charset=UTF-8"
+        }
+      });
+    }
     if (request.method === "PUT") {
       const auth = request.headers.get("Authorization");
       const expectedAuth = `Bearer ${AUTH_SECRET}`;
       if (!auth || auth !== expectedAuth) {
-        return new Response(JSON.stringify({
+        const response: ErrorResponse = {
           message: "unauthorized",
-          auth
-        }), {
+          key,
+          url
+        };
+        return new Response(JSON.stringify(response), {
           status: 401,
           headers: {
             "content-type": "text/json;charset=UTF-8"
@@ -19,10 +75,12 @@ var worker_default = {
         });
       }
       if (!key) {
-        return new Response(JSON.stringify({
+        const response: ErrorResponse = {
           message: `Invalid key`,
+          key,
           url
-        }), {
+        };
+        return new Response(JSON.stringify(response), {
           status: 400,
           headers: {
             "content-type": "text/json;charset=UTF-8"
@@ -31,22 +89,24 @@ var worker_default = {
       }
       try {
         await BUCKET.put(key, request.body);
-        return new Response(JSON.stringify({
+        const response: SuccessResponse = {
           message: `Object ${key} uploaded successfully!`,
           key,
           url
-        }), {
+        };
+        return new Response(JSON.stringify(response), {
           status: 201,
           headers: {
             "content-type": "text/json;charset=UTF-8"
           }
         });
       } catch (error) {
-        return new Response(JSON.stringify({
+        const response: ErrorResponse = {
           message: "failed",
           key,
           url
-        }), {
+        };
+        return new Response(JSON.stringify(response), {
           status: 502,
           headers: {
             "content-type": "text/json;charset=UTF-8"
@@ -60,6 +120,7 @@ var worker_default = {
       };
       const list = await BUCKET.list(options);
       let truncated = list.truncated;
+      //@ts-ignore
       let cursor = truncated ? list.cursor : void 0;
       while (truncated) {
         const next = await BUCKET.list({
@@ -68,6 +129,7 @@ var worker_default = {
         });
         list.objects.push(...next.objects);
         truncated = next.truncated;
+        //@ts-ignore
         cursor = next.cursor;
       }
       const images = list.objects.map(
@@ -82,10 +144,11 @@ var worker_default = {
           };
         }
       );
-      return new Response(JSON.stringify({
+      const response: ListResponse = {
         message: `${list.objects.length} items`,
         images
-      }), {
+      };
+      return new Response(JSON.stringify(response), {
         status: 200,
         headers: {
           "content-type": "text/json;charset=UTF-8"
@@ -112,7 +175,5 @@ var worker_default = {
     });
   }
 };
-export {
-  worker_default as default
-};
-//# sourceMappingURL=worker.js.map
+
+export default worker;
