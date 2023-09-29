@@ -8,6 +8,7 @@ import { and, eq } from 'drizzle-orm';
 import { createHandler } from './handlers/createHandler';
 import {getStatus} from '@social';
 import { allClassifications } from './handlers/classifications';
+import { collectPhotos } from './handlers/photos';
 // Initialize router
 const router = new Router<Env>()
 
@@ -24,6 +25,7 @@ router.get('/api/mastodon' , getToots );
 router.get('/api/mastodon/classifications', allMastodonClassifications)
 router.get('/api/mastodon/s/:id' , getToot );
 router.get('/api/mastodon/d' , deleteToots );
+router.get('/api/photos/injest', collectPhotos );
 //?classify=1
 router.get('/api/mastodon/injest' , injestToots );
 router.get('/api/hi', async ({ req }: {req: Request}) => {
