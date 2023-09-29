@@ -1,0 +1,16 @@
+{
+  "name": "workers",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "wrangler": "wrangler init --from-dash cdn"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20230922.0",
+    "typescript": "^5.2.2",
+    "wrangler": "^2.20.1"
+  }
+}

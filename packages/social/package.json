@@ -7,7 +7,6 @@
     "dependencies": {
         "@atproto/api": "^0.6.19"
     },
-    "scripts": {},
     "devDependencies": {
         "@cloudflare/workers-types": "^4.20230922.0"
     }
