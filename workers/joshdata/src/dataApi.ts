@@ -59,7 +59,7 @@ export class DataService {
         const statuses = await getStatuses(
             instanceUrl,
             accountId,
-            lastId ? lastId : undefined,
+            111042246072598623
         );
         if( ! statuses ){
             return {
