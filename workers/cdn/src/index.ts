@@ -45,115 +45,27 @@ const worker = {
     const { BUCKET, AUTH_SECRET } = env;
     const url = new URL(request.url);
     const key = url.pathname.slice(1);
-    const auth = request.headers.get("Authorization");
-    const expectedAuth = `Bearer ${AUTH_SECRET}`;
-    if (!auth || auth !== expectedAuth) {
+    //error unless GET
+    if( request.method !== 'GET' ){
       return new Response(JSON.stringify({
-        message: "unauthorized",
-        auth
+        message: `<h1>${request.method} Not Allowed</h1>`
       }), {
-        status: 401,
+        status: 405,
         headers: {
-          "content-type": "text/json;charset=UTF-8"
+          "content-type": "text/html;charset=UTF-8"
         }
       });
     }
-    if (request.method === "PUT") {
-      const auth = request.headers.get("Authorization");
-      const expectedAuth = `Bearer ${AUTH_SECRET}`;
-      if (!auth || auth !== expectedAuth) {
-        const response: ErrorResponse = {
-          message: "unauthorized",
-          key,
-          url
-        };
-        return new Response(JSON.stringify(response), {
-          status: 401,
-          headers: {
-            "content-type": "text/json;charset=UTF-8"
-          }
-        });
-      }
-      if (!key) {
-        const response: ErrorResponse = {
-          message: `Invalid key`,
-          key,
-          url
-        };
-        return new Response(JSON.stringify(response), {
-          status: 400,
-          headers: {
-            "content-type": "text/json;charset=UTF-8"
-          }
-        });
-      }
-      try {
-        await BUCKET.put(key, request.body);
-        const response: SuccessResponse = {
-          message: `Object ${key} uploaded successfully!`,
-          key,
-          url
-        };
-        return new Response(JSON.stringify(response), {
-          status: 201,
-          headers: {
-            "content-type": "text/json;charset=UTF-8"
-          }
-        });
-      } catch (error) {
-        const response: ErrorResponse = {
-          message: "failed",
-          key,
-          url
-        };
-        return new Response(JSON.stringify(response), {
-          status: 502,
-          headers: {
-            "content-type": "text/json;charset=UTF-8"
-          }
-        });
-      }
-    }
-    if (!key) {
-      const options = {
-        limit: 500
-      };
-      const list = await BUCKET.list(options);
-      let truncated = list.truncated;
-      //@ts-ignore
-      let cursor = truncated ? list.cursor : void 0;
-      while (truncated) {
-        const next = await BUCKET.list({
-          ...options,
-          cursor
-        });
-        list.objects.push(...next.objects);
-        truncated = next.truncated;
-        //@ts-ignore
-        cursor = next.cursor;
-      }
-      const images = list.objects.map(
-        (item) => {
-          return {
-            key: item.key,
-            uploaded: item.uploaded,
-            size: item.size,
-            etag: item.etag,
-            httpEtag: item.httpEtag,
-            url: `${url}${item.key}`
-          };
-        }
-      );
-      const response: ListResponse = {
-        message: `${list.objects.length} items`,
-        images
-      };
-      return new Response(JSON.stringify(response), {
-        status: 200,
+    if( ! key ){
+      return new Response(JSON.stringify({
+        message: `<h1>Key is required</h1>`
+      }), {
+        status: 400,
         headers: {
-          "content-type": "text/json;charset=UTF-8"
+          "content-type": "text/html;charset=UTF-8"
         }
       });
+
     }
     const object = await env.BUCKET.get(key);
     if (object === null) {
@@ -173,6 +85,7 @@ const worker = {
     return new Response(object.body, {
       headers
     });
+
   }
 };
 

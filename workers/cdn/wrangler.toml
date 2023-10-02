@@ -7,9 +7,9 @@ env = { }
 [triggers]
 crons = [ ]
 
-[vars]
-AUTH_SECRET = "9b88b17f4abfdb870e1ac42"
+
 
 [[r2_buckets]]
 binding = "BUCKET"
 bucket_name = "josh412-cdn-1"
+preview_bucket_name = "cdn-dev"
