@@ -1,5 +1,8 @@
 {
 	"compilerOptions": {
+		"paths": {
+			"@media": ["../../packages/media/src"],
+		},
 		/* Visit https://aka.ms/tsconfig.json to read more about this file */
 
 		/* Projects */

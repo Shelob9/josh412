@@ -3,10 +3,13 @@ main = "src/worker.ts"
 compatibility_date = "2023-08-21"
 
 
-[[kv_namespaces]]
-binding = "KV"
-id = "419991e62cdd45e6b1acbc45fadf0204"
-preview_id = "c00a0570cd4b4f0083936400ef3b77d0"
+kv_namespaces = [
+    {binding =  "KV",id = "419991e62cdd45e6b1acbc45fadf0204",preview_id = "c00a0570cd4b4f0083936400ef3b77d0"}
+]
+
+
+
+
 
 [[d1_databases]]
 binding = "DB1"
@@ -16,7 +19,7 @@ migrations_table = "d1_migrations" # Customize this value to change your applied
 migrations_dir = "migrations"
 
 
-[[r2_buckets]]
-binding = "DATABUCKET"
-bucket_name = "joshdata"
-preview_bucket_name= "joshdatalocal"
+r2_buckets = [
+    {binding = "DATABUCKET",bucket_name = "joshdata",preview_bucket_name = "joshdatalocal"},
+    {binding = "CDN_BUCKET",cdn_bucket_name = "josh412-cdn-1",preview_cdn_bucket_name = "cdn-dev"}
+]
