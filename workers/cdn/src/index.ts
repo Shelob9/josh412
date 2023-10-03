@@ -1,8 +1,7 @@
-import {handleGet} from "@media"
+import {handleGet} from "@media/handlers"
 
 interface Env {
   BUCKET: R2Bucket;
-
 }
 
 

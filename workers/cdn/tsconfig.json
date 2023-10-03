@@ -1,7 +1,8 @@
 {
 	"compilerOptions": {
 		"paths": {
-			"@media": ["../../packages/media/src"],
+			"@media/functions": ["../../packages/media/src/functions.ts"],
+			"@media/handlers": ["../../packages/media/src/handlers.ts"],
 		},
 		/* Visit https://aka.ms/tsconfig.json to read more about this file */
 
