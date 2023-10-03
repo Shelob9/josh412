@@ -17,13 +17,16 @@ const instanceUrl = "https://mastodon.social";
 export const collectPhotos = async ({env,req}: handlerInputArgs): Promise<Response> => {
     return createHandler(env,req, async (data,url,req) => {
         const {CDN_BUCKET} = env;
-        const uploadImageFromUrl = async (url:string,) => {
-            console.log(`uploading ${url}`);
+        const uploadImageFromUrl = async (url:string) => {
+            let newKey = url.split('/').pop() as string;
+            newKey = `photos/${newKey}`;
+            console.log(`uploading ${url} to ${newKey}`);
             const response = await fetch(url);
             if( ! response.ok || ! response.body ) {
+                console.log('Fetch failed');
                 return;
             }
-            const newKey = url.split('/').pop() as string;
+
             await putMediaItem(CDN_BUCKET,newKey,response.body);
         }
         const dataApi = await data.getStatusApi(network);
