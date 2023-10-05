@@ -1,11 +1,19 @@
 import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import { Status } from "@social";
-import { INSERT_CLASSIFICATION, SAVED_CLASSIFICATION, TABLE_classifications } from "./db/schema";
+import { MediaAttachment,ImageAttachment, Status } from "@social";
+import {
+    INSERT_CLASSIFICATION,
+    INSERT_IMAGE,
+    SAVED_CLASSIFICATION,
+    TABLE_classifications,
+    TABLE_media
+} from "./db/schema";
 import { and, eq } from "drizzle-orm";
 import { Env } from "./env";
 import { getStatuses } from "@social";
 import {makeSourceType,makeSocialPostKey,makeInjestLastKey} from './kvUtil';
 import { CLASSIFICATION_SOURCE_TYPES, ITEM_TYPE_SOCIAL_POST } from "./classify";
+import {putMediaItem} from "@media/functions";
+
 export type SAVED_STATUS = Status & {key:string};
 
 export type SavedStatusMetaData ={
@@ -166,7 +174,45 @@ export class SocialInjestTrack {
 }
 
 
+export class MediaApi {
+    kv: KVNamespace;
+    d1: DrizzleD1Database;
+    constructor(env: Env ){
+        this.kv = env.KV
+        this.d1 = drizzle(env.DB1);
+    }
 
+    async putAttatchment(item: ImageAttachment ){
+        await putMediaItem(this.BUCKET,newKey,response.body);
+
+        await this.d1.insert(TABLE_media).values(this.attatchmentToInsert(item));
+
+    }
+
+     attatchmentToInsert(item: ImageAttachment ): INSERT_IMAGE {
+        const extension = item.url.split('.').pop();
+        return {
+            url: item.url,
+            height: item.meta?.original.height ?? 0,
+            width: item.meta?.original.width ?? 0,
+            cdnurl: this.makeCdnUrl(item),
+            //@todo this based on actual type.
+            mimetype: `image/${extension}`,
+            description: item.description,
+        }
+    }
+
+    makeCdnUrl(item: ImageAttachment ): string {
+        const name = item.url.split('/').pop();
+        return `https://josh412/${this.makeCdnKey(item)}`;
+    }
+
+    makeCdnKey(item: ImageAttachment ): string {
+        const name = item.url.split('/').pop();
+        return `photos/${name}`;
+    }
+
+}
 export class StatusDataApi {
     network: string;
     kv: KVNamespace;
