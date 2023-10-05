@@ -115,24 +115,27 @@ export class SocialInjestTrack {
 
     }
     async getLastId(accountId:string): Promise<string|false|null> {
-        const lastId = await this.kv.get(makeInjestLastKey({
-            network:this.network,
-            instanceUrl:this.instanceUrl,
-            accountId
-        }));
+        const lastId = await this.kv.get(this.injestKey(accountId));
+        console.log({lastId});
         if( SocialInjestTrack.DONE_FLAG === lastId ){
             return false;
         }
-        return lastId ? lastId : null;
+        return lastId;
     }
 
-    async storeLastId(accountId:string,newValue: string) {
-        await this.kv.put(makeInjestLastKey(
-            {
-                network:this.network,
-                instanceUrl:this.instanceUrl,
-                accountId
-            }),newValue);
+    injestKey(accountId:string): string {
+        return makeInjestLastKey({
+            network:this.network,
+            instanceUrl:this.instanceUrl,
+            accountId
+        });
+    }
+
+    async storeLastId(accountId:string,newValue: string|number) {
+        if( 'number' === typeof newValue ){
+            newValue = newValue.toString();
+        }
+        await this.kv.put(this.injestKey(accountId),newValue);
     }
 
     async setIsDone(accountId:string) {
