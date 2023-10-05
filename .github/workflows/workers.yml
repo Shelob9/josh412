@@ -52,7 +52,12 @@ jobs:
         run: npm run test
         working-directory: workers/joshdata
 
-     
+      - name: deploy
+        run: npm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        working-directory: workers/joshdata
+
 
   tooter:
     runs-on: ubuntu-latest
@@ -71,13 +76,26 @@ jobs:
       - name: test
         run: npm run test
         working-directory: workers/tooter
-        
+
+      - name: deploy
+        run: npm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        working-directory: workers/tooter
+
   cdn:
     runs-on: ubuntu-latest
     needs: paths-filter
     if: needs.paths-filter.outputs.cdn == 'true'
     steps:
       - uses: actions/checkout@v3
-      
-        with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
+
+      - name: install cdn
+        run: npm i
+        working-directory: workers/cdn
+
+      - name: Deploy
+        run: npm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        working-directory: workers/cdn
