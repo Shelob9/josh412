@@ -8,6 +8,13 @@
       "when": 1694728952069,
       "tag": "0000_peaceful_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1696533999591,
+      "tag": "0001_nasty_thing",
+      "breakpoints": true
     }
   ]
 }

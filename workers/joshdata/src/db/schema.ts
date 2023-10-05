@@ -77,6 +77,8 @@ export type INSERT_LINK = typeof TABLE_links.$inferInsert;
 export const TABLE_media = sqliteTable('media', {
     id: integer('id').notNull().primaryKey(),
     url: text('url').notNull(),
+    cdnurl: text('cdnurl'),
+    processversion: integer('processversion'),
 	  description: text('description'),
 	  source: text('source'),
 	  sourceid: text('sourceid'),
