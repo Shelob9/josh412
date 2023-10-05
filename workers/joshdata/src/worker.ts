@@ -35,37 +35,14 @@ router.get('/api/hi', async ({ req }: {req: Request}) => {
 		toot,
 	},420);
 });
-router.get('/api/st', async ({ req }: {req: Request}) => {
 
-
-	// Using our readable and writable to handle streaming data
-	let { readable, writable } = new TransformStream()
-
-
-	let writer = writable.getWriter()
-	const textEncoder = new TextEncoder();
-	writer.write(textEncoder.encode(`One`))
-	writer.write(textEncoder.encode(`TWO`))
-
-	//every two seconds, write Hi Roy and time to the stream
-	setInterval(() => {
-		writer.write(textEncoder.encode(`Hi Roy ${new Date().toISOString()}\n`))
-	}, 2000)
-	setTimeout(() => {
-		writer.write(textEncoder.encode(`Bye`))
-		writer.close()
-	}, 4000)
-
-
-	// Send readable back to the browser so it can read the stream content
-	return new Response(readable, {
-		status: 200,
-		statusText: 'OK',
-		headers: { "Content-Type": "text/plain" }
-	})
-});
 router.get('/api/test', async ({ env,req }: {env: Env,req: Request}) => {
 	return createHandler(env,req,async (data,url,req) => {
+		//const accountId = '425078'
+		const injest = await data.getSocialInjestTrack('mastodon', 'masto.social');
+		await injest.storeLastId('425078', 14 );
+		const lastId  = await injest.getLastId('425078');
+		return  jsonReponse({lastId},200);
 		const statusId = 110986907620507393;
 		const network = 'mastodon';
 		const api = await data.getStatusApi(network);

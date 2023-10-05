@@ -106,16 +106,21 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
             case 'save':
                 const  {
                     lastId,
+                    newLastId,
+                    injestKey,
                     done,
                     statuses:toots,
                 } = await data.injestSocialPosts({
                     network,
                     instanceUrl,
                     accountId,
-                    stopAfter:1
+                    stopAfter:1,
+                    //resetFirst: url.searchParams.has('reset') && url.searchParams.get('reset') ? true :false,
                 });
                 return jsonReponse({
                     lastId,
+                    newLastId,
+                    injestKey,
                     done,
                     stage,
                     toots

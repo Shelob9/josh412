@@ -37,34 +37,40 @@ export class DataService {
         instanceUrl,
         accountId,
         stopAfter,
-
+        resetFirst
     }:
     {
         network:string,
         instanceUrl:string,
         accountId:number,
         stopAfter?: number,
-
+        resetFirst?: boolean,
     }): Promise<{
         lastId: string|false|null;
         done: boolean;
         statuses?: Status[];
+        injestKey: string;
+        newLastId?: string;
     }> {
         const api = await this.getStatusApi(network);
         const track = await this.getSocialInjestTrack(network,instanceUrl);
-        await track.reset(accountId.toString());
+        if( resetFirst ){
+            await track.reset(accountId.toString());
+        }
         await api.deleteAllStatuses(instanceUrl,accountId.toString());
         let lastId = await track.getLastId(accountId.toString());
         let done = await track.isDone(accountId.toString());
         const statuses = await getStatuses(
             instanceUrl,
             accountId,
-            111042246072598623
+            lastId?.toString(),
         );
         if( ! statuses ){
             return {
                 lastId: null,
                 done: true,
+                injestKey: track.injestKey(accountId.toString()),
+
             };
         }
         for( const status of statuses ){
@@ -79,17 +85,21 @@ export class DataService {
             return {
                 lastId:statuses[0].id,
                 done: true,
+                injestKey: track.injestKey(accountId.toString()),
+                statuses,
             };
         }
-        lastId = statuses[statuses.length-1].id;
-        if( lastId ){
-            await track.storeLastId(accountId.toString(),lastId);
+        const newLastId = statuses[statuses.length-1].id;
+        if( newLastId ){
+            await track.storeLastId(accountId.toString(),newLastId);
             done = await track.isDone(accountId.toString());
         }
 
         return {
             statuses,
             lastId,
+            newLastId,
+            injestKey: track.injestKey(accountId.toString()),
             done,
         };
     }
