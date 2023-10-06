@@ -10,9 +10,10 @@ import {
 import { and, eq } from "drizzle-orm";
 import { Env } from "./env";
 import { getStatuses } from "@social";
-import {makeSourceType,makeSocialPostKey,makeInjestLastKey} from './kvUtil';
+import {makeSourceType,makeSocialPostKey} from './kvUtil';
 import { CLASSIFICATION_SOURCE_TYPES, ITEM_TYPE_SOCIAL_POST } from "./classify";
-import {putMediaItem} from "@media/functions";
+import { SocialInjestTrack } from "./dataApi/InjestApi";
+import MediaApi from "./dataApi/MediaApi";
 
 export type SAVED_STATUS = Status & {key:string};
 
@@ -26,9 +27,11 @@ export type SavedStatusMetaData ={
 export class DataService {
     kv: KVNamespace;
     d1: DrizzleD1Database;
+    CDN_BUCKET: R2Bucket;
     constructor(env: Env ){
         this.kv = env.KV
         this.d1 = drizzle(env.DB1);
+        this.CDN_BUCKET = env.CDN_BUCKET;
     }
 
     async getStatusApi(network:string): Promise<StatusDataApi> {
@@ -37,6 +40,10 @@ export class DataService {
 
     async getSocialInjestTrack(network:string,instanceUrl:string): Promise<SocialInjestTrack> {
         return new SocialInjestTrack(network,instanceUrl,this.kv);
+    }
+
+    async getMediaApi (): Promise<MediaApi> {
+        return new MediaApi(this.kv,this.d1,this.CDN_BUCKET);
     }
 
 
@@ -113,106 +120,9 @@ export class DataService {
     }
 }
 
-export class SocialInjestTrack {
-    network: string;
-    instanceUrl: string;
-    kv: KVNamespace;
-
-    static DONE_FLAG: string = 'done';
-    constructor(network:string,instanceUrl:string,kv:KVNamespace){
-        this.network = network;
-        this.instanceUrl = instanceUrl;
-        this.kv = kv;
-    }
-    async reset(accountId:string) {
-        await this.kv.delete(makeInjestLastKey({
-            network:this.network,
-            instanceUrl:this.instanceUrl,
-            accountId
-        }));
-
-    }
-    async getLastId(accountId:string): Promise<string|false|null> {
-        const lastId = await this.kv.get(this.injestKey(accountId));
-        console.log({lastId});
-        if( SocialInjestTrack.DONE_FLAG === lastId ){
-            return false;
-        }
-        return lastId;
-    }
-
-    injestKey(accountId:string): string {
-        return makeInjestLastKey({
-            network:this.network,
-            instanceUrl:this.instanceUrl,
-            accountId
-        });
-    }
-
-    async storeLastId(accountId:string,newValue: string|number) {
-        if( 'number' === typeof newValue ){
-            newValue = newValue.toString();
-        }
-        await this.kv.put(this.injestKey(accountId),newValue);
-    }
-
-    async setIsDone(accountId:string) {
-        await this.kv.put(
-            makeInjestLastKey({
-                network:this.network,
-                instanceUrl:this.instanceUrl,
-                accountId
-            }),
-            SocialInjestTrack.DONE_FLAG
-        );
-    }
-
-    async isDone(accountId:string) {
-        const lastId = await this.getLastId(accountId);
-        return SocialInjestTrack.DONE_FLAG === lastId;
-    }
-}
 
 
-export class MediaApi {
-    kv: KVNamespace;
-    d1: DrizzleD1Database;
-    constructor(env: Env ){
-        this.kv = env.KV
-        this.d1 = drizzle(env.DB1);
-    }
 
-    async putAttatchment(item: ImageAttachment ){
-        await putMediaItem(this.BUCKET,newKey,response.body);
-
-        await this.d1.insert(TABLE_media).values(this.attatchmentToInsert(item));
-
-    }
-
-     attatchmentToInsert(item: ImageAttachment ): INSERT_IMAGE {
-        const extension = item.url.split('.').pop();
-        return {
-            url: item.url,
-            height: item.meta?.original.height ?? 0,
-            width: item.meta?.original.width ?? 0,
-            cdnurl: this.makeCdnUrl(item),
-            //@todo this based on actual type.
-            mimetype: `image/${extension}`,
-            description: item.description,
-        }
-    }
-
-    makeCdnUrl(item: ImageAttachment ): string {
-        const name = item.url.split('/').pop();
-        return `https://josh412/${this.makeCdnKey(item)}`;
-    }
-
-    makeCdnKey(item: ImageAttachment ): string {
-        const name = item.url.split('/').pop();
-        return `photos/${name}`;
-    }
-
-}
 export class StatusDataApi {
     network: string;
     kv: KVNamespace;
