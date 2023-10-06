@@ -13,5 +13,8 @@
     "workers/joshdata",
     "workers/tooter",
     "workers/cdn"
-  ]
+  ],
+  "dependencies": {
+    "wrangler": "^3.11.0"
+  }
 }

@@ -102,6 +102,8 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
 
         const stage = url.searchParams.has('classify') ? 'classify': 'save';
         const cursor = url.searchParams.get('cursor') ?? undefined;
+        env.INJEST_QUEUE.send({direction:'backwards',network:'mastodon',instanceUrl:'https://mastodon.social',accountId:'111131517917647244'});
+
         switch (stage) {
             case 'save':
                 const  {

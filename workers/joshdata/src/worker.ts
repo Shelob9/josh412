@@ -36,114 +36,28 @@ router.get('/api/hi', async ({ req }: {req: Request}) => {
 	},420);
 });
 
-router.get('/api/test', async ({ env,req }: {env: Env,req: Request}) => {
-	return createHandler(env,req,async (data,url,req) => {
-		//const accountId = '425078'
-		const injest = await data.getSocialInjestTrack('mastodon', 'masto.social');
-		await injest.storeLastId('425078', 14 );
-		const lastId  = await injest.getLastId('425078');
-		return  jsonReponse({lastId},200);
-		const statusId = 110986907620507393;
-		const network = 'mastodon';
-		const api = await data.getStatusApi(network);
-		const {status,key,
-			//classifications
-		} = await api.getSavedStatus({
-			instanceUrl: 'mastodon.social',
-			statusId: statusId.toString(),
-			accountId: '425078',
-		});
 
-
-		const d1 = await drizzle(env.DB1);
-		const now = new Date();
-		const args = {
-			slug:'dog',
-			subtype: network,
-			itemid: key,
-			itemtype: `socialpost`,
-
-
-		}
-
-
-		const cG = await api.getOrCreateClassification(args);
-
-		const instanceUrl = "https://mastodon.social";
-		const accountId = '425078';
-		const classification = await api.getOrCreateClassification({
-			slug:'food',
-			subtype: network,
-			itemid: key,
-			itemtype: api.itemType
-		});
-		const r = await api.saveClassifications({
-			key,
-			classifications: [
-				'gn'
-			],
-				subtype: network,
-				instanceUrl,
-				accountId,
-		})
-		const classifications = await d1.select().from(TABLE_classifications).limit(
-			300
-		)
-		return jsonReponse({
-			r,
-			classifications: classifications ?? [],
-			key,
-			status,
-			classification
-
-		},200);
-
-
-	});
-
-
-	const db = await drizzle(env.DB1);
-
-	try {
-		const one = await db.select().from(TABLE_classifications)
-			.where(eq(TABLE_classifications.slug, 'test')
-		).limit(1);
-
-		const results = await db.select().from(TABLE_classifications).all();
-	//const all = await db.select().from(TABLE_classifications).all();
-	return jsonReponse({
-		hi: 'Roy',
-		//result,
-		results,
-		one
-	},200);
-	} catch (error) {
-		return jsonReponse({
-			// @ts-ignore
-			e: error.message,
-		},400);
-	}
-
-
-});
 const rootHandler = async ({ req }: {req: Request}) => {
 	return jsonReponse({
-		routes: {
-			'/api/': 'this',
-			'/api/hi': 'hello',
-			'/api/mastodon': 'all toots',
-			'/api/mastodon/s/:id': 'get toot',
-			'/api/mastodon/d': 'delete toots',
-			'/api/mastodon/injest': 'injest toots',
-		}
 	},200);
 };
 router.get('/api' , rootHandler );
 //redirect root to /api
 router.get('/', rootHandler );
 
+type Injest_Message = {
+	direction:'backwards'|'forward';
+	network:string;
+	instanceUrl:string;
+	accountId:string;
+	type: 'social_post'|'social_post_image'
+}
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		return router.handle(request, env, ctx)
-	}
+	},
+	async queue(batch: MessageBatch<Injest_Message>, env: Env): Promise<void> {
+		let messages = JSON.stringify(batch.messages);
+		console.log(`consumed from our queue: ${messages}`);
+	},
 };
