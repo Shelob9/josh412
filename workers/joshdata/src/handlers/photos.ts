@@ -1,5 +1,4 @@
 import { createHandler, handlerInputArgs } from "./createHandler";
-import { Env } from "../env";
 import { DataService, SAVED_STATUS, StatusDataApi } from "../dataApi";
 import { jsonReponse } from "src/responseFactory";
 import { MediaAttachment, Status } from "@social";
@@ -13,6 +12,10 @@ import {putMediaItem} from "@media/functions";
 const network = 'mastodon';
 const instanceUrl = "https://mastodon.social";
 
+const storeMediaItem = async (dataApi:StatusDataApi,media:MediaAttachment,BUCKET: R2Bucket) => {
+
+
+}
 
 export const collectPhotos = async ({env,req}: handlerInputArgs): Promise<Response> => {
     return createHandler(env,req, async (data,url,req) => {
@@ -20,6 +23,7 @@ export const collectPhotos = async ({env,req}: handlerInputArgs): Promise<Respon
         const uploadImageFromUrl = async (url:string) => {
             let newKey = url.split('/').pop() as string;
             newKey = `photos/${newKey}`;
+            console.log('newKey',newKey);
             console.log(`uploading ${url} to ${newKey}`);
             const response = await fetch(url);
             if( ! response.ok || ! response.body ) {

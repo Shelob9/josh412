@@ -19,5 +19,10 @@ export const makeSocialPostKey = ({network,instanceUrl,id,accountId}:NETWORK_INS
 }
 
 export const makeInjestLastKey = ({network,instanceUrl,accountId}:NETWORK_INSTANCE_ACCOUNT) => {
-    return `meta_socialpost:injest:${makeSourceType({network,instanceUrl,accountId})}:lastid`;
+    return `meta_socialpost:injest:${makeSourceType({network,instanceUrl,accountId})}:lastId`;
+}
+
+//A list of all lastIds used for injests
+export const makeInjestLastIdListKey = ({network,instanceUrl,accountId}:NETWORK_INSTANCE_ACCOUNT) => {
+    return `meta_socialpost:injest:${makeSourceType({network,instanceUrl,accountId})}:lastIdList`;
 }

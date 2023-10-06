@@ -1,4 +1,4 @@
-import { makeInjestLastKey } from "src/kvUtil";
+import { makeInjestLastKey,makeInjestLastIdListKey } from "src/kvUtil";
 
 export class SocialInjestTrack {
     network: string;
@@ -17,15 +17,47 @@ export class SocialInjestTrack {
             instanceUrl:this.instanceUrl,
             accountId
         }));
+        //delete log
+        await this.kv.delete(makeInjestLastIdListKey({
+            network:this.network,
+            instanceUrl:this.instanceUrl,
+            accountId
+        }));
 
     }
     async getLastId(accountId:string): Promise<string|false|null> {
         const lastId = await this.kv.get(this.injestKey(accountId));
-        console.log({lastId});
         if( SocialInjestTrack.DONE_FLAG === lastId ){
             return false;
         }
         return lastId;
+    }
+
+    private async getLastIdList(): Promise<string[]> {
+        const listKey = makeInjestLastIdListKey({
+            network:this.network,
+            instanceUrl:this.instanceUrl,
+            accountId:undefined
+        });
+        // @ts-ignore
+        let lastIds : string[] = await this.kv.get(listKey) || [];
+        if( ! lastIds ){
+            lastIds  = [];
+        }
+        return lastIds;
+    }
+
+    private async recordLastId(accountId:string,lastId:string ) {
+
+        if( SocialInjestTrack.DONE_FLAG !== lastId ){
+            //get the list of lastIds
+            const lastIds = await this.getLastIdList();
+            //add the lastId to the list
+            lastIds.push(lastId);
+        }
+
+        await this.kv.put(this.injestKey(accountId),lastId);
+
     }
 
     injestKey(accountId:string): string {
@@ -40,7 +72,7 @@ export class SocialInjestTrack {
         if( 'number' === typeof newValue ){
             newValue = newValue.toString();
         }
-        await this.kv.put(this.injestKey(accountId),newValue);
+        await this.recordLastId(accountId,newValue);
     }
 
     async setIsDone(accountId:string) {
