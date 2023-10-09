@@ -9,8 +9,15 @@ export function getStatuses(
     instanceUrl: string,
     accountId:number,
     maxId?:string,
+    sinceId?:string
 ): Promise<Status[]>{
-    const statuses = fetch(`${instanceUrl}/api/v1/accounts/${accountId}/statuses?limit=40${maxId ? `&max_id=${maxId}` : ''}`).then(res => res.json())
+    let url = `${instanceUrl}/api/v1/accounts/${accountId}/statuses?limit=40`
+    if( maxId ){
+        url += `&max_id=${maxId}`;
+    }else if( sinceId ){
+        url += `&since_id=${sinceId}`;
+    }
+    const statuses = fetch(url).then(res => res.json())
         .catch(err => {
             console.error(err);
             return [];
