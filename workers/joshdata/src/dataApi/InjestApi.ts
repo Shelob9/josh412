@@ -1,5 +1,77 @@
+import { DataService } from "src/dataApi";
 import { makeInjestLastKey,makeInjestLastIdListKey } from "src/kvUtil";
+import { Injest_Message } from "src/types";
 
+export class InjestQueueApi {
+
+    DATA: DataService;
+    constructor(data: DataService){
+        this.DATA = data;
+
+    }
+    async send(message: Injest_Message) {
+        await this.DATA.INJEST_QUEUE.send(message);
+    }
+
+    async consume(message: Injest_Message) {
+        switch (message.stage) {
+            case 'save':
+                switch (message.type) {
+                    case 'social_post':
+                        const  {
+                            done,
+                        } = await this.DATA.injestSocialPosts({
+                            network: message.network,
+                            instanceUrl: message.instanceUrl,
+                            accountId: parseInt(message.accountId,10),
+                        });
+                        if( ! done ){
+                            await this.send({
+                                direction:message.direction,
+                                network:message.network,
+                                instanceUrl:message.instanceUrl,
+                                accountId:message.accountId,
+                                type:message.type,
+                                stage:message.stage,
+                            });
+                        }
+                        break;
+                    case 'social_post_image':
+
+
+                    default:
+                        break;
+                }
+
+
+                break;
+            case 'classify':
+                if( 'social_post' === message.type ){
+                    const {
+                        complete,
+                    } = await this.DATA.classifySocialPosts({
+                        network: message.network,
+                        instanceUrl: message.instanceUrl,
+                        accountId: parseInt(message.accountId,10),
+                    });
+                    if( ! complete ){
+                        await this.send({
+                            direction:message.direction,
+                            network:message.network,
+                            instanceUrl:message.instanceUrl,
+                            accountId:message.accountId,
+                            type:message.type,
+                            stage:message.stage,
+                        });
+                    }
+                }
+
+
+            default:
+                break;
+        }
+    }
+}
 export class SocialInjestTrack {
     network: string;
     instanceUrl: string;

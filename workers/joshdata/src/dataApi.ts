@@ -12,7 +12,7 @@ import { Env } from "./env";
 import { getStatuses } from "@social";
 import {makeSourceType,makeSocialPostKey} from './kvUtil';
 import { CLASSIFICATION_SOURCE_TYPES, Classification_Source, ITEM_TYPE_SOCIAL_POST, classifySources } from "./classify";
-import { SocialInjestTrack } from "./dataApi/InjestApi";
+import { InjestQueueApi, SocialInjestTrack } from "./dataApi/InjestApi";
 import MediaApi from "./dataApi/MediaApi";
 import { CLASSIFIERS } from "./classifiers";
 
@@ -42,10 +42,12 @@ export class DataService {
     kv: KVNamespace;
     d1: DrizzleD1Database;
     CDN_BUCKET: R2Bucket;
+    INJEST_QUEUE: Queue;
     constructor(env: Env ){
         this.kv = env.KV
         this.d1 = drizzle(env.DB1);
         this.CDN_BUCKET = env.CDN_BUCKET;
+        this.INJEST_QUEUE = env.INJEST_QUEUE;
     }
 
     async getStatusApi(network:string): Promise<StatusDataApi> {
@@ -58,6 +60,10 @@ export class DataService {
 
     async getMediaApi (): Promise<MediaApi> {
         return new MediaApi(this.kv,this.d1,this.CDN_BUCKET);
+    }
+
+    async getInjestQueueApi (): Promise<InjestQueueApi> {
+        return new InjestQueueApi(this);
     }
 
 

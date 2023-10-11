@@ -5,6 +5,7 @@ import { jsonReponse } from "../responseFactory";
 import { Classification_Source, classifySources } from "../classify";
 import { CLASSIFIERS, CLASSIFIER_GM } from "../classifiers";
 import { SAVED_CLASSIFICATION } from "src/db/schema";
+import { InjestQueueApi } from "src/dataApi/InjestApi";
 const network = 'mastodon';
 
 const instanceUrl = "https://mastodon.social";
@@ -102,7 +103,7 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
 
         const stage = url.searchParams.has('classify') ? 'classify': 'save';
         const cursor = url.searchParams.get('cursor') ?? undefined;
-       // env.INJEST_QUEUE.send({direction:'backwards',network:'mastodon',instanceUrl:'https://mastodon.social',accountId:'111131517917647244'});
+        const injestQueue = await data.getInjestQueueApi();
 
         switch (stage) {
             case 'save':
@@ -118,6 +119,28 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
                     accountId,
                     //resetFirst: url.searchParams.has('reset') && url.searchParams.get('reset') ? true :false,
                 });
+                if( done ) {
+                    //start classifying
+                    injestQueue.send({
+                        direction: 'backwards',
+                        network,
+                        instanceUrl,
+                        accountId: accountId.toString(),
+                        type: 'social_post',
+                        stage: 'classify',
+                    });
+                }else{
+                    injestQueue.send({
+                        direction: 'backwards',
+                        network,
+                        instanceUrl,
+                        accountId: accountId.toString(),
+                        type: 'social_post',
+                        stage: 'classify',
+                    });
+                }
+
+
                 return jsonReponse({
                     lastId,
                     newLastId,
@@ -138,6 +161,16 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
                 instanceUrl,
                 accountId,
             });
+            if( ! complete ) {
+                injestQueue.send({
+                    direction: 'backwards',
+                    network,
+                    instanceUrl,
+                    accountId: accountId.toString(),
+                    type: 'social_post',
+                    stage: 'classify',
+                });
+            }
             return jsonReponse({
                 cursor,
                 sCursor,
