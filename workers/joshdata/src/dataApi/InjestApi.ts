@@ -90,4 +90,6 @@ export class SocialInjestTrack {
         const lastId = await this.getLastId(accountId);
         return SocialInjestTrack.DONE_FLAG === lastId;
     }
+
+
 }

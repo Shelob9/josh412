@@ -102,7 +102,7 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
 
         const stage = url.searchParams.has('classify') ? 'classify': 'save';
         const cursor = url.searchParams.get('cursor') ?? undefined;
-        env.INJEST_QUEUE.send({direction:'backwards',network:'mastodon',instanceUrl:'https://mastodon.social',accountId:'111131517917647244'});
+       // env.INJEST_QUEUE.send({direction:'backwards',network:'mastodon',instanceUrl:'https://mastodon.social',accountId:'111131517917647244'});
 
         switch (stage) {
             case 'save':
@@ -116,7 +116,6 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
                     network,
                     instanceUrl,
                     accountId,
-                    stopAfter:1,
                     //resetFirst: url.searchParams.has('reset') && url.searchParams.get('reset') ? true :false,
                 });
                 return jsonReponse({
@@ -130,55 +129,20 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
                 break;
 
         default:
-            const api = await data.getStatusApi(network);
-            const {statuses,cursor:sCursor,complete} = await api.getSavedSatuses(instanceUrl,cursor);
-            const sources = statusesToSources(statuses,network);
-
-
-            const classifications = classifySources(sources,CLASSIFIERS);
-            const cIds : string[] = [];
-            const errors : {
-                statusId:string,
-                classificationId:string,
-                error:any
-            }[] = [];
-            //loop through, update each status with classifications
-            Object.keys(classifications).forEach(async (statusId:string) => {
-                const classificationids = classifications[statusId];
-
-                if( classificationids.length ){
-                    classificationids.forEach(async (classificationId:string) => {
-                        const status = statuses.find(status => status.id === statusId);
-                        if( ! status ){
-                            return;
-                        }
-                        cIds.push(classificationId);
-                        try {
-                            await api.createClassification({
-                                slug:classificationId,
-                                subtype: network,
-                                itemid: status.key,
-                                itemtype: api.itemType
-                            });
-                        } catch (error) {
-                            errors.push({
-                                statusId,
-                                classificationId,
-                                error,
-                            });
-                        }
-
-                    })
-                }
+            const {
+                sCursor,
+                complete,
+                cIds
+            } = await data.classifySocialPosts({
+                network,
+                instanceUrl,
+                accountId,
             });
             return jsonReponse({
                 cursor,
                 sCursor,
                 complete,
-                classifications,
-                stage,
                 cIds,
-                errors,
                 //sources
             },200);
             break;

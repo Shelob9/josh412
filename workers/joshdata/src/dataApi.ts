@@ -11,9 +11,10 @@ import { and, eq } from "drizzle-orm";
 import { Env } from "./env";
 import { getStatuses } from "@social";
 import {makeSourceType,makeSocialPostKey} from './kvUtil';
-import { CLASSIFICATION_SOURCE_TYPES, ITEM_TYPE_SOCIAL_POST } from "./classify";
+import { CLASSIFICATION_SOURCE_TYPES, Classification_Source, ITEM_TYPE_SOCIAL_POST, classifySources } from "./classify";
 import { SocialInjestTrack } from "./dataApi/InjestApi";
 import MediaApi from "./dataApi/MediaApi";
+import { CLASSIFIERS } from "./classifiers";
 
 export type SAVED_STATUS = Status & {key:string};
 
@@ -22,6 +23,19 @@ export type SavedStatusMetaData ={
     itemid: string;
     accountId: string;
     instanceUrl: string;
+};
+
+const statusToSource = (status: SAVED_STATUS, network: string): Classification_Source => {
+    const { id, content } = status;
+    return {
+        id,
+        text: content,
+        sourcetype: network,
+    };
+};
+
+const statusesToSources = (statuses: SAVED_STATUS[], network: string): Classification_Source[] => {
+    return statuses.map((status:SAVED_STATUS) => statusToSource(status, network));
 };
 
 export class DataService {
@@ -51,14 +65,12 @@ export class DataService {
         network,
         instanceUrl,
         accountId,
-        stopAfter,
         resetFirst
     }:
     {
         network:string,
         instanceUrl:string,
         accountId:number,
-        stopAfter?: number,
         resetFirst?: boolean,
     }): Promise<{
         lastId: string|false|null;
@@ -117,6 +129,79 @@ export class DataService {
             injestKey: track.injestKey(accountId.toString()),
             done,
         };
+    }
+
+    async classifySocialPosts({
+        network,
+        instanceUrl,
+        accountId,
+        cursor
+    }:{
+        network:string,
+        instanceUrl:string,
+        accountId:number,
+        cursor?:string
+
+    }): Promise<{
+        sCursor: string|false;
+        complete: boolean;
+        cIds: string[];
+        errors: {
+            statusId:string,
+            classificationId:string,
+            error:any
+        }[]
+    }> {
+        const api = await this.getStatusApi(network);
+        const {statuses,cursor:sCursor,complete} =
+            await api.getSavedSatuses(instanceUrl,accountId,cursor);
+        const sources = statusesToSources(statuses,network);
+
+
+        const classifications = classifySources(sources,CLASSIFIERS);
+        const cIds : string[] = [];
+        const errors : {
+            statusId:string,
+            classificationId:string,
+            error:any
+        }[] = [];
+        //loop through, update each status with classifications
+        Object.keys(classifications).forEach(async (statusId:string) => {
+            const classificationids = classifications[statusId];
+
+            if( classificationids.length ){
+                classificationids.forEach(async (classificationId:string) => {
+                    const status = statuses.find(status => status.id === statusId);
+                    if( ! status ){
+                        return;
+                    }
+                    cIds.push(classificationId);
+                    try {
+                        await api.createClassification({
+                            slug:classificationId,
+                            subtype: network,
+                            itemid: status.key,
+                            itemtype: api.itemType
+                        });
+                    } catch (error) {
+                        errors.push({
+                            statusId,
+                            classificationId,
+                            error,
+                        });
+                    }
+
+                })
+            }
+        });
+        return {
+            sCursor,
+            complete,
+            cIds,
+            errors
+            //sources
+        };
+
     }
 }
 
@@ -191,13 +276,18 @@ export class StatusDataApi {
 
 
     }
-    async getSavedSatuses(instanceUrl:string,cursor?:string): Promise<{
+    async getSavedSatuses(instanceUrl:string,accountId?:number,cursor?:string): Promise<{
         statuses: SAVED_STATUS[];
         complete: boolean;
         cursor: string|false;
     }>{
+        let prefix = makeSourceType({
+            network:this.network,
+            accountId: accountId ? accountId.toString() : undefined,
+            instanceUrl:instanceUrl}
+        );
         const keys = await this.kv.list({
-            prefix: makeSourceType({network:this.network,instanceUrl:instanceUrl}),
+            prefix,
             limit: 1000,
             cursor,
         });

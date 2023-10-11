@@ -1,14 +1,14 @@
-import {  drizzle } from 'drizzle-orm/d1';
+
 import { TABLE_classifications } from './db/schema';
-import { deleteToots, getToots, injestToots,getToot, allMastodonClassifications } from './handlers/mastodon';
+import { deleteToots, getToots, injestToots,getToot, allMastodonClassifications, saveToots } from './handlers/mastodon';
 import { Router } from '@tsndr/cloudflare-worker-router'
 import { jsonReponse } from './responseFactory';
 import { Env } from './env';
-import { and, eq } from 'drizzle-orm';
-import { createHandler } from './handlers/createHandler';
+
 import {getStatus} from '@social';
 import { allClassifications } from './handlers/classifications';
 import { collectPhotos } from './handlers/photos';
+import { Injest_Message } from './types';
 // Initialize router
 const router = new Router<Env>()
 
@@ -45,13 +45,7 @@ router.get('/api' , rootHandler );
 //redirect root to /api
 router.get('/', rootHandler );
 
-type Injest_Message = {
-	direction:'backwards'|'forward';
-	network:string;
-	instanceUrl:string;
-	accountId:string;
-	type: 'social_post'|'social_post_image'
-}
+
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		return router.handle(request, env, ctx)
@@ -59,5 +53,6 @@ export default {
 	async queue(batch: MessageBatch<Injest_Message>, env: Env): Promise<void> {
 		let messages = JSON.stringify(batch.messages);
 		console.log(`consumed from our queue: ${messages}`);
+
 	},
 };
