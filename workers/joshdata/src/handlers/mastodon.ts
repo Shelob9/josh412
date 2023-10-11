@@ -182,3 +182,20 @@ export const injestToots = async ({env,req}: handlerInputArgs): Promise<Response
     }
 
 })};
+
+export const getTootsWithClassification = async ({env,req}: handlerInputArgs): Promise<Response> => {
+
+    return createHandler(env,req,async (data,url,req) =>  {
+        const api = await data.getStatusApi(network);
+        const {statuses} = await api.getWithClassiffication({
+            accountId: accountId.toString(),
+            classification: 'gm',
+        });
+        return jsonReponse({
+            statuses,
+        },200);
+    });
+
+
+
+};

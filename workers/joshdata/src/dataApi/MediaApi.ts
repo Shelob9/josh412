@@ -28,6 +28,7 @@ export default class MediaApi {
 
     }
 
+
     attatchmentToInsert(item: ImageAttachment): INSERT_IMAGE {
         const extension = item.url.split('.').pop();
         return {

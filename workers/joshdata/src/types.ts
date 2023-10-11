@@ -9,3 +9,4 @@ export type Injest_Message = {
 	type: Injest_Type;
     stage: Injest_Stage;
 }
+export type Injest_Messages = Injest_Message[];

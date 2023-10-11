@@ -11,11 +11,8 @@ import {putMediaItem} from "@media/functions";
 
 const network = 'mastodon';
 const instanceUrl = "https://mastodon.social";
+const accountId = 425078;
 
-const storeMediaItem = async (dataApi:StatusDataApi,media:MediaAttachment,BUCKET: R2Bucket) => {
-
-
-}
 
 export const collectPhotos = async ({env,req}: handlerInputArgs): Promise<Response> => {
     return createHandler(env,req, async (data,url,req) => {
@@ -38,7 +35,7 @@ export const collectPhotos = async ({env,req}: handlerInputArgs): Promise<Respon
         const collected : Status[] = statuses;
         //get all status
         while( ! complete ) {
-            const next = await dataApi.getSavedSatuses(instanceUrl,cursor ? cursor : undefined);
+            const next = await dataApi.getSavedSatuses(instanceUrl,accountId,cursor ? cursor : undefined);
             collected.push(...next.statuses);
         }
         //for each status

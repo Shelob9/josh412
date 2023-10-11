@@ -238,7 +238,7 @@ export class StatusDataApi {
             accountId,
         });
     }
-    async  getSavedStatus({instanceUrl,accountId,statusId}:{
+    async getSavedStatus({instanceUrl,accountId,statusId}:{
         instanceUrl:string;
         accountId:string;
         statusId:string;
@@ -468,6 +468,42 @@ export class StatusDataApi {
         }
         await this.createClassification(classification);
         return await this.getOrCreateClassification(classification);
+    }
+
+    async getWithClassiffication({
+        classification,
+    }: {
+        classification: string;
+    }): Promise<{
+        statuses: Status[];
+    }> {
+        const classifications = await this.d1.select().from(TABLE_classifications)
+            .where(
+                and(
+                    eq(TABLE_classifications.slug, classification),
+                    eq(TABLE_classifications.itemtype, this.itemType),
+                    eq(TABLE_classifications.subtype, this.network ),
+                ),
+        );
+        if( ! classifications.length ){
+            return {
+                statuses: [],
+            }
+        }
+        const keys = classifications.map((classification:SAVED_CLASSIFICATION) => classification.itemid);
+        const statuses : Status[] = [];
+        for( const key of keys ){
+            const data = await this.kv.get(key);
+            if( data ){
+                statuses.push(this.prepareStatus(
+                    JSON.parse(data),
+                    key
+                ))
+            }
+        }
+        return {
+            statuses
+        };
     }
 
 
