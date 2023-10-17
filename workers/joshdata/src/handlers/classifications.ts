@@ -6,7 +6,7 @@ export const allClassifications = async ({env,req}: handlerInputArgs): Promise<R
         const dataApi = await data.getStatusApi('mastodon');
         const classifications = await dataApi.getClassifications();
         return jsonReponse({
-            classifications
+            classifications,
         },200);
 
     });

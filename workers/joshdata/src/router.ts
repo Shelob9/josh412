@@ -1,5 +1,5 @@
 
-import { deleteToots, getToots, injestToots,getToot, allMastodonClassifications, getTootsWithClassification, } from './handlers/mastodon';
+import { deleteToots, getToots, injestToots,getToot, allMastodonClassifications, getTootsWithClassification,  } from './handlers/mastodon';
 import { Router } from '@tsndr/cloudflare-worker-router'
 import { jsonReponse } from './responseFactory';
 import { Env } from './env';
@@ -21,9 +21,9 @@ router.use(({ env, req }) => {
 
 router.get('/api/classifications' , allClassifications );
 router.get('/api/mastodon' , getToots );
-router.get('/api/mastodon/classifications', allMastodonClassifications)
+router.get('/api/mastodon/classifications' , getTootsWithClassification );
+
 router.get('/api/mastodon/s/:id' , getToot );
-router.get('/api/mastodon/s/:id/c' , getTootsWithClassification );
 router.get('/api/mastodon/d' , deleteToots );
 router.get('/api/photos/injest', collectPhotos );
 //?classify=1
@@ -32,7 +32,7 @@ router.get('/api/hi', async ({ req }: {req: Request}) => {
 	const toot = await getStatus('https://mastodon.social','111131517917647244');
 	return jsonReponse({
 		hi: 'Roy',
-		toot,
+		//toot,
 	},420);
 });
 

@@ -187,12 +187,13 @@ export const getTootsWithClassification = async ({env,req}: handlerInputArgs): P
 
     return createHandler(env,req,async (data,url,req) =>  {
         const api = await data.getStatusApi(network);
+        const classification = url.searchParams.get('slug') ?? 'gm';
         const {statuses} = await api.getWithClassiffication({
-            accountId: accountId.toString(),
-            classification: 'gm',
+            classification: classification,
         });
         return jsonReponse({
             statuses,
+            classification
         },200);
     });
 
