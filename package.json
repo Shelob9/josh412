@@ -10,9 +10,7 @@
   "license": "ISC",
   "workspaces": [
     "packages/*",
-    "workers/joshdata",
-    "workers/tooter",
-    "workers/cdn"
+    "workers/*"
   ],
   "dependencies": {
     "wrangler": "^3.11.0"
