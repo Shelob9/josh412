@@ -22,6 +22,7 @@ router.use(({ env, req }) => {
 router.get('/api/classifications' , allClassifications );
 router.get('/api/mastodon' , getToots );
 router.get('/api/mastodon/classifications' , getTootsWithClassification );
+router.get('/classifications' , getTootsWithClassification );
 
 router.get('/api/mastodon/s/:id' , getToot );
 router.get('/api/mastodon/d' , deleteToots );
