@@ -1,7 +1,21 @@
+import { ReactNode } from "react";
+
 type Header_Button_Props = {
-    text: string;
+    children: ReactNode;
     onClick?: () => void;
   };
+
+  const primaryBtnClasses = () => `ml-3 inline-flex items-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500`;
+  const secondaryBtnClasses = () => `inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold hover:text-white text-black border-gray hover:border-white border-2 shadow-sm hover:bg-white/20`;
+  const HeaderButton = ({ children, onClick,isPrimary }: Header_Button_Props & {isPrimary:boolean}) => (
+    <button
+          onClick={onClick}
+            type="button"
+            className={isPrimary ? primaryBtnClasses() : secondaryBtnClasses()}
+          >
+            {children}
+      </button>
+  );
   export default function Header({
     title,
     titleLink,
@@ -21,18 +35,8 @@ type Header_Button_Props = {
           </h2>
         </div>
         <div className="mt-4 flex md:ml-4 md:mt-0">
-          <button
-            type="button"
-            className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold hover:text-white text-black border-gray hover:border-white border-2 shadow-sm hover:bg-white/20"
-          >
-            Edit
-          </button>
-          <button
-            type="button"
-            className="ml-3 inline-flex items-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-          >
-            Publish
-          </button>
+          {buttonOne ? <HeaderButton {...buttonOne } isPrimary={false} /> : null}
+          {buttonTwo ? <HeaderButton {...buttonTwo } isPrimary={true} /> : null}
         </div>
       </div>
     );
