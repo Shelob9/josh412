@@ -10,7 +10,8 @@
   "license": "ISC",
   "workspaces": [
     "packages/*",
-    "workers/*"
+    "workers/*",
+    "clients/*"
   ],
   "dependencies": {
     "wrangler": "^3.11.0"
