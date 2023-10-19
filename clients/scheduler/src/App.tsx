@@ -1,3 +1,4 @@
+import {useEffect} from 'react';
 import Grid from "./components/Grid";
 import Header from "./components/Header";
 import PostList, { Post_Props } from "./components/PostList";
@@ -37,6 +38,9 @@ const posts: Post_Props[] = [
 ];
 
 export default function App(){
+  useEffect(() => {
+    fetch('/api/scheduler').then(r => r.json()).then(r => console.log(r))
+  },[])
   return (
     <>
       <Header title={'App Title'} />
@@ -46,4 +50,4 @@ export default function App(){
       </Grid>
     </>
   );
-};
+}
