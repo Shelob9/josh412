@@ -75,14 +75,17 @@ const accounts : Account[] = [
     network: 'mastodon',
     instanceUrl: 'https://mastodon.social',
     accountId: '1',
-    accountName: 'Josh412',
+    accountName: 'Josh One',
+    accountHandle: '@Josh412',
+
     accountAvatarUrl: 'https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png',
   },
   {
     network: 'mastodon',
     instanceUrl: 'https://fosstodon.org',
     accountId: '122',
-    accountName: 'Josh412',
+    accountName: 'Josh Pollock',
+    accountHandle: '@Josh412',
     accountAvatarUrl: 'https://cdn.fosstodon.org/accounts/avatars/109/276/361/938/539/865/original/ac052ce9bc796f07.png',
   }
 ].map(account => ({...account, key:`${account.network}-${account.instanceUrl.replace('https://', '')}-${account.accountId}`})
@@ -97,7 +100,6 @@ export default function App(){
     console.log({text,enabledAccounts})
   }
 
-
   return (
     <>
       <Header title={'App Title'} buttonOne={buttonOne} buttonTwo={buttonTwo} />
@@ -105,8 +107,8 @@ export default function App(){
         <Composer onPublish={onPublish} accounts={accounts} />
       </>
       <Grid columns={2}>
-        <PostList posts={posts} />
-        <PostList posts={posts} />
+        <PostList posts={posts} account={accounts[0]} />
+        <PostList posts={posts} account={accounts[1]}/>
       </Grid>
 
     </>

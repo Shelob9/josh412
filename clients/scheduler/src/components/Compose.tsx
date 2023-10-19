@@ -5,6 +5,7 @@ export type Account = {
     instanceUrl: string;
     accountId: string;
     accountName: string;
+    accountHandle: string;
     accountAvatarUrl: string;
     key: string;
 }
@@ -17,16 +18,33 @@ export function AccountIconButton({
     enabled: boolean;
     toggleEnabled: () => void;
 }) {
-    const clickHandler = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+    const clickHandler = (e: {preventDefault: () => void }) => {
         e.preventDefault();
         toggleEnabled();
     }
     return(
+        <button onClick={clickHandler}>
+            <AccountIcon
+                account={account}
+                className={enabled ? 'border-black' : 'grayscale'}
+            />
+        </button>
+    )
+}
+
+export function AccountIcon({
+    account,
+    className
+}:{
+    account: Account;
+    className: string;
+}) {
+
+    return(
         <img
-            className={`border-2 ${enabled ? 'border-black' : 'grayscale'} inline-block h-10 w-10 rounded-full`}
+            className={`${className} inline-block h-10 w-10 rounded-full`}
             src={account.accountAvatarUrl}
             alt={`Avatar for ${account.accountName} on ${account.network}`}
-            onClick={clickHandler}
         />
     )
 }
