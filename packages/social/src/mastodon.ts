@@ -1,4 +1,57 @@
-import { Status } from "./types/mastodon";
+import { Attatchment } from ".";
+import { ImageAttachment, Status } from "./types/mastodon";
+
+/**
+ * Create status
+ *
+ * @see https://docs.joinmastodon.org/methods/statuses/#create
+ * @see https://docs.joinmastodon.org/methods/media/
+ */
+export async function createMastodonStatus(
+    token: string,
+    text: string,
+    instanceUrl: string,
+    visibility: 'public' | 'unlisted' | 'private' | 'direct',
+    attachments?: Attatchment[]
+): Promise<{
+    id: string
+}> {
+    const data : {
+        status: string;
+        visibility: string;
+        media_ids?: string[];
+    } = {
+        status: text,
+        visibility: visibility,
+    };
+    if( attachments ){
+        const mediaIds = await Promise.all(attachments.map(async (attatchment) => {
+            const mediaResponse = await fetch(`${instanceUrl}/api/v1/media`, {
+                method: 'POST',
+                body: attatchment.file,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': attatchment.encoding
+                }
+            });
+            const mediaData = await mediaResponse.json() as ImageAttachment;
+            return mediaData.id;
+        }));
+        if( mediaIds.length ){
+            data.media_ids = mediaIds;
+        }
+    }
+    const statusResponse = await fetch('https://mastodon.social/api/v1/statuses', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
+    const statusData = await statusResponse.json() as {id:string};
+    return {id: statusData.id}
+}
 
 /**
  * Get statuses

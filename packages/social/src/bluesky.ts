@@ -96,7 +96,8 @@ export async function postBsykyStatus({ text, agent, attatchments }: {
     if (attatchments && attatchments.length > 0) {
 
       const images = await Promise.all(attatchments.map(async ({ file, description, encoding }) => {
-        const upload = await agent.uploadBlob(file, { encoding, });
+        const buffer = await file.text();//@todo use arrayBuffer?
+        const upload = await agent.uploadBlob(buffer, { encoding, });
         return {
           image: upload.data.blob,
           alt: description,
