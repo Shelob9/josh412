@@ -1,4 +1,4 @@
-import { putMediaItem,getMediaItem } from "./functions";
+import { getMediaItem, putMediaItem } from "./functions";
 interface Image {
     key: string;
     uploaded: Date;
@@ -49,7 +49,9 @@ interface Image {
         });
       }
       try {
-        const {message} = await putMediaItem(BUCKET, key, request.body);
+        const {message} = await putMediaItem(BUCKET, key, request.body,request.headers.get("content-type") ?{
+          contentType: request.headers.get("content-type"),
+        }:undefined);
         return new Response(JSON.stringify({
           message,
           key,

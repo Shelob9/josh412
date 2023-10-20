@@ -1,22 +1,39 @@
 import { Receiver, Client } from "@upstash/qstash";
-
+import {handlePut} from "@media/handlers"
 export interface Env {
     QSTASH_CURRENT_SIGNING_KEY: string;
     QSTASH_NEXT_SIGNING_KEY: string;
     QSTASH_TOKEN: string;
     UPSTASH_QSTASH_URL: string;
+    IMAGE_BUCKET: R2Bucket;
 }
 export default {
     async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
         const method = request.method.toUpperCase();
         if (['PUT', 'POST'].includes(method)) {
+
             const topic = "josh412"
             const body = await request.text();
             const {
                 QSTASH_CURRENT_SIGNING_KEY,
                 QSTASH_NEXT_SIGNING_KEY,
                 QSTASH_TOKEN,
+                IMAGE_BUCKET,
             } = env;
+            // if we have content-type and it is png or jpg
+            // upload media
+            const allowedMediaTypes = ["image/png","image/jpeg"];
+            const contentType = request.headers.get("content-type");
+            if( contentType && allowedMediaTypes.includes(contentType)  ){
+               const uploadResponse =  await handlePut(request,IMAGE_BUCKET );
+               return uploadResponse;
+            }
+            //if not JSON return invalid
+            if( ! contentType || ! contentType.includes("application/json") ){
+                return new Response(JSON.stringify({
+                    status: "content-typenot allowed",
+                }), { status: 400 });
+            }
 
             if ('PUT' === method) {
                 const nowInseconds = Math.round( Date.now().valueOf() / 1000 );

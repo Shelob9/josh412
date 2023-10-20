@@ -68,6 +68,22 @@ export function AccountIcons({ accounts,enabledAccounts, toggleEnabled}: {
         </div>
     )
 }
+
+const AddImageButton = ({onClick}:{
+    onClick: () => void;
+}) => {
+    return (
+        <button
+            onClick={(e) => {
+                e.preventDefault();
+                onClick();
+            }}
+            className="mt-1 group flex items-center text-blue-400 px-2 py-2 text-base leading-6 font-medium rounded-full hover:bg-blue-800 hover:text-blue-300">
+            <svg className="text-center h-7 w-6" fill="none" stroke-linecap="round" stroke-linejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+        </button>
+    );
+}
+const UPLOAD_ID = 'imgupload';
 export default function Composer({accounts, onPublish}: {
     accounts: Account[];
     onPublish: (text: string,enabledAccounts:Account[] ) => void;
@@ -88,11 +104,45 @@ export default function Composer({accounts, onPublish}: {
         const text = e.currentTarget.elements.namedItem(TEXTAREA_NAME) as HTMLInputElement;
         onPublish(text.value, _enabledAccounts);
     }
+
+    function handleImageBtnClick() {
+        const input = document.getElementById(UPLOAD_ID) as HTMLInputElement;
+        if( input ){
+            input.click();
+        }
+    }
+    function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const files = e.target.files;
+        if(files){
+            console.log({files});
+            if( files.length > 0 ){
+                const file = files[0];
+                fetch('/api/upload', {
+                    method: 'POST',
+                    body: files[0],
+                    headers: {
+                        "content-type": file.type
+                    }
+                }).then(res => {
+                    console.log({res});
+                })
+            }
+        }
+    }
     return(
         <form
             onSubmit={handler}
             className={`border-2 border-gray`}
         >
+            <input
+                accept="image/png, image/jpeg"
+                type="file"
+                id={UPLOAD_ID}
+                style={
+                    {display: 'none',visibility: 'hidden'}
+                }
+                onChange={handleFileChange}
+            />
             <div className="flex ">
                     <AccountIcons
                         enabledAccounts={enabledAccounts}
@@ -110,16 +160,13 @@ export default function Composer({accounts, onPublish}: {
                 </div>
                 <div className="flex">
                     <div className="w-10"></div>
-
                     <div className="w-64 px-2">
 
                         <div className="flex items-center">
-                            <div className="flex-1 text-center px-1 py-1 m-2">
-                                <a className="mt-1 group flex items-center text-blue-400 px-2 py-2 text-base leading-6 font-medium rounded-full hover:bg-blue-800 hover:text-blue-300" target="_blank">
-                                    <svg className="text-center h-7 w-6" fill="none" stroke-linecap="round" stroke-linejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                  </a>
+                            <div className="flex-1 text-center px-1 py-1 m-2 composer-insert-image">
+                                <AddImageButton onClick={handleImageBtnClick} />
                             </div>
-                            <div className="flex-1 text-center py-2 m-2">
+                            <div className="flex-1 text-center py-2 m-2 composer-insert-emoji">
                                 <a className="mt-1 group flex items-center text-blue-400 px-2 py-2 text-base leading-6 font-medium rounded-full hover:bg-blue-800 hover:text-blue-300" target="_blank">
                                 <svg className="text-center h-7 w-6" fill="none" stroke-linecap="round" stroke-linejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </a>
