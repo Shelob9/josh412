@@ -1,11 +1,13 @@
-import { Receiver, Client } from "@upstash/qstash";
-import {handlePut} from "@media/handlers"
+import { handlePut } from "@media/handlers";
+import { Receiver } from "@upstash/qstash";
+import ScheduledPostData, { InsertScheduledPost } from "./data/scheduled";
 export interface Env {
     QSTASH_CURRENT_SIGNING_KEY: string;
     QSTASH_NEXT_SIGNING_KEY: string;
     QSTASH_TOKEN: string;
     UPSTASH_QSTASH_URL: string;
     IMAGE_BUCKET: R2Bucket;
+    KV: KVNamespace;
 }
 export default {
     async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -13,7 +15,7 @@ export default {
         if (['PUT', 'POST'].includes(method)) {
 
             const topic = "josh412"
-            const body = await request.text();
+
             const {
                 QSTASH_CURRENT_SIGNING_KEY,
                 QSTASH_NEXT_SIGNING_KEY,
@@ -24,6 +26,7 @@ export default {
             // upload media
             const allowedMediaTypes = ["image/png","image/jpeg"];
             const contentType = request.headers.get("content-type");
+
             if( contentType && allowedMediaTypes.includes(contentType)  ){
                const uploadResponse =  await handlePut(request,IMAGE_BUCKET );
                return uploadResponse;
@@ -34,14 +37,20 @@ export default {
                     status: "content-typenot allowed",
                 }), { status: 400 });
             }
-
+            const body = await request.text();
+            const dataApi =  new ScheduledPostData(env.KV);
             if ('PUT' === method) {
                 const nowInseconds = Math.round( Date.now().valueOf() / 1000 );
                 const notBefore = nowInseconds + 3;
+                const data = JSON.parse(body) as InsertScheduledPost;
+                const keys = await dataApi.savePost(data);
+
                 try {
                     const response = await fetch(`https://qstash.upstash.io/v1/publish/${topic}`, {
                         method: 'POST',
-                        body,
+                        body: JSON.stringify({
+                            keys
+                        }),
                         headers: {
                             "content-type": "application/json",
                             "Authorization": `Bearer ${QSTASH_TOKEN}`,
@@ -77,7 +86,30 @@ export default {
                 if (!isValid) {
                     return new Response("Invalid signature", { status: 401 });
                 }
-                return new Response(body, { status: 200 });
+                const keys = JSON.parse(body) as string[];
+
+                const posts = Promise.all(
+                    keys.map(key => dataApi.getSavedPost(key))
+                );
+                const send = async (post: InsertScheduledPost) => {
+                    //@todo this
+                    return false;
+                }
+                const responses = Promise.all(
+                    (await posts).map(async (post) => {
+                        if( ! post ){
+                            return false;
+                        }
+                        const sent = await send(post);
+                        if( sent ){
+                            return dataApi.markPostAsSent(post);
+                        }
+                    })
+                );
+                return new Response(JSON.stringify({
+                    responses,
+                    body
+                }), { status: 200 });
             }
 
         }
