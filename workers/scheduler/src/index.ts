@@ -1,4 +1,4 @@
-import { DataService, Env, ScheduledPostData } from '@feeder';
+import { DataService, Env } from '@feeder';
 import { handlePut } from "@media/handlers";
 import { InsertScheduledPost } from "../../../packages/feeder/src/data/ScheduledPostData";
 export default {
@@ -27,11 +27,19 @@ export default {
                 }), { status: 400 });
             }
             const body = await request.text();
-            const scheduledPostService =  new ScheduledPostData(dataService);
             const nowInseconds = Math.round( Date.now().valueOf() / 1000 );
             const notBefore = nowInseconds + 3;
             const data = JSON.parse(body) as InsertScheduledPost;
-            const keys = await scheduledPostService.savePost(data);
+            //Validate accounts exist
+            data.accounts.map(async (accountKey:string) => {
+                const account = await dataService.accounts.getAccount(accountKey);
+                if( ! account ){
+                    return new Response(JSON.stringify({
+                        status: `Account ${accountKey} not found`,
+                    }), { status: 400 });
+                }
+            });
+            const keys = await dataService.scheduledPosts.savePost(data);
             try {
                 const response = await fetch(`https://qstash.upstash.io/v1/publish/${topic}`, {
                     method: 'POST',

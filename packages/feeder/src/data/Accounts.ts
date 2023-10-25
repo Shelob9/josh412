@@ -11,8 +11,12 @@ export default class Accounts extends DataService {
         return await this.kv.put(this.accountKey(account), JSON.stringify(account));
     }
 
-    async getAccount( accountKey : string ){
-        return await this.kv.get(accountKey);
+    async getAccount( accountKey : string ):Promise<Account>{
+        const data = await this.kv.get(accountKey);
+        if( data === null ){
+            throw new Error("Account not found");
+        }
+        return JSON.parse(data) as Account;
     }
 
     async hasAccount(accountKey :string ){

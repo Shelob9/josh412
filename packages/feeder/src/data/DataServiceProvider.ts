@@ -3,6 +3,8 @@ import AccountsService from "./Accounts";
 import ScheduledPostData from "./ScheduledPostData";
 export default class DataServiceProvider {
     env: Env;
+    private _scheduledPosts: ScheduledPostData;
+    private _accounts: AccountsService;
     constructor(env: Env) {
         this.env = env;
     }
@@ -12,10 +14,16 @@ export default class DataServiceProvider {
     }
 
     get scheduledPosts(){
-        return new ScheduledPostData(this);
+        if( ! this._scheduledPosts ){
+            this._scheduledPosts = new ScheduledPostData(this);
+        }
+        return this._scheduledPosts;
     }
 
     get accounts(){
-        return new AccountsService(this);
+        if( ! this._accounts ){
+            this._accounts = new AccountsService(this);
+        }
+        return this._accounts;
     }
 }

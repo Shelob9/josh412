@@ -1,6 +1,7 @@
 import { DataService, Env, ScheduledPostData } from "@feeder";
+import { createMastodonStatus } from "@social";
 import { Receiver } from "@upstash/qstash";
-import { Account, ScheduledPost } from "../../../packages/feeder/src/data/ScheduledPostData";
+import { ScheduledPost } from "../../../packages/feeder/src/data/ScheduledPostData";
 export default {
     async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
         const method = request.method.toUpperCase();
@@ -30,48 +31,65 @@ export default {
 				nextSigningKey: QSTASH_NEXT_SIGNING_KEY,
 			});
 
-                const isValid = await receiver
-                    .verify({
-                        signature: request.headers.get("Upstash-Signature")!,
-                        body,
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                        return false;
-                    });
-                console.log({ isValid, body })
-                if (!isValid) {
-                    return new Response("Invalid signature", { status: 401 });
-                }
-                const keys = JSON.parse(body) as string[];
+			const isValid = await receiver
+				.verify({
+					signature: request.headers.get("Upstash-Signature")!,
+					body,
+				})
+				.catch((err) => {
+					console.error(err);
+					return false;
+				});
+			console.log({ isValid, body })
+			if (!isValid) {
+				return new Response("Invalid signature", { status: 401 });
+			}
+			const keys = JSON.parse(body) as string[];
 
-                const posts = await Promise.all(
-                    keys.map(key => dataApi.getSavedPost(key))
-                );
-                const send = async (post: ScheduledPost) => {
+			const posts = await Promise.all(
+				keys.map(key => dataApi.getSavedPost(key))
+			);
 
-                }
-                const responses = Promise.all(
-                    ( posts).map(async (post:ScheduledPost|null) => {
-						if( ! post ){
+			const responses = Promise.all(
+				( posts).map(async (post:ScheduledPost|null) => {
+					if( ! post ){
+						return;
+					}
+					post.accounts.map(async (accountKey:string) => {
+						const account = await dataService.accounts.getAccount(accountKey);
+						if( ! account ){
 							return;
 						}
-                        post.accounts.map(async (account:Account) => {
-							switch(account.network){
-								case "bluesky":
-									break;
-								case "mastodon":
-									break;
-							}
-							const response = await send(post);
-							console.log({response});
-						})
-                    }).filter(p => p)
-                );
-                return new Response(JSON.stringify({
-                    responses,
-                    body
-                }), { status: 200 });
+						switch(account.network){
+							case "bluesky":
+
+								break;
+							case "mastodon":
+								const mastodonToken = await dataService.accounts.getAccountToken(accountKey);
+								if( mastodonToken ){
+										const r = await createMastodonStatus(mastodonToken,post.post.text,account.instanceUrl, 'public');
+										dataService.scheduledPosts.markPostAsSentByKey(post.key);
+										return {
+											id: r.id,
+											accountKey,
+											success: true,
+										}
+								}else{
+									return {
+										id: undefined,
+										accountKey,
+										success: false,
+									}
+								}
+								break;
+						}
+					})
+				}).filter(p => p)
+			);
+			return new Response(JSON.stringify({
+				responses,
+				body
+			}), { status: 200 });
 
 
         }

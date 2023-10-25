@@ -1,4 +1,4 @@
-import DataService from "./data/DataService";
+import DataService from "./data/DataServiceProvider";
 import ScheduledPostData from "./data/ScheduledPostData";
 export interface Env {
     QSTASH_CURRENT_SIGNING_KEY: string;
