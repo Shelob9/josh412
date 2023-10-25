@@ -1,3 +1,5 @@
+import DataService from "./DataService";
+
 //Duplicated from scheduler-client
 export type Account = {
     network: 'mastodon' | 'bluesky';
@@ -11,7 +13,7 @@ export type Account = {
 export type InsertScheduledPost = {
     post: {
         text: string;
-        mediaKeys: string[];
+        mediaKeys?: string[];
     },
     accounts: Account[]
     //Unix timestamp in seconds
@@ -26,9 +28,13 @@ export type ScheduledPost = InsertScheduledPost & {
 
 
 export default class ScheduledPostData {
-    private kv: KVNamespace;
-    constructor(kv: KVNamespace) {
-        this.kv = kv;
+    private data: DataService;
+    constructor(data: DataService) {
+        this.data = data;
+    }
+
+    private get kv(){
+        return this.data.kv;
     }
 
     async savePost(post: InsertScheduledPost) {

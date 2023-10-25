@@ -4,6 +4,7 @@
 			"@social": ["../../packages/social/src"],
 			"@media/functions": ["../../packages/media/src/functions.ts"],
 			"@media/handlers": ["../../packages/media/src/handlers.ts"],
+			"@feeder": ["../../packages/feeder/src"],
 		},
 		/* Visit https://aka.ms/tsconfig.json to read more about this file */
 
