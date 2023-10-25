@@ -1,17 +1,16 @@
-import { Env } from "..";
-import ScheduledPostData from "./ScheduledPostData";
+import DataServiceProvider from "./DataServiceProvider";
+import { Account } from "./ScheduledPostData";
 
-export default class DataService {
-    env: Env;
-    constructor(env: Env) {
-        this.env = env;
+export default abstract class DataService{
+    private dataService: DataServiceProvider;
+    constructor(data: DataServiceProvider) {
+        this.dataService = data;
+    }
+    protected get kv(){
+        return this.dataService.kv;
     }
 
-    get kv(){
-        return this.env.KV;
-    }
-
-    getSchedulePostApi(){
-        return new ScheduledPostData(this);
+    accountKey(account: Account) {
+        return `${account.network}:${account.instanceUrl}:A_${account.accountId}`
     }
 }

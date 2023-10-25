@@ -1,4 +1,5 @@
 import DataService from "./DataService";
+import DataServiceProvider from "./DataServiceProvider";
 
 //Duplicated from scheduler-client
 export type Account = {
@@ -15,7 +16,7 @@ export type InsertScheduledPost = {
         text: string;
         mediaKeys?: string[];
     },
-    accounts: Account[]
+    accounts: string[]
     //Unix timestamp in seconds
     postAt: number;
 }
@@ -27,16 +28,10 @@ export type ScheduledPost = InsertScheduledPost & {
 }
 
 
-export default class ScheduledPostData {
-    private data: DataService;
-    constructor(data: DataService) {
-        this.data = data;
+export default class ScheduledPostData extends DataService {
+    constructor(data: DataServiceProvider){
+        super(data);
     }
-
-    private get kv(){
-        return this.data.kv;
-    }
-
     async savePost(post: InsertScheduledPost) {
         const savedAt = Math.round(Date.now().valueOf() / 1000);
         const keys = post.accounts.map(account => this.accountKey(account));
@@ -111,7 +106,5 @@ export default class ScheduledPostData {
         }
 
     }
-    accountKey(account: Account) {
-        return `${account.network}:${account.instanceUrl}:A_${account.accountId}`
-    }
+
 }
