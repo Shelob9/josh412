@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 
+export type SupportedNetwork = 'mastodon' | 'twitter';
 export type Account = {
-    network: 'mastodon'|'bluesky';
+    network: SupportedNetwork;
     instanceUrl: string;
     accountId: string;
     accountName: string;

@@ -1,8 +1,8 @@
-import {useEffect} from 'react';
+import { useEffect } from 'react';
+import Composer, { Account, SupportedNetwork } from "./components/Compose";
 import Grid from "./components/Grid";
 import Header from "./components/Header";
 import PostList, { Post_Props } from "./components/PostList";
-import Composer, { Account } from "./components/Compose";
 //Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eleifend consectetur massa at tempus. Suspendisse ut odio vitae ipsum blandit vulputate ac eget justo. Nunc pulvinar erat quis risus accumsan volutpat. Proin placerat leo sit amet ex ornare bibendum. Duis varius viverra risus ac dictum. Mauris feugiat augue sem, ut ultricies nulla fermentum id. Curabitur sed ipsum urna.
 const posts: Post_Props[] = [
   {
@@ -46,33 +46,11 @@ const buttonTwo = {
   onClick: () => console.log('Button Two Clicked')
 }
 
-function Writer() {
-  return (
-    <>
-      <div className="flex border-2 border-gray">
-      <div className="m-2 w-10 py-1">
-              <img className="inline-block h-10 w-10 rounded-full" src="/mastodon.svg" alt=""/>
-          </div>
-          <div className="flex-1 px-2 pt-2 mt-2">
-              <textarea
-              className=" bg-transparent text-black placeholder-gray-400 font-medium text-lg w-full"
-              rows={2} cols={50}
-              placeholder="What's happening?">
 
-              </textarea>
-          </div>
-      </div>
-
-    </>
-
-
-
-  )
-}
-
+const network : SupportedNetwork = 'mastodon';
 const accounts : Account[] = [
   {
-    network: 'mastodon',
+    network,
     instanceUrl: 'https://mastodon.social',
     accountId: '1',
     accountName: 'Josh One',
@@ -81,7 +59,7 @@ const accounts : Account[] = [
     accountAvatarUrl: 'https://files.mastodon.social/accounts/avatars/000/425/078/original/7006abf653ee7ca0.png',
   },
   {
-    network: 'mastodon',
+    network,
     instanceUrl: 'https://fosstodon.org',
     accountId: '122',
     accountName: 'Josh Pollock',

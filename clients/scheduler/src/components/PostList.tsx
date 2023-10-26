@@ -1,7 +1,9 @@
-import { EnvelopeIcon,PencilSquareIcon, } from "@heroicons/react/20/solid";
+import { PencilSquareIcon } from "@heroicons/react/20/solid";
 import { Account } from "./Compose";
 
-function List({ children }) {
+function List({ children }:{
+    children: React.ReactNode;
+}) {
     return (
       <div>
         <ul className="bg-white shadow overflow-hidden sm:rounded-md max-w-sm mx-auto mt-16">
@@ -101,7 +103,7 @@ function List({ children }) {
         <List>
         <AccountTop account={account} />
           {posts.map((post) => (
-            <PostListItem key={post.key} {...post} />
+            <PostListItem {...post} />
           ))}
         </List>
       </>
