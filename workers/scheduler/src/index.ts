@@ -80,6 +80,6 @@ export default {
 
         // GET should return saved
         //const posts = await dataService.scheduledPosts.getSavedPosts();
-        return new Response(JSON.stringify({ serive: "scheduler" }), { status: 200 });
+        return new Response(JSON.stringify({ service: "scheduler" }), { status: 200 });
     },
 };

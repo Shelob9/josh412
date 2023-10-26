@@ -2,19 +2,20 @@ import { DataService, Env, ScheduledPostData } from "@feeder";
 import { createMastodonStatus } from "@social";
 import { Receiver } from "@upstash/qstash";
 import { ScheduledPost } from "../../../packages/feeder/src/data/ScheduledPostData";
+/**
+ * Handler for posting scheduled posts
+ *
+ * Is the callback for qStash topic that scheduler uses
+ */
 export default {
     async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
         const method = request.method.toUpperCase();
         if (['PUT', 'POST'].includes(method)) {
-
-
             const contentType = request.headers.get("content-type");
 			const dataService = new DataService(env);
             const {
                 QSTASH_CURRENT_SIGNING_KEY,
                 QSTASH_NEXT_SIGNING_KEY,
-                QSTASH_TOKEN,
-                IMAGE_BUCKET,
             } = env;
 
             //if not JSON return invalid
@@ -42,14 +43,22 @@ export default {
 				});
 			console.log({ isValid, body })
 			if (!isValid) {
-				return new Response("Invalid signature", { status: 401 });
+				return new Response(JSON.stringify({
+					message: "Unauthorized."
+				}), { status: 401 });
 			}
 			const keys = JSON.parse(body) as string[];
 
 			const posts = await Promise.all(
 				keys.map(key => dataApi.getSavedPost(key))
-			);
-
+			).catch(getSavedPostError => {
+				console.log({getSavedPostError});
+			});
+			if( ! posts || posts.length === 0 ){
+				return new Response(JSON.stringify({
+					message: "No posts found",
+				}), { status: 400 });
+			}
 			const responses = Promise.all(
 				( posts).map(async (post:ScheduledPost|null) => {
 					if( ! post ){
@@ -90,13 +99,10 @@ export default {
 				responses,
 				body
 			}), { status: 200 });
-
-
         }
 
-        //Put UI here
-        return new Response(JSON.stringify({ hi: "roy" }), { status: 200 });
-
+        //Put UI here?
+        return new Response(JSON.stringify({ service:"poster", hi: "roy" }), { status: 200 });
 
     },
 };
