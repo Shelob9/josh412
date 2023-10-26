@@ -12,10 +12,8 @@ export type Account = {
     key: string;
 }
 export type InsertScheduledPost = {
-    post: {
-        text: string;
-        mediaKeys?: string[];
-    },
+    text: string;
+    mediaKeys?: string[];
     accounts: string[]
     //Unix timestamp in seconds
     postAt: number;
