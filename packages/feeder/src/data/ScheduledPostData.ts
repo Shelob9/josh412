@@ -11,6 +11,8 @@ export type Account = {
     accountAvatarUrl: string;
     key: string;
 }
+
+//When creating can be for more than one account
 export type InsertScheduledPost = {
     text: string;
     mediaKeys?: string[];
@@ -18,8 +20,10 @@ export type InsertScheduledPost = {
     //Unix timestamp in seconds
     postAt: number;
 }
+// Insert per account
 export type ScheduledPost = InsertScheduledPost & {
     key: string;
+    accountKey: string;
     //Unix timestamp in seconds
     savedAt: number;
     hasSent: boolean;
@@ -32,18 +36,33 @@ export default class ScheduledPostData extends DataService {
     }
     async savePost(post: InsertScheduledPost) {
         const savedAt = Math.round(Date.now().valueOf() / 1000);
-        const keys = post.accounts.map(account => this.accountKey(account));
-        keys.map(async (key) => {
-            const data: ScheduledPost = {
+        const postAt = new Date(post.postAt * 1000);
+        const accounts = await Promise.all(post.accounts.map(async (accountKey) => {
+            const account = await this.accounts.getAccount(accountKey);
+            if (!account) {
+                throw new Error(`Account ${accountKey} not found`);
+            }
+            return account;
+        }));
+        if( ! accounts.length ){
+            throw new Error("No valid accounts found");
+
+        }
+        const postKeys = Promise.all(accounts.map(async (account) => {
+            const accountKey = this.accountKey(account);
+            const postKey = this.scheduledPostKey(postAt, accountKey);
+            await this.kv.put(postKey, JSON.stringify({
                 ...post,
-                key,
+                key: postKey,
+                accountKey,
                 savedAt,
                 hasSent: false,
-            }
-            await this.kv.put(key, JSON.stringify(data));
-        })
-        return keys;
+            }));
+            return postKey;
+        }));
+        return postKeys;
     }
+
 
     async getSavedPost(key: string) {
         const data = await this.kv.get(key);

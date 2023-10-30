@@ -1,7 +1,12 @@
 import { DataService, Env, ScheduledPostData } from "@feeder";
-import { createMastodonStatus } from "@social";
+import { createMastodonStatus, postBsykyStatus, tryBskyLogin } from "@social";
 import { Receiver } from "@upstash/qstash";
+import zod from "zod";
 import { ScheduledPost } from "../../../packages/feeder/src/data/ScheduledPostData";
+
+const sendPostBody = zod.object({
+	postKeys: zod.string().array(),
+});
 /**
  * Handler for posting scheduled posts
  *
@@ -25,6 +30,16 @@ export default {
                 }), { status: 400 });
             }
             const body = await request.text();
+			//validate with zod
+			try {
+				//validate with zod
+				const data = sendPostBody.parse(JSON.parse(body));
+			} catch (error) {
+				return new Response(JSON.stringify({
+					status: "Invalid request body",
+					error,
+				}), { status: 400 });
+			}
             const dataApi =  new ScheduledPostData(dataService);
 
 			const receiver = new Receiver({
@@ -47,10 +62,10 @@ export default {
 					message: "Unauthorized."
 				}), { status: 401 });
 			}
-			const keys = JSON.parse(body) as string[];
+			const postKeys = JSON.parse(body) as string[];
 
 			const posts = await Promise.all(
-				keys.map(key => dataApi.getSavedPost(key))
+				postKeys.map(key => dataApi.getSavedPost(key))
 			).catch(getSavedPostError => {
 				console.log({getSavedPostError});
 			});
@@ -59,47 +74,104 @@ export default {
 					message: "No posts found",
 				}), { status: 400 });
 			}
-			const responses = Promise.all(
-				( posts).map(async (post:ScheduledPost|null) => {
-					if( ! post ){
-						return;
-					}
-					post.accounts.map(async (accountKey:string) => {
-						const account = await dataService.accounts.getAccount(accountKey);
-						if( ! account ){
-							return;
-						}
-						switch(account.network){
-							case "bluesky":
+			type SuccesResponse = {
+				id: string;
+				uri: string;
+				postKey: string;
+				accountKey: string;
+				success: true;
 
-								break;
-							case "mastodon":
-								const mastodonToken = await dataService.accounts.getAccountToken(accountKey);
-								if( mastodonToken ){
-										const r = await createMastodonStatus(mastodonToken,post.post.text,account.instanceUrl, 'public');
-										dataService.scheduledPosts.markPostAsSentByKey(post.key);
-										return {
-											id: r.id,
-											accountKey,
-											success: true,
-										}
-								}else{
-									return {
-										id: undefined,
+			};
+			type FailResponse = {
+				postKey: string;
+				accountKey: string;
+				success: false;
+				errors?: string[];
+			}
+			const responses : (SuccesResponse | FailResponse )[] = []
+
+			posts.forEach(async (post:ScheduledPost|null) => {
+				if( ! post ){
+					return undefined;
+				}
+				return post.accounts.map(async (accountKey:string) => {
+					const account = await dataService.accounts.getAccount(accountKey);
+					if( ! account ){
+						return undefined;
+					}
+					switch(account.network){
+						case "bluesky":
+							const loginDetails = await dataService.accounts.getAccountToken(accountKey);
+							if( loginDetails ){
+								try {
+									// split login details on : to get identifier and password
+									const [identifier, password] = loginDetails.split(":");
+									const {agent} = await tryBskyLogin({
+										service: "bluesky.social",
+										identifier,
+										password,
+									});
+									const r = await postBsykyStatus({
+										agent,
+										text: post.text,
+									});
+									responses.push( {
+										id: r.cid,
+										uri: r.uri,
 										accountKey,
+										postKey: post.key,
+										success: true,
+									})
+								} catch (error:any) {
+									responses.push({
+										accountKey,
+										postKey: post.key,
 										success: false,
-									}
+										errors: [error.message],
+									});
 								}
-								break;
-						}
-					})
-				}).filter(p => p)
-			);
+
+
+							}else{
+								responses.push({
+									accountKey,
+									postKey: post.key,
+									success: false,
+									errors: ["Could not login"],
+								});
+							}
+							break;
+						case "mastodon":
+							const mastodonToken = await dataService.accounts.getAccountToken(accountKey);
+							if( mastodonToken ){
+									const r = await createMastodonStatus(mastodonToken,post.text,account.instanceUrl, 'public');
+									dataService.scheduledPosts.markPostAsSentByKey(post.key);
+									responses.push({
+										id: r.id,
+										uri: r.uri,
+										postKey: post.key,
+										accountKey,
+										success: true,
+									});
+							}else{
+								responses.push({
+									accountKey,
+									postKey: post.key,
+									success: false,
+									errors: ["Could not get mastodon token"],
+								});
+							}
+							break;
+					}
+				})
+			});
+
 			return new Response(JSON.stringify({
 				responses,
-				body
-			}), { status: 200 });
-        }
+				postKeys,
+			}), { status: 201 });
+		}
+
 
         //Put UI here?
         return new Response(JSON.stringify({ service:"poster", hi: "roy" }), { status: 200 });

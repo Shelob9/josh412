@@ -14,7 +14,9 @@ export async function createMastodonStatus(
     visibility: 'public' | 'unlisted' | 'private' | 'direct',
     attachments?: Attatchment[]
 ): Promise<{
-    id: string
+    id: string,
+    uri: string,
+    url?: string,
 }> {
     const data : {
         status: string;
@@ -49,8 +51,12 @@ export async function createMastodonStatus(
             'Content-Type': 'application/json'
         }
     });
-    const statusData = await statusResponse.json() as {id:string};
-    return {id: statusData.id}
+    const statusData = await statusResponse.json() as Status;
+    return {
+        id: statusData.id,
+        uri: statusData.uri,
+        url: statusData.url,
+    }
 }
 
 /**
@@ -59,7 +65,7 @@ export async function createMastodonStatus(
  * @see  https://docs.joinmastodon.org/methods/accounts/#statuses
  */
 export function getStatuses(
-    instanceUrl: string,
+    instancei: string,
     accountId:number,
     maxId?:string,
     sinceId?:string

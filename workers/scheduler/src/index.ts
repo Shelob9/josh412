@@ -35,8 +35,7 @@ export default {
                 }), { status: 400 });
             }
             const body = await request.text();
-            const nowInseconds = Math.round( Date.now().valueOf() / 1000 );
-            const notBefore = nowInseconds + 3;
+
             try {
                 const data : SchedulePostBody = schedulePostBody.parse(JSON.parse(body));
                 //Validate accounts exist
@@ -48,12 +47,12 @@ export default {
                         }), { status: 400 });
                     }
                 });
-                const keys = await dataService.scheduledPosts.savePost(data);
+                const postKeys = await dataService.scheduledPosts.savePost(data);
                 try {
                     const response = await fetch(`https://qstash.upstash.io/v1/publish/${topic}`, {
                         method: 'POST',
                         body: JSON.stringify({
-                            keys
+                            postKeys
                         }),
                         headers: {
                             "content-type": "application/json",
@@ -61,7 +60,7 @@ export default {
                             //"Upstash-Delay": "3s"
                             //https://upstash.com/docs/qstash/features/delay#absolute-delay
                             //. The format is a unix timestamp in seconds, based on the UTC timezone.
-                            "Upstash-Not-Before": notBefore.toString(),
+                            "Upstash-Not-Before": ,
                         },
                     });
                     return new Response(JSON.stringify({
