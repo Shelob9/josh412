@@ -65,7 +65,7 @@ export default {
                     });
                     return new Response(JSON.stringify({
                         status: response.statusText,
-                        keys: keys,
+                        postKeys,
                     }), { status: response.status });
                 } catch (error) {
                     console.log({ error });
