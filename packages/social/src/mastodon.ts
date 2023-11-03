@@ -65,7 +65,7 @@ export async function createMastodonStatus(
  * @see  https://docs.joinmastodon.org/methods/accounts/#statuses
  */
 export function getStatuses(
-    instancei: string,
+    instanceUrl: string,
     accountId:number,
     maxId?:string,
     sinceId?:string

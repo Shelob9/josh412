@@ -1,3 +1,4 @@
+import { INSERT_FEEDER_SCHEDULED_POST, TABLE_FEEDER_SCHEDULED_POSTS } from "../db/schemas";
 import DataService from "./DataService";
 import DataServiceProvider from "./DataServiceProvider";
 
@@ -6,60 +7,77 @@ export type Account = {
     network: 'mastodon' | 'bluesky';
     instanceUrl: string;
     accountId: string;
-    accountName: string;
     accountHandle: string;
     accountAvatarUrl: string;
-    key: string;
+    accountKey: string;
 }
 
 //When creating can be for more than one account
 export type InsertScheduledPost = {
     text: string;
     mediaKeys?: string[];
-    accounts: string[]
+    accountKeys: string[]
     //Unix timestamp in seconds
     postAt: number;
 }
-// Insert per account
-export type ScheduledPost = InsertScheduledPost & {
-    key: string;
-    accountKey: string;
-    //Unix timestamp in seconds
-    savedAt: number;
+export type ScheduledPost = {
+    id: number;
+    text: string;
+    postKey: string;
+    mediaKeys?: string[];
+    savedAt: Date;
+    sendAt: Date;
     hasSent: boolean;
+    accountKey: string;
 }
 
+export interface IPostsService {
+    savePost(post: Omit<ScheduledPost,"postKey"|"id"|"savedAt,hasSent">): Promise<boolean>;
+    getSavedPost(key: string): Promise<ScheduledPost | null>;
+    getSavedPosts(account: Account): Promise<ScheduledPost[]>;
+    deletePost(post: ScheduledPost): Promise<boolean>;
+    markPostAsSent(post: ScheduledPost): Promise<boolean>;
+    markPostAsSentByKey(key: string): Promise<boolean>;
 
-export default class ScheduledPostData extends DataService {
+}
+
+export default class ScheduledPostData extends DataService implements IPostsService {
     constructor(data: DataServiceProvider){
         super(data);
     }
-    async savePost(post: InsertScheduledPost) {
-        const savedAt = Math.round(Date.now().valueOf() / 1000);
-        const postAt = new Date(post.postAt * 1000);
-        const accounts = await Promise.all(post.accounts.map(async (accountKey) => {
-            const account = await this.accounts.getAccount(accountKey);
-            if (!account) {
-                throw new Error(`Account ${accountKey} not found`);
-            }
-            return account;
-        }));
-        if( ! accounts.length ){
-            throw new Error("No valid accounts found");
-
+    async savePost(post: Omit<ScheduledPost,"postKey"|"id"|"sendAt">) {
+        const postKey = this.uuid();
+        console.log({postKey});
+        const data  = {
+            ...post,
+            postKey,
+            sendAt: (new Date().valueOf()).toString(),
+            hasSent: false,
         }
-        const postKeys = Promise.all(accounts.map(async (account) => {
-            const accountKey = this.accountKey(account);
+        await this.kv.put(postKey, JSON.stringify(data));
+        return true;
+    }
+    async _savePost(post: InsertScheduledPost, _post: INSERT_FEEDER_SCHEDULED_POST) {
+        const postAt = new Date(post.postAt * 1000);
+        const postKeys = post.accountKeys.map(async (accountKey) => {
+            const account = await this.accounts.getAccount(accountKey);
+            if( ! account ){
+                throw new Error("Account not found");
+            }
             const postKey = this.scheduledPostKey(postAt, accountKey);
-            await this.kv.put(postKey, JSON.stringify({
-                ...post,
-                key: postKey,
+            await this.db.insert(TABLE_FEEDER_SCHEDULED_POSTS).values({
+                ..._post,
+                text: post.text,
+                mediaKeys: post.mediaKeys,
+                //sendAt: postAt,
                 accountKey,
-                savedAt,
+                //savedAt: Date.now(),
                 hasSent: false,
-            }));
+                postKey
+            });
             return postKey;
-        }));
+        });
+
         return postKeys;
     }
 
@@ -86,14 +104,14 @@ export default class ScheduledPostData extends DataService {
     }
 
     async markPostAsSent(post: ScheduledPost) {
-        await this.kv.put(post.key, JSON.stringify({
+        await this.kv.put(post.postKey, JSON.stringify({
             ...post,
             hasSent: true,
         }));
         return true;
     }
 
-    async getSavedPosts(account: Account) {
+    async getSavedPosts(account: Account) : Promise<ScheduledPost[]> {
         let completed = false;
         let cursor : string|null = null;
         const posts: ScheduledPost[] = [];
@@ -121,7 +139,13 @@ export default class ScheduledPostData extends DataService {
             }
 
         }
+        return posts;
 
+    }
+
+    async deletePost(post: ScheduledPost) {
+        await this.kv.delete(post.postKey);
+        return true;
     }
 
 }

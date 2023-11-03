@@ -7,3 +7,8 @@ compatibility_date = "2023-10-16"
 binding = "IMAGE_BUCKET"
 bucket_name = "scheduler-media-00"
 preview_bucket_name = "scheduler-media-00-prev"
+
+## KV namespaces
+[[kv_namespaces]]
+binding = "KV"
+id = "3f74d87bb28c49b5b2ceca3670830dae"

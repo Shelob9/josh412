@@ -1,5 +1,5 @@
-import { sqliteTable, integer,index, text,blob, primaryKey, uniqueIndex } from 'drizzle-orm/sqlite-core';
-import { CLASSIFICATION_ITEM_TYPES,CLASSIFICATION_SOURCE_TYPES } from 'src/classify';
+import { blob, index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { CLASSIFICATION_ITEM_TYPES, CLASSIFICATION_SOURCE_TYPES } from 'src/classify';
 
 
 // classifications by taxonomy and tag

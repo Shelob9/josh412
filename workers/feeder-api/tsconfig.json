@@ -1,5 +1,9 @@
 {
 	"compilerOptions": {
+		"paths": {
+			"@feeder": ["../../packages/feeder/src"],
+			"@social": ["../../packages/social/src"],
+		},
 		/* Visit https://aka.ms/tsconfig.json to read more about this file */
 
 		/* Projects */

@@ -1,5 +1,10 @@
 import DataService from "./data/DataServiceProvider";
-import ScheduledPostData from "./data/ScheduledPostData";
+import ScheduledPostData, {
+    Account,
+    InsertScheduledPost,
+    ScheduledPost,
+} from "./data/ScheduledPostData";
+import * as dbSchema from "./db/schemas";
 export interface Env {
     QSTASH_CURRENT_SIGNING_KEY: string;
     QSTASH_NEXT_SIGNING_KEY: string;
@@ -7,9 +12,9 @@ export interface Env {
     UPSTASH_QSTASH_URL: string;
     IMAGE_BUCKET: R2Bucket;
     KV: KVNamespace;
+    DB: D1Database;
 }
 
 export {
-    DataService,
-    ScheduledPostData
+    Account, DataService, InsertScheduledPost, ScheduledPost, ScheduledPostData, dbSchema
 };
