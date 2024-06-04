@@ -1,7 +1,8 @@
 {
 	"compilerOptions": {
 		"paths": {
-			"@feeder": ["../../packages/feeder/src"],
+			"@feeder/data-service": ["./src/data-service"],
+			"@feeder/db": ["./src/db"],
 			"@social": ["../../packages/social/src"],
 		},
 		/* Visit https://aka.ms/tsconfig.json to read more about this file */

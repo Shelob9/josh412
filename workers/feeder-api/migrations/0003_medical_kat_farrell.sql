@@ -2,7 +2,6 @@ CREATE TABLE `feeder_accounts` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`text` text NOT NULL,
 	`instanceUrl` text NOT NULL,
-	`accountName` text NOT NULL,
 	`accountId` text NOT NULL,
 	`accountHandle` text NOT NULL,
 	`accountAvatarUrl` text,

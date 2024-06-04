@@ -5,8 +5,8 @@ compatibility_date = "2023-10-30"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "feeder-01"
-database_id = "24c22221-e1e0-4e9e-bc3e-6a72a95f60e9"
+database_name = "feeder-dev-01"
+database_id = "65307ec1-086e-41a5-8b65-e6f3f941635c"
 migrations_table = "d1_migrations" # Customize this value to change your applied migrations table name
 migrations_dir = "migrations"
 

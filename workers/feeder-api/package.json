@@ -6,10 +6,9 @@
     "deploy": "wrangler deploy",
     "dev": "wrangler dev --local",
     "start": "wrangler dev",
-    "migrate": "wrangler d1 migrations apply feeder-01",
+    "migrate": "wrangler d1 migrations apply feeder-dev-01",
     "migrate:generate": "drizzle-kit generate:sqlite",
-    "migrate:local1": "wrangler d1 migrations apply feeder-01 --local",
-    "migrate:local": "drizzle-kit push:sqlite"
+    "migrate:local": "wrangler d1 migrations apply feeder-dev-01 --local"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230419.0",

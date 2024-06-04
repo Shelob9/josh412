@@ -1,4 +1,6 @@
-import { DataService, dbSchema } from '@feeder';
+import { DataService } from './data-service';
+import { dbSchema } from './db';
+
 import { zValidator } from '@hono/zod-validator';
 import { getAccount } from '@social';
 import { Hono } from 'hono';
@@ -212,7 +214,8 @@ apiRouter.delete('/accounts/:accountKey', async (c) => {
 });
 
 app.get('/test', async(c) => {
-	const count = await c.get('DataService').kv.get('count') || 0;
+
+	const count = await c.get('DataService').counts();
 	return c.jsonT({
 		count
 	});
