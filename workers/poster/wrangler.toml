@@ -1,6 +1,0 @@
-name = "poster"
-main = "src/index.ts"
-compatibility_date = "2023-10-16"
-[[kv_namespaces]]
-binding = "KV"
-id = "3f74d87bb28c49b5b2ceca3670830dae"
