@@ -1,3 +1,19 @@
+hooks.json
+# WordPress
+wp-content/plugins
+wp-content/themes
+wp-content/uploads
+wp-content/mu-plugins/sqlite-database-integration-main
+wp-content/database
+wp-content/db.php
+wordpress
+wp-content/vendor
+wp-content/mu-plugins/vendor
+wp-content/mu-plugins/local.php
+/vendor/
+wp-content/mu-plugins/1-local.php
+wp-content/s3-uploads/vendor
+
 # Logs
 logs
 *.log
