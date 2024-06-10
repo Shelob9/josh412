@@ -1,16 +1,11 @@
-const cacheSeconds = 604800
-const uri = `https://josh412.com`;
-
+import { isAllowed, isAuthed } from "@lib/allowed";
+import config from "@lib/config";
+const { cacheSeconds, uri } = config;
 export default {
     async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
          // Determine which group this request is in.
          const cookie = request.headers.get('Cookie')
-         if (cookie
-           && (
-             cookie.includes(`wordpress_logged`)
-             || cookie.includes(`comment_`)
-             || cookie.includes(`wordpress_sec`)
-           )) {
+         if (isAuthed(cookie)) {
            const bustedRequest = new Request(request, { cf: { cacheTtl: -1 } })
            const response = await fetch(bustedRequest)
 
@@ -23,10 +18,9 @@ export default {
                 headers: newHeaders
            })
          } else {
-            console.log('served from Cached', request.url);
-
             const originalUrl = new URL(request.url);
-            const newUrl = new URL(`${uri}${originalUrl.pathname}`);
+            const allowed = isAllowed(originalUrl);
+            const newUrl = allowed ? new URL(`${uri}${originalUrl.pathname}`) : new URL(`${uri}/404`);
             // Edge Cache for 7 days
                return fetch(newUrl, {
                 cf: { cacheTtl: cacheSeconds },

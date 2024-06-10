@@ -1,5 +1,13 @@
 {
 	"compilerOptions": {
+		"paths": {
+			"@lib/allowed": [
+				"../lib/allowed",
+			],
+			"@lib/config": [
+				"../lib/config",
+			],
+		},
 		/* Visit https://aka.ms/tsconfig.json to read more about this file */
 
 		/* Projects */
