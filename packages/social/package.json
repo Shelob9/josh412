@@ -1,0 +1,13 @@
+{
+    "name": "social",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "dependencies": {
+        "@atproto/api": "^0.6.19"
+    },
+    "devDependencies": {
+        "@cloudflare/workers-types": "^4.20230922.0"
+    }
+}
