@@ -16,8 +16,8 @@
  *
  * */
 
-import Account, { isAccount } from './Account.js';
-import Status, { isStatus } from './Status.js';
+import Account, { isAccount } from "./Account.js"
+import Status, { isStatus } from "./Status.js"
 
 /* *
  *
@@ -34,36 +34,36 @@ export interface Notification {
      * The account that performed the action that generated the notification.
      * @since 0.9.9
      */
-    account: Account;
+    account: Account
     /**
      * The timestamp of the notification.
      * @since 0.9.9
      */
-    created_at: string;
+    created_at: string
     /**
      * The id of the notification in the database.
      * @since 0.9.9
      */
-    id: string;
+    id: string
     /**
      * Report that was the object of the notification. Attached when `type` of
      * the notification is `admin.report`.
      * @since 4.0.0
      */
-    report?: unknown;
+    report?: unknown
     /**
      * The type of event that resulted in the notification.
      * @since 0.9.9
      */
-    type: NotificationType;
+    type: NotificationType
     /**
      * Status that was the object of the notification. Attached when `type` of
      * the notification is `favourite`, `reblog`, `status`, `mention`, `poll`,
      * or `update`.
      * @since 0.9.9
      */
-    status?: Status;
-};
+    status?: Status
+}
 
 /**
  * The type of event that resulted in the notification.
@@ -85,16 +85,16 @@ export interface Notification {
  * @since 0.9.9
  */
 export type NotificationType =
-    | 'mention'
-    | 'status'
-    | 'reblog'
-    | 'follow'
-    | 'follow_request'
-    | 'favourite'
-    | 'poll'
-    | 'update'
-    | 'admin.sign_up'
-    | 'admin.report';
+    | "mention"
+    | "status"
+    | "reblog"
+    | "follow"
+    | "follow_request"
+    | "favourite"
+    | "poll"
+    | "update"
+    | "admin.sign_up"
+    | "admin.report"
 
 /* *
  *
@@ -111,20 +111,20 @@ export type NotificationType =
  * @return
  * True, if the JSON object has a Notification structure.
  */
-export function isNotification (
+export function isNotification(
     json: Partial<Notification>
 ): json is Notification {
     return (
-        typeof json === 'object' &&
-        typeof json.account === 'object' &&
-        typeof json.created_at === 'string' &&
-        typeof json.id === 'string' &&
-        typeof json.status === 'object' &&
-        typeof json.type === 'string' &&
-        isAccount( json.account ) &&
-        isNotificationType( json.type ) &&
-        isStatus( json.status )
-    );
+        typeof json === "object" &&
+        typeof json.account === "object" &&
+        typeof json.created_at === "string" &&
+        typeof json.id === "string" &&
+        typeof json.status === "object" &&
+        typeof json.type === "string" &&
+        isAccount(json.account) &&
+        isNotificationType(json.type) &&
+        isStatus(json.status)
+    )
 }
 
 /**
@@ -136,16 +136,12 @@ export function isNotification (
  * @return
  * True, if the JSON array contains a Notification structure.
  */
-export function isNotifications (
+export function isNotifications(
     json: Partial<Array<Partial<Notification>>>
 ): json is Array<Notification> {
     return (
-        Array.isArray( json ) &&
-        (
-            !json.length ||
-            isNotification( json[0] || {} )
-        )
-    );
+        Array.isArray(json) && (!json.length || isNotification(json[0] || {}))
+    )
 }
 
 /**
@@ -157,21 +153,19 @@ export function isNotifications (
  * @return
  * True, if the type string is a known Notification type.
  */
-export function isNotificationType (
-    type: string
-): type is NotificationType {
+export function isNotificationType(type: string): type is NotificationType {
     return (
-        type === 'mention' ||
-        type === 'status' ||
-        type === 'reblog' ||
-        type === 'follow' ||
-        type === 'follow_request' ||
-        type === 'favourite' ||
-        type === 'poll' ||
-        type === 'update' ||
-        type === 'admin.sign_up' ||
-        type === 'admin.report'
-    );
+        type === "mention" ||
+        type === "status" ||
+        type === "reblog" ||
+        type === "follow" ||
+        type === "follow_request" ||
+        type === "favourite" ||
+        type === "poll" ||
+        type === "update" ||
+        type === "admin.sign_up" ||
+        type === "admin.report"
+    )
 }
 
 /* *
@@ -180,4 +174,4 @@ export function isNotificationType (
  *
  * */
 
-export default Notification;
+export default Notification

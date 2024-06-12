@@ -16,13 +16,13 @@
  *
  * */
 
-import type Account from './Account.js';
-import type Status from './Status.js';
-import type Tag from './Tag.js';
+import type Account from "./Account.js"
+import type Status from "./Status.js"
+import type Tag from "./Tag.js"
 
-import { isAccount } from './Account.js';
-import { isStatus } from './Status.js';
-import { isTag } from './Tag.js';
+import { isAccount } from "./Account.js"
+import { isStatus } from "./Status.js"
+import { isTag } from "./Tag.js"
 
 /* *
  *
@@ -35,16 +35,16 @@ import { isTag } from './Tag.js';
  * @since 1.1.0
  */
 export interface Search {
-    account_id?: string;
-    exclude_unreviewed?: boolean;
-    following?: boolean;
-    max_id?: string;
-    min_id?: string;
-    q: string;
-    limit?: number;
-    offset?: number;
-    resolve?: boolean;
-    type?: string;
+    account_id?: string
+    exclude_unreviewed?: boolean
+    following?: boolean
+    max_id?: string
+    min_id?: string
+    q: string
+    limit?: number
+    offset?: number
+    resolve?: boolean
+    type?: string
 }
 
 /**
@@ -56,17 +56,17 @@ export interface SearchResults {
      * Accounts which match the given query.
      * @since 1.1.0
      */
-    accounts: Array<Account>;
+    accounts: Array<Account>
     /**
      * Hashtags which match the given query.
      * @since 3.0.0
      */
-    hashtags: Array<Tag>;
+    hashtags: Array<Tag>
     /**
      * Statuses which match the given query.
      * @since 1.1.0
      */
-    statuses: Array<Status>;
+    statuses: Array<Status>
 }
 
 /* *
@@ -84,13 +84,8 @@ export interface SearchResults {
  * @return
  * True, if the JSON object has a Search structure.
  */
-export function isSearch (
-    json: Partial<Search>
-): json is Search {
-    return (
-        typeof json === 'object' &&
-        typeof json.q === 'string'
-    );
+export function isSearch(json: Partial<Search>): json is Search {
+    return typeof json === "object" && typeof json.q === "string"
 }
 
 /**
@@ -102,27 +97,18 @@ export function isSearch (
  * @return
  * True, if the JSON object has a SearchResults structure.
  */
-export function isSearchResults (
+export function isSearchResults(
     json: Partial<SearchResults>
 ): json is SearchResults {
     return (
-        typeof json === 'object' &&
-        Array.isArray( json.accounts ) &&
-        Array.isArray( json.hashtags ) &&
-        Array.isArray( json.statuses ) &&
-        (
-            !json.accounts.length ||
-            isAccount( json.accounts[0] )
-        ) &&
-        (
-            !json.hashtags.length ||
-            isTag( json.hashtags[0] )
-        ) &&
-        (
-            !json.statuses.length ||
-            isStatus( json.statuses[0] )
-        )
-    );
+        typeof json === "object" &&
+        Array.isArray(json.accounts) &&
+        Array.isArray(json.hashtags) &&
+        Array.isArray(json.statuses) &&
+        (!json.accounts.length || isAccount(json.accounts[0])) &&
+        (!json.hashtags.length || isTag(json.hashtags[0])) &&
+        (!json.statuses.length || isStatus(json.statuses[0]))
+    )
 }
 
 /* *
@@ -131,4 +117,4 @@ export function isSearchResults (
  *
  * */
 
-export default Search;
+export default Search

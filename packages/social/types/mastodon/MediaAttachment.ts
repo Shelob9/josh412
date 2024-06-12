@@ -26,49 +26,49 @@ export interface AudioAttachment {
      * preview thumbnails when media has not been downloaded yet.
      * @since 2.8.1
      */
-    blurhash?: ( string | null );
+    blurhash?: string | null
     /**
      * Alternate text that describes what is in the media attachment, to be used
      * for the visually impaired or when media attachments do not load.
      * @since 2.0.0
      */
-    description?: ( string | null );
+    description?: string | null
     /**
      * The ID of the attachment in the database.
      * @since 0.6.0
      */
-    id: string;
+    id: string
     /**
      * Metadata returned by Paperclip.
      * @since 1.5.0
      */
-    meta: AudioAttachmentMeta;
+    meta: AudioAttachmentMeta
     /**
      * The location of a scaled-down preview of the attachment.
      * @since 0.6.0
      */
-    preview_url: string;
+    preview_url: string
     /**
      * The location of the full-size original attachment on the remote
      * @since 0.6.0
      */
-    remote_url?: ( string | null );
+    remote_url?: string | null
     /**
      * A shorter URL for the attachment.
      * @deprecated
      * @since 3.5.0
      */
-    text_url?: string;
+    text_url?: string
     /**
      * The type of the attachment.
      * @since 0.6.0
      */
-    type: 'audio';
+    type: "audio"
     /**
      * The location of the original full-size attachment.
      * @since 0.6.0
      */
-    url: string;
+    url: string
 }
 
 /**
@@ -76,12 +76,12 @@ export interface AudioAttachment {
  * @since 1.5.0
  */
 export interface AudioAttachmentMeta {
-    audio_bitrate: string;
-    audio_channels: string;
-    audio_encode: string;
-    duration: number;
-    length: string;
-    original: AudioAttachmentMetaOriginal;
+    audio_bitrate: string
+    audio_channels: string
+    audio_encode: string
+    duration: number
+    length: string
+    original: AudioAttachmentMetaOriginal
 }
 
 /**
@@ -89,8 +89,8 @@ export interface AudioAttachmentMeta {
  * @since 1.5.0
  */
 export interface AudioAttachmentMetaOriginal {
-    bitrate: number;
-    duration: number;
+    bitrate: number
+    duration: number
 }
 
 /**
@@ -104,76 +104,76 @@ export interface GIFVAttachment {
      * preview thumbnails when media has not been downloaded yet.
      * @since 2.8.1
      */
-    blurhash: string;
+    blurhash: string
     /**
      * Alternate text that describes what is in the media attachment, to be used
      * for the visually impaired or when media attachments do not load.
      * @since 2.0.0
      */
-    description?: ( string | null );
+    description?: string | null
     /**
      * The ID of the attachment in the database.
      * @since 0.6.0
      */
-    id: string;
+    id: string
     /**
      * Metadata returned by Paperclip.
      * @since 1.5.0
      */
-    meta: GIFVAttachmentMeta;
+    meta: GIFVAttachmentMeta
     /**
      * The location of a scaled-down preview of the attachment.
      * @since 0.6.0
      */
-    preview_url: string;
+    preview_url: string
     /**
      * The location of the full-size original attachment on the remote
      * @since 0.6.0
      */
-    remote_url?: ( string | null );
+    remote_url?: string | null
     /**
      * A shorter URL for the attachment.
      * @deprecated
      * @since 3.5.0
      */
-    text_url?: string;
+    text_url?: string
     /**
      * The type of the attachment.
      * @since 0.6.0
      */
-    type: 'gifv';
+    type: "gifv"
     /**
      * The location of the original full-size attachment.
      * @since 0.6.0
      */
-    url: string;
+    url: string
 }
 
 export interface GIFVAttachmentMeta {
-    aspect: number;
-    duration: number;
-    fps: number;
-    height: number;
-    length: string;
-    original: GIFVAttachmentMetaOriginal;
-    size: string;
-    small: GIFVAttachmentMetaSmall;
-    width: number;
+    aspect: number
+    duration: number
+    fps: number
+    height: number
+    length: string
+    original: GIFVAttachmentMetaOriginal
+    size: string
+    small: GIFVAttachmentMetaSmall
+    width: number
 }
 
 export interface GIFVAttachmentMetaOriginal {
-    bitrate: number;
-    duration: number;
-    frame_rate: string;
-    height: number;
-    width: number;
+    bitrate: number
+    duration: number
+    frame_rate: string
+    height: number
+    width: number
 }
 
 export interface GIFVAttachmentMetaSmall {
-    aspect: number;
-    height: number;
-    size: string;
-    width: number;
+    aspect: number
+    height: number
+    size: string
+    width: number
 }
 
 /**
@@ -186,49 +186,49 @@ export interface ImageAttachment {
      * preview thumbnails when media has not been downloaded yet.
      * @since 2.8.1
      */
-    blurhash: string;
+    blurhash: string
     /**
      * Alternate text that describes what is in the media attachment, to be used
      * for the visually impaired or when media attachments do not load.
      * @since 2.0.0
      */
-    description?: ( string | null );
+    description?: string | null
     /**
      * The ID of the attachment in the database.
      * @since 0.6.0
      */
-    id: string;
+    id: string
     /**
      * Metadata returned by Paperclip.
      * @since 1.5.0
      */
-    meta: ImageAttachmentMeta;
+    meta: ImageAttachmentMeta
     /**
      * The location of a scaled-down preview of the attachment.
      * @since 0.6.0
      */
-    preview_url: string;
+    preview_url: string
     /**
      * The location of the full-size original attachment on the remote
      * @since 0.6.0
      */
-    remote_url?: ( string | null );
+    remote_url?: string | null
     /**
      * A shorter URL for the attachment.
      * @deprecated
      * @since 3.5.0
      */
-    text_url?: string;
+    text_url?: string
     /**
      * The type of the attachment.
      * @since 0.6.0
      */
-    type: 'image';
+    type: "image"
     /**
      * The location of the original full-size attachment.
      * @since 0.6.0
      */
-    url: string;
+    url: string
 }
 
 /**
@@ -236,9 +236,9 @@ export interface ImageAttachment {
  * @since 1.5.0
  */
 export interface ImageAttachmentMeta {
-    focus: ImageAttachmentMetaFocus;
-    original: ImageAttachmentMetaOriginal;
-    small: ImageAttachmentMetaSmall;
+    focus: ImageAttachmentMetaFocus
+    original: ImageAttachmentMetaOriginal
+    small: ImageAttachmentMetaSmall
 }
 
 /**
@@ -246,8 +246,8 @@ export interface ImageAttachmentMeta {
  * @since 2.3.0
  */
 export interface ImageAttachmentMetaFocus {
-    x: number;
-    y: number;
+    x: number
+    y: number
 }
 
 /**
@@ -255,10 +255,10 @@ export interface ImageAttachmentMetaFocus {
  * @since 1.5.0
  */
 export interface ImageAttachmentMetaOriginal {
-    aspect: number;
-    height: number;
-    size: string;
-    width: number;
+    aspect: number
+    height: number
+    size: string
+    width: number
 }
 
 /**
@@ -266,32 +266,31 @@ export interface ImageAttachmentMetaOriginal {
  * @since 1.5.0
  */
 export interface ImageAttachmentMetaSmall {
-    aspect: number;
-    height: number;
-    size: string;
-    width: number;
+    aspect: number
+    height: number
+    size: string
+    width: number
 }
 
 /**
  * Represents a file or media attachment that can be added to a status.
  * @since 0.6.0
  */
-export type MediaAttachment = (
+export type MediaAttachment =
     | AudioAttachment
     | GIFVAttachment
     | ImageAttachment
     | UnknownAttachment
     | VideoAttachment
-);
 
 /**
  * Interface to post a new media attachment.
  */
 export interface MediaAttachmentPost {
-    file: ( Blob | File );
-    thumbnail?: Blob;
-    description?: string;
-    focus?: string;
+    file: Blob | File
+    thumbnail?: Blob
+    description?: string
+    focus?: string
 }
 
 /**
@@ -304,43 +303,43 @@ export interface UnknownAttachment {
      * for the visually impaired or when media attachments do not load.
      * @since 2.0.0
      */
-    description?: ( string | null );
+    description?: string | null
     /**
      * The ID of the attachment in the database.
      * @since 0.6.0
      */
-    id: string;
+    id: string
     /**
      * Metadata returned by Paperclip.
      * @since 1.5.0
      */
-    meta: Record<string, Record<string, ( number | string )>>;
+    meta: Record<string, Record<string, number | string>>
     /**
      * The location of a scaled-down preview of the attachment.
      * @since 0.6.0
      */
-    preview_url: string;
+    preview_url: string
     /**
      * The location of the full-size original attachment on the remote
      * @since 0.6.0
      */
-    remote_url?: ( string | null );
+    remote_url?: string | null
     /**
      * A shorter URL for the attachment.
      * @deprecated
      * @since 3.5.0
      */
-    text_url?: string;
+    text_url?: string
     /**
      * The type of the attachment.
      * @since 0.6.0
      */
-    type: 'unknown';
+    type: "unknown"
     /**
      * The location of the original full-size attachment.
      * @since 0.6.0
      */
-    url: string;
+    url: string
 }
 
 /**
@@ -353,45 +352,45 @@ export interface VideoAttachment {
      * preview thumbnails when media has not been downloaded yet.
      * @since 2.8.1
      */
-    blurhash: string;
+    blurhash: string
     /**
      * Alternate text that describes what is in the media attachment, to be used
      * for the visually impaired or when media attachments do not load.
      * @since 2.0.0
      */
-    description?: ( string | null );
+    description?: string | null
     /**
      * The ID of the attachment in the database.
      * @since 0.6.0
      */
-    id: string;
+    id: string
     /**
      * Metadata returned by Paperclip.
      * @since 1.5.0
      */
-    meta: VideoAttachmentMeta;
+    meta: VideoAttachmentMeta
     /**
      * The location of a scaled-down preview of the attachment.
      * @since 0.6.0
      */
-    preview_url: string;
+    preview_url: string
     /**
      * The location of the full-size original attachment on the remote
      * @since 0.6.0
      */
-    remote_url?: ( string | null );
+    remote_url?: string | null
     /** @deprecated */
-    text_url?: string;
+    text_url?: string
     /**
      * The type of the attachment.
      * @since 0.6.0
      */
-    type: 'video';
+    type: "video"
     /**
      * The location of the original full-size attachment.
      * @since 0.6.0
      */
-    url: string;
+    url: string
 }
 
 /**
@@ -399,18 +398,18 @@ export interface VideoAttachment {
  * @since 1.5.0
  */
 export interface VideoAttachmentMeta {
-    aspect: number;
-    audio_bitrate: string;
-    audio_channels: string;
-    audio_encode: string;
-    duration: number;
-    fps: number;
-    height: number;
-    length: string;
-    original: VideoAttachmentMetaOriginal;
-    size: string;
-    small: VideoAttachmentMetaSmall;
-    width: number;
+    aspect: number
+    audio_bitrate: string
+    audio_channels: string
+    audio_encode: string
+    duration: number
+    fps: number
+    height: number
+    length: string
+    original: VideoAttachmentMetaOriginal
+    size: string
+    small: VideoAttachmentMetaSmall
+    width: number
 }
 
 /**
@@ -418,11 +417,11 @@ export interface VideoAttachmentMeta {
  * @since 1.5.0
  */
 export interface VideoAttachmentMetaOriginal {
-    bitrate: number;
-    duration: number;
-    frame_rate: string;
-    height: number;
-    width: number;
+    bitrate: number
+    duration: number
+    frame_rate: string
+    height: number
+    width: number
 }
 
 /**
@@ -430,10 +429,10 @@ export interface VideoAttachmentMetaOriginal {
  * @since 1.5.0
  */
 export interface VideoAttachmentMetaSmall {
-    aspect: number;
-    height: number;
-    size: string;
-    width: number;
+    aspect: number
+    height: number
+    size: string
+    width: number
 }
 
 /* *
@@ -451,18 +450,18 @@ export interface VideoAttachmentMetaSmall {
  * @return
  * True, if the JSON object has an AudioAttachment structure.
  */
-export function isAudioAttachment (
+export function isAudioAttachment(
     json: Partial<AudioAttachment>
 ): json is AudioAttachment {
     return (
-        typeof json === 'object' &&
-        typeof json.id === 'string' &&
-        typeof json.meta === 'object' &&
-        typeof json.preview_url === 'string' &&
-        ( typeof json.url === 'string' || json.url === null ) &&
-        json.type === 'audio' &&
-        isAudioAttachmentMeta( json.meta )
-    );
+        typeof json === "object" &&
+        typeof json.id === "string" &&
+        typeof json.meta === "object" &&
+        typeof json.preview_url === "string" &&
+        (typeof json.url === "string" || json.url === null) &&
+        json.type === "audio" &&
+        isAudioAttachmentMeta(json.meta)
+    )
 }
 
 /**
@@ -474,20 +473,20 @@ export function isAudioAttachment (
  * @return
  * True, if the JSON object has an AudioAttachmentMeta structure.
  */
-export function isAudioAttachmentMeta (
+export function isAudioAttachmentMeta(
     json: Partial<AudioAttachmentMeta>
 ): json is AudioAttachmentMeta {
     return (
-        typeof json === 'object' &&
-        typeof json.audio_bitrate === 'string' &&
-        typeof json.audio_channels === 'string' &&
-        typeof json.audio_encode === 'string' &&
-        typeof json.duration === 'number' &&
-        typeof json.length === 'string' &&
-        typeof json.original === 'object' &&
-        typeof json.original.bitrate === 'number' &&
-        typeof json.original.duration === 'number'
-    );
+        typeof json === "object" &&
+        typeof json.audio_bitrate === "string" &&
+        typeof json.audio_channels === "string" &&
+        typeof json.audio_encode === "string" &&
+        typeof json.duration === "number" &&
+        typeof json.length === "string" &&
+        typeof json.original === "object" &&
+        typeof json.original.bitrate === "number" &&
+        typeof json.original.duration === "number"
+    )
 }
 
 /**
@@ -499,19 +498,19 @@ export function isAudioAttachmentMeta (
  * @return
  * True, if the JSON object has a GIFVAttachment structure.
  */
-export function isGIFVAttachment (
+export function isGIFVAttachment(
     json: Partial<GIFVAttachment>
 ): json is GIFVAttachment {
     return (
-        typeof json === 'object' &&
-        typeof json.blurhash === 'string' &&
-        typeof json.id === 'string' &&
-        typeof json.meta === 'object' &&
-        typeof json.preview_url === 'string' &&
-        ( typeof json.url === 'string' || json.url === null ) &&
-        json.type === 'gifv' &&
-        isGIFVAttachmentMeta( json.meta )
-    );
+        typeof json === "object" &&
+        typeof json.blurhash === "string" &&
+        typeof json.id === "string" &&
+        typeof json.meta === "object" &&
+        typeof json.preview_url === "string" &&
+        (typeof json.url === "string" || json.url === null) &&
+        json.type === "gifv" &&
+        isGIFVAttachmentMeta(json.meta)
+    )
 }
 
 /**
@@ -523,30 +522,30 @@ export function isGIFVAttachment (
  * @return
  * True, if the JSON object has a GIFVAttachmentMeta structure.
  */
-export function isGIFVAttachmentMeta (
+export function isGIFVAttachmentMeta(
     json: Partial<GIFVAttachmentMeta>
 ): json is GIFVAttachmentMeta {
     return (
-        typeof json === 'object' &&
-        typeof json.aspect === 'number' &&
-        typeof json.duration === 'number' &&
-        typeof json.fps === 'number' &&
-        typeof json.height === 'number' &&
-        typeof json.length === 'string' &&
-        typeof json.size === 'string' &&
-        typeof json.width === 'number' &&
-        typeof json.original === 'object' &&
-        typeof json.original.bitrate === 'number' &&
-        typeof json.original.duration === 'number' &&
-        typeof json.original.frame_rate === 'string' &&
-        typeof json.original.height === 'number' &&
-        typeof json.original.width === 'number' &&
-        typeof json.small === 'object' &&
-        typeof json.small.aspect === 'number' &&
-        typeof json.small.height === 'number' &&
-        typeof json.small.size === 'string' &&
-        typeof json.small.width === 'number'
-    );
+        typeof json === "object" &&
+        typeof json.aspect === "number" &&
+        typeof json.duration === "number" &&
+        typeof json.fps === "number" &&
+        typeof json.height === "number" &&
+        typeof json.length === "string" &&
+        typeof json.size === "string" &&
+        typeof json.width === "number" &&
+        typeof json.original === "object" &&
+        typeof json.original.bitrate === "number" &&
+        typeof json.original.duration === "number" &&
+        typeof json.original.frame_rate === "string" &&
+        typeof json.original.height === "number" &&
+        typeof json.original.width === "number" &&
+        typeof json.small === "object" &&
+        typeof json.small.aspect === "number" &&
+        typeof json.small.height === "number" &&
+        typeof json.small.size === "string" &&
+        typeof json.small.width === "number"
+    )
 }
 
 /**
@@ -558,19 +557,19 @@ export function isGIFVAttachmentMeta (
  * @return
  * True, if the JSON object has an ImageAttachment structure.
  */
-export function isImageAttachment (
+export function isImageAttachment(
     json: Partial<ImageAttachment>
 ): json is ImageAttachment {
     return (
-        typeof json === 'object' &&
-        typeof json.blurhash === 'string' &&
-        typeof json.id === 'string' &&
-        typeof json.meta === 'object' &&
-        typeof json.preview_url === 'string' &&
-        ( typeof json.url === 'string' || json.url === null ) &&
-        json.type === 'image' &&
-        isImageAttachmentMeta( json.meta )
-    );
+        typeof json === "object" &&
+        typeof json.blurhash === "string" &&
+        typeof json.id === "string" &&
+        typeof json.meta === "object" &&
+        typeof json.preview_url === "string" &&
+        (typeof json.url === "string" || json.url === null) &&
+        json.type === "image" &&
+        isImageAttachmentMeta(json.meta)
+    )
 }
 
 /**
@@ -582,25 +581,25 @@ export function isImageAttachment (
  * @return
  * True, if the JSON object has an ImageAttachmentMeta structure.
  */
-export function isImageAttachmentMeta (
+export function isImageAttachmentMeta(
     json: Partial<ImageAttachmentMeta>
 ): json is ImageAttachmentMeta {
     return (
-        typeof json === 'object' &&
-        typeof json.focus === 'object' &&
-        typeof json.focus.x === 'number' &&
-        typeof json.focus.y === 'number' &&
-        typeof json.original === 'object' &&
-        typeof json.original.aspect === 'number' &&
-        typeof json.original.height === 'number' &&
-        typeof json.original.size === 'string' &&
-        typeof json.original.width === 'number' &&
-        typeof json.small === 'object' &&
-        typeof json.small.aspect === 'number' &&
-        typeof json.small.height === 'number' &&
-        typeof json.small.size === 'string' &&
-        typeof json.small.width === 'number'
-    );
+        typeof json === "object" &&
+        typeof json.focus === "object" &&
+        typeof json.focus.x === "number" &&
+        typeof json.focus.y === "number" &&
+        typeof json.original === "object" &&
+        typeof json.original.aspect === "number" &&
+        typeof json.original.height === "number" &&
+        typeof json.original.size === "string" &&
+        typeof json.original.width === "number" &&
+        typeof json.small === "object" &&
+        typeof json.small.aspect === "number" &&
+        typeof json.small.height === "number" &&
+        typeof json.small.size === "string" &&
+        typeof json.small.width === "number"
+    )
 }
 
 /**
@@ -612,16 +611,16 @@ export function isImageAttachmentMeta (
  * @return
  * True, if the JSON object has a MediaAttachment structure.
  */
-export function isMediaAttachment (
+export function isMediaAttachment(
     json: Partial<MediaAttachment>
 ): json is MediaAttachment {
     return (
-        isAudioAttachment( json as AudioAttachment ) ||
-        isGIFVAttachment( json as GIFVAttachment ) ||
-        isImageAttachment( json as ImageAttachment ) ||
-        isUnknownAttachment( json as UnknownAttachment ) ||
-        isVideoAttachment( json as VideoAttachment )
-    );
+        isAudioAttachment(json as AudioAttachment) ||
+        isGIFVAttachment(json as GIFVAttachment) ||
+        isImageAttachment(json as ImageAttachment) ||
+        isUnknownAttachment(json as UnknownAttachment) ||
+        isVideoAttachment(json as VideoAttachment)
+    )
 }
 
 /**
@@ -633,17 +632,17 @@ export function isMediaAttachment (
  * @return
  * True, if the JSON object has an UnknownAttachment structure.
  */
-export function isUnknownAttachment (
+export function isUnknownAttachment(
     json: Partial<UnknownAttachment>
 ): json is UnknownAttachment {
     return (
-        typeof json === 'object' &&
-        typeof json.id === 'string' &&
-        typeof json.meta === 'object' &&
-        typeof json.preview_url === 'string' &&
-        ( typeof json.url === 'string' || json.url === null ) &&
-        json.type === 'unknown'
-    );
+        typeof json === "object" &&
+        typeof json.id === "string" &&
+        typeof json.meta === "object" &&
+        typeof json.preview_url === "string" &&
+        (typeof json.url === "string" || json.url === null) &&
+        json.type === "unknown"
+    )
 }
 
 /**
@@ -655,19 +654,19 @@ export function isUnknownAttachment (
  * @return
  * True, if the JSON object has a VideoAttachment structure.
  */
-export function isVideoAttachment (
+export function isVideoAttachment(
     json: Partial<VideoAttachment>
 ): json is VideoAttachment {
     return (
-        typeof json === 'object' &&
-        typeof json.blurhash === 'string' &&
-        typeof json.id === 'string' &&
-        typeof json.meta === 'object' &&
-        typeof json.preview_url === 'string' &&
-        ( typeof json.url === 'string' || json.url === null ) &&
-        json.type === 'video' &&
-        isVideoAttachmentMeta( json.meta )
-    );
+        typeof json === "object" &&
+        typeof json.blurhash === "string" &&
+        typeof json.id === "string" &&
+        typeof json.meta === "object" &&
+        typeof json.preview_url === "string" &&
+        (typeof json.url === "string" || json.url === null) &&
+        json.type === "video" &&
+        isVideoAttachmentMeta(json.meta)
+    )
 }
 
 /**
@@ -679,33 +678,33 @@ export function isVideoAttachment (
  * @return
  * True, if the JSON object has a VideoAttachmentMeta structure.
  */
-export function isVideoAttachmentMeta (
+export function isVideoAttachmentMeta(
     json: Partial<VideoAttachmentMeta>
 ): json is VideoAttachmentMeta {
     return (
-        typeof json === 'object' &&
-        typeof json.aspect === 'number' &&
-        typeof json.audio_bitrate === 'string' &&
-        typeof json.audio_channels === 'string' &&
-        typeof json.audio_encode === 'string' &&
-        typeof json.duration === 'number' &&
-        typeof json.fps === 'number' &&
-        typeof json.height === 'number' &&
-        typeof json.length === 'string' &&
-        typeof json.size === 'string' &&
-        typeof json.width === 'number' &&
-        typeof json.original === 'object' &&
-        typeof json.original.bitrate === 'number' &&
-        typeof json.original.duration === 'number' &&
-        typeof json.original.frame_rate === 'string' &&
-        typeof json.original.height === 'number' &&
-        typeof json.original.width === 'number' &&
-        typeof json.small === 'object' &&
-        typeof json.small.aspect === 'number' &&
-        typeof json.small.height === 'number' &&
-        typeof json.small.size === 'string' &&
-        typeof json.small.width === 'number'
-    );
+        typeof json === "object" &&
+        typeof json.aspect === "number" &&
+        typeof json.audio_bitrate === "string" &&
+        typeof json.audio_channels === "string" &&
+        typeof json.audio_encode === "string" &&
+        typeof json.duration === "number" &&
+        typeof json.fps === "number" &&
+        typeof json.height === "number" &&
+        typeof json.length === "string" &&
+        typeof json.size === "string" &&
+        typeof json.width === "number" &&
+        typeof json.original === "object" &&
+        typeof json.original.bitrate === "number" &&
+        typeof json.original.duration === "number" &&
+        typeof json.original.frame_rate === "string" &&
+        typeof json.original.height === "number" &&
+        typeof json.original.width === "number" &&
+        typeof json.small === "object" &&
+        typeof json.small.aspect === "number" &&
+        typeof json.small.height === "number" &&
+        typeof json.small.size === "string" &&
+        typeof json.small.width === "number"
+    )
 }
 
 /* *
@@ -714,4 +713,4 @@ export function isVideoAttachmentMeta (
  *
  * */
 
-export default MediaAttachment;
+export default MediaAttachment

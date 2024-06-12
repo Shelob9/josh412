@@ -25,29 +25,29 @@ export interface Reaction {
      * The total number of users who have added this reaction.
      * @since 3.1.0
      */
-    count: number;
+    count: number
     /**
      * True, if the authorized user added this reaction.
      * @since 3.1.0
      */
-    me?: boolean;
+    me?: boolean
     /**
      * The emoji used for the reaction. Either a unicode emoji, or a custom
      * emoji’s shortcode.
      * @since 3.1.0
      */
-    name: string;
+    name: string
     /**
      * A link to a non-animated version of the custom emoji, if the reaction is
      * a custom emoji
      * @since 3.1.0
      */
-    static_url?: string;
+    static_url?: string
     /**
      * A link to the custom emoji, if the reaction is a custom emoji.
      * @since 3.1.0
      */
-    url?: string;
+    url?: string
 }
 
 /* *
@@ -65,14 +65,12 @@ export interface Reaction {
  * @return
  * True, if the JSON object has a Reaction structure.
  */
-export function isReaction (
-    json: Partial<Reaction>
-): json is Reaction {
+export function isReaction(json: Partial<Reaction>): json is Reaction {
     return (
-        typeof json === 'object' &&
-        typeof json.count === 'number' &&
-        typeof json.name === 'string'
-    );
+        typeof json === "object" &&
+        typeof json.count === "number" &&
+        typeof json.name === "string"
+    )
 }
 
 /**
@@ -84,16 +82,10 @@ export function isReaction (
  * @return
  * True, if the JSON array contains a Reaction structure.
  */
-export function isReactions (
+export function isReactions(
     json: Partial<Array<Partial<Reaction>>>
 ): json is Array<Reaction> {
-    return (
-        Array.isArray( json ) &&
-        (
-            !json.length ||
-            isReaction( json[0] || {} )
-        )
-    );
+    return Array.isArray(json) && (!json.length || isReaction(json[0] || {}))
 }
 
 /* *
@@ -102,4 +94,4 @@ export function isReactions (
  *
  * */
 
-export default Reaction;
+export default Reaction

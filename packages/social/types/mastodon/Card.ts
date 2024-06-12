@@ -25,34 +25,29 @@ interface BaseCard {
      * Description of preview.
      * @since 1.0.0
      */
-    description: string;
+    description: string
     /**
      * Title of linked resource.
      * @since 1.0.0
      */
-    title: string;
+    title: string
     /**
      * The type of the preview card.
      * @since 1.3.0
      */
-    type: string;
+    type: string
     /**
      * Location of linked resource.
      * @since 1.0.0
      */
-    url: string;
+    url: string
 }
 
 /**
  * Represents a rich preview card that is generated using OpenGraph tags from an
  * URL.
  */
-export type Card = (
-    | LinkCard
-    | PhotoCard
-    | IframeCard
-    | VideoCard
-);
+export type Card = LinkCard | PhotoCard | IframeCard | VideoCard
 
 /**
  * Represents an iframe preview card that is generated using OpenGraph tags from
@@ -63,7 +58,7 @@ export interface IframeCard extends BaseCard {
      * The type of the preview card.
      * @since 1.3.0
      */
-    type: 'rich';
+    type: "rich"
 }
 
 /**
@@ -75,7 +70,7 @@ export interface LinkCard extends BaseCard {
      * The type of the preview card.
      * @since 1.3.0
      */
-    type: 'link';
+    type: "link"
 }
 
 /**
@@ -87,12 +82,12 @@ export interface PhotoCard extends BaseCard {
      * The author of the original resource.
      * @since 1.3.0
      */
-    author_name: string;
+    author_name: string
     /**
      * A link to the author of the original resource.
      * @since 1.3.0
      */
-    author_url: string;
+    author_url: string
     /**
      * A hash computed by
      * [the BlurHash algorithm](https://github.com/woltapp/blurhash), for
@@ -100,42 +95,42 @@ export interface PhotoCard extends BaseCard {
      * yet.
      * @since 3.2.0
      */
-    blurhash: string;
+    blurhash: string
     /**
      * Used for photo embeds, instead of custom `html`.
      * @since 2.1.0
      */
-    embed_url: string;
+    embed_url: string
     /**
      * Height of preview, in pixels.
      * @since 1.3.0
      */
-    height: number;
+    height: number
     /**
      * Preview thumbnail.
      * @since 1.0.0
      */
-    image?: string;
+    image?: string
     /**
      * The provider of the original resource.
      * @since 1.3.0
      */
-    provider_name: string;
+    provider_name: string
     /**
      * A link to the provider of the original resource.
      * @since 1.3.0
      */
-    provider_url: string;
+    provider_url: string
     /**
      * The type of the preview card.
      * @since 1.3.0
      */
-    type: 'photo';
+    type: "photo"
     /**
      * Width of preview, in pixels.
      * @since 1.3.0
      */
-    width: number;
+    width: number
 }
 
 /**
@@ -147,12 +142,12 @@ export interface VideoCard extends BaseCard {
      * The author of the original resource.
      * @since 1.3.0
      */
-    author_name: string;
+    author_name: string
     /**
      * A link to the author of the original resource.
      * @since 1.3.0
      */
-    author_url: string;
+    author_url: string
     /**
      * A hash computed by
      * [the BlurHash algorithm](https://github.com/woltapp/blurhash), for
@@ -160,42 +155,42 @@ export interface VideoCard extends BaseCard {
      * yet.
      * @since 3.2.0
      */
-    blurhash?: string;
+    blurhash?: string
     /**
      * Height of preview, in pixels.
      * @since 1.3.0
      */
-    height: number;
+    height: number
     /**
      * HTML to be used for generating the preview card.
      * @since 1.3.0
      */
-    html: string;
+    html: string
     /**
      * Preview thumbnail.
      * @since 1.0.0
      */
-    image?: string;
+    image?: string
     /**
      * The provider of the original resource.
      * @since 1.3.0
      */
-    provider_name: string;
+    provider_name: string
     /**
      * A link to the provider of the original resource.
      * @since 1.3.0
      */
-    provider_url: string;
+    provider_url: string
     /**
      * The type of the preview card.
      * @since 1.3.0
      */
-    type: 'video';
+    type: "video"
     /**
      * Width of preview, in pixels.
      * @since 1.3.0
      */
-    width: number;
+    width: number
 }
 
 /* *
@@ -204,4 +199,4 @@ export interface VideoCard extends BaseCard {
  *
  * */
 
-export default Card;
+export default Card

@@ -16,8 +16,8 @@
  *
  * */
 
-import Notification from './Notification.js';
-import Status from './Status.js';
+import Notification from "./Notification.js"
+import Status from "./Status.js"
 
 /* *
  *
@@ -34,17 +34,17 @@ export interface StreamData {
      * Event type of the stream data received.
      * @since 1.0.0
      */
-    event: StreamEventType;
+    event: StreamEventType
     /**
      * JSON object related to the event.
      * @since 1.0.0
      */
-    payload?: StreamPayload;
+    payload?: StreamPayload
     /**
      * Stream types related to the event.
      * @since 1.0.0
      */
-    stream: Array<StreamType>;
+    stream: Array<StreamType>
 }
 
 /**
@@ -72,18 +72,17 @@ export interface StreamData {
  *
  * @since 1.0.0
  */
-export type StreamEventType = (
-    | 'announcement'
-    | 'announcement.delete'
-    | 'announcement.reaction'
-    | 'conversation'
-    | 'delete'
-    | 'encrypted_message'
-    | 'filters_changed'
-    | 'notification'
-    | 'status.update'
-    | 'update'
-);
+export type StreamEventType =
+    | "announcement"
+    | "announcement.delete"
+    | "announcement.reaction"
+    | "conversation"
+    | "delete"
+    | "encrypted_message"
+    | "filters_changed"
+    | "notification"
+    | "status.update"
+    | "update"
 
 /**
  * Additional parameter to filter the subscription.
@@ -95,40 +94,36 @@ export interface StreamParams {
      * ID.
      * @since 1.0.0
      */
-    list?: string;
+    list?: string
     /**
      * When stream is set to hashtag or hashtag:local, use this parameter to
      * specify the tag name.
      * @since 1.0.0
      */
-    tag?: string;
+    tag?: string
 }
 
 /**
  * Possible JSON objects related to a event.
  */
-export type StreamPayload = (
-    | Notification
-    | Status
-);
+export type StreamPayload = Notification | Status
 
 /**
  * Stream types one can subscribe to.
  */
-export type StreamType = (
-    | 'direct'
-    | 'hashtag'
-    | 'hashtag:local'
-    | 'list'
-    | 'public'
-    | 'public:local'
-    | 'public:local:media'
-    | 'public:media'
-    | 'public:remote'
-    | 'public:remote:media'
-    | 'user'
-    | 'user:notification'
-);
+export type StreamType =
+    | "direct"
+    | "hashtag"
+    | "hashtag:local"
+    | "list"
+    | "public"
+    | "public:local"
+    | "public:local:media"
+    | "public:media"
+    | "public:remote"
+    | "public:remote:media"
+    | "user"
+    | "user:notification"
 
 /* *
  *
@@ -145,19 +140,15 @@ export type StreamType = (
  * @return
  * True, if the JSON object has a StreamData structure.
  */
-export function isStreamData (
-    json: Partial<StreamData>
-): json is StreamData {
+export function isStreamData(json: Partial<StreamData>): json is StreamData {
     return (
-        typeof json === 'object' &&
-        typeof json.event === 'string' &&
-        Array.isArray( json.stream ) &&
-        (
-            typeof json.payload === 'undefined' ||
-            typeof json.payload === 'string' ||
-            typeof json.payload === 'object'
-        )
-    );
+        typeof json === "object" &&
+        typeof json.event === "string" &&
+        Array.isArray(json.stream) &&
+        (typeof json.payload === "undefined" ||
+            typeof json.payload === "string" ||
+            typeof json.payload === "object")
+    )
 }
 
 /* *
@@ -166,4 +157,4 @@ export function isStreamData (
  *
  * */
 
-export default StreamData;
+export default StreamData

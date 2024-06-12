@@ -16,7 +16,7 @@
  *
  * */
 
-import Account from './Account.js';
+import Account from "./Account.js"
 
 /* *
  *
@@ -33,33 +33,33 @@ export interface List {
      * The internal database ID of the list.
      * @since 2.1.0
      */
-    id: string;
+    id: string
     /**
      * Which replies should be shown in the list.
      * @since 3.3.0
      */
-    replies_policy?: ListReplyPolicy;
+    replies_policy?: ListReplyPolicy
     /**
      * The user-defined title of the list.
      * @since 2.1.0
      */
-    title: string;
+    title: string
 }
 
-export type ListAccounts = Array<Account>;
+export type ListAccounts = Array<Account>
 
 /**
  * Interface to remove accounts from a list.
  */
 export interface ListAccountsDelete {
-    account_ids: Array<string>;
+    account_ids: Array<string>
 }
 
 /**
  * Interface to add accounts to a list.
  */
 export interface ListAccountsPost {
-    account_ids: Array<string>;
+    account_ids: Array<string>
 }
 
 /**
@@ -70,28 +70,24 @@ export interface ListPost {
      * The internal database ID of the list.
      * @since 2.1.0
      */
-    id?: string;
+    id?: string
     /**
      * Which replies should be shown in the list.
      * @since 3.3.0
      */
-    replies_policy?: string;
+    replies_policy?: string
     /**
      * The user-defined title of the list.
      * @since 2.1.0
      */
-    title: string;
+    title: string
 }
 
 /**
  * Which replies should be shown in the list.
  * @since 3.3.0
  */
-export type ListReplyPolicy = (
-    | 'followed'
-    | 'list'
-    | 'none'
-);
+export type ListReplyPolicy = "followed" | "list" | "none"
 
 /* *
  *
@@ -108,14 +104,12 @@ export type ListReplyPolicy = (
  * @return
  * True, if the JSON object has a List structure.
  */
-export function isList (
-    json: Partial<List>
-): json is List {
+export function isList(json: Partial<List>): json is List {
     return (
-        typeof json === 'object' &&
-        typeof json.id === 'string' &&
-        typeof json.title === 'string'
-    );
+        typeof json === "object" &&
+        typeof json.id === "string" &&
+        typeof json.title === "string"
+    )
 }
 
 /**
@@ -127,16 +121,10 @@ export function isList (
  * @return
  * True, if the JSON array contains a List structure.
  */
-export function isLists (
+export function isLists(
     json: Partial<Array<Partial<List>>>
 ): json is Array<List> {
-    return (
-        Array.isArray( json ) &&
-        (
-            !json.length ||
-            isList( json[0] || {} )
-        )
-    );
+    return Array.isArray(json) && (!json.length || isList(json[0] || {}))
 }
 
 /* *
@@ -145,4 +133,4 @@ export function isLists (
  *
  * */
 
-export default List;
+export default List

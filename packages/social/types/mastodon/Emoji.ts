@@ -25,27 +25,27 @@ export interface Emoji {
      * Used for sorting custom emoji in the picker.
      * @since 3.0.0
      */
-    category: string;
+    category: string
     /**
      * The name of the custom emoji.
      * @since 2.0.0
      */
-    shortcode: string;
+    shortcode: string
     /**
      * A link to a static copy of the custom emoji.
      * @since 2.0.0
      */
-    static_url: string;
+    static_url: string
     /**
      * A link to the custom emoji.
      * @since 2.0.0
      */
-    url: string;
+    url: string
     /**
      * Whether this Emoji should be visible in the picker or unlisted.
      * @since 2.0.0
      */
-    visible_in_picker: boolean;
+    visible_in_picker: boolean
 }
 
 /* *
@@ -63,17 +63,15 @@ export interface Emoji {
  * @return
  * True, if the JSON has a Emoji structure.
  */
-export function isEmoji (
-    json: Partial<Emoji>
-): json is Emoji {
+export function isEmoji(json: Partial<Emoji>): json is Emoji {
     return (
-        typeof json === 'object' &&
-        typeof json.category === 'string' &&
-        typeof json.shortcode === 'string' &&
-        typeof json.static_url === 'string' &&
-        typeof json.url === 'string' &&
-        typeof json.visible_in_picker === 'boolean'
-    );
+        typeof json === "object" &&
+        typeof json.category === "string" &&
+        typeof json.shortcode === "string" &&
+        typeof json.static_url === "string" &&
+        typeof json.url === "string" &&
+        typeof json.visible_in_picker === "boolean"
+    )
 }
 
 /**
@@ -85,16 +83,10 @@ export function isEmoji (
  * @return
  * True, if the JSON array contains a Emoji structure.
  */
-export function isEmojis (
+export function isEmojis(
     json: Partial<Array<Partial<Emoji>>>
 ): json is Array<Emoji> {
-    return (
-        Array.isArray( json ) &&
-        (
-            !json.length ||
-            isEmoji( json[0] || {} )
-        )
-    );
+    return Array.isArray(json) && (!json.length || isEmoji(json[0] || {}))
 }
 
 /* *
@@ -103,4 +95,4 @@ export function isEmojis (
  *
  * */
 
-export default Emoji;
+export default Emoji

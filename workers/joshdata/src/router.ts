@@ -1,10 +1,10 @@
 
-import { deleteToots, getToots, injestToots,getToot, allMastodonClassifications, getTootsWithClassification,  } from './handlers/mastodon';
-import { Router } from '@tsndr/cloudflare-worker-router'
-import { jsonReponse } from './responseFactory';
+import { Router } from '@tsndr/cloudflare-worker-router';
 import { Env } from './env';
+import { deleteToots, getToot, getToots, getTootsWithClassification, injestToots } from './handlers/mastodon';
+import { jsonReponse } from './responseFactory';
 
-import {getStatus} from '@social';
+import { getStatus } from '@social';
 import { allClassifications } from './handlers/classifications';
 import { collectPhotos } from './handlers/photos';
 
@@ -19,7 +19,8 @@ router.use(({ env, req }) => {
 	}
 })
 
-router.get('/api/classifications' , allClassifications );
+router.get('/api/classifications' ,(({ env, req }) =>  allClassifications({env,req}));
+
 router.get('/api/mastodon' , getToots );
 router.get('/api/mastodon/classifications' , getTootsWithClassification );
 router.get('/classifications' , getTootsWithClassification );

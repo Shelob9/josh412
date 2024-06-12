@@ -25,17 +25,17 @@ export interface Tag {
      * Usage statistics for given days (typically the past week).
      * @since 2.4.1
      */
-    history?: Array<TagStatistic>;
+    history?: Array<TagStatistic>
     /**
      * The value of the hashtag after the # sign.
      * @since 0.9.0
      */
-    name: string;
+    name: string
     /**
      * A link to the hashtag on the instance.
      * @since 0.9.0
      */
-    url: string;
+    url: string
 }
 
 /**
@@ -47,22 +47,22 @@ export interface TagStatistic {
      * The total of accounts using the tag within that day.
      * @since 2.4.1
      */
-    accounts: number;
+    accounts: number
     /**
      * UNIX timestamp on midnight of the given day.
      * @since 2.4.1
      */
-    day: number;
+    day: number
     /**
      * Whether the authorized user is following this tag.
      * @since 4.0.0
      */
-    following?: boolean;
+    following?: boolean
     /**
      * The counted usage of the tag within that day.
      * @since 2.4.1
      */
-    uses: number;
+    uses: number
 }
 
 /* *
@@ -80,22 +80,16 @@ export interface TagStatistic {
  * @return
  * True, if the JSON object has a Tag structure.
  */
-export function isTag (
-    json: Partial<Tag>
-): json is Tag {
+export function isTag(json: Partial<Tag>): json is Tag {
     return (
-        typeof json === 'object' &&
-        typeof json.name === 'string' &&
-        typeof json.url === 'string' &&
-        (
-            typeof json.history === 'undefined' ||
-            Array.isArray( json.history ) &&
-            (
-                !json.history.length ||
-                isTagStatistic( json.history[0] || {} )
-            )
-        )
-    );
+        typeof json === "object" &&
+        typeof json.name === "string" &&
+        typeof json.url === "string" &&
+        (typeof json.history === "undefined" ||
+            (Array.isArray(json.history) &&
+                (!json.history.length ||
+                    isTagStatistic(json.history[0] || {}))))
+    )
 }
 
 /**
@@ -107,16 +101,8 @@ export function isTag (
  * @return
  * True, if the JSON array contains a Tag structure.
  */
-export function isTags (
-    json: Partial<Array<Partial<Tag>>>
-): json is Array<Tag> {
-    return (
-        Array.isArray( json ) &&
-        (
-            !json.length ||
-            isTag( json[0] || {} )
-        )
-    );
+export function isTags(json: Partial<Array<Partial<Tag>>>): json is Array<Tag> {
+    return Array.isArray(json) && (!json.length || isTag(json[0] || {}))
 }
 
 /**
@@ -128,15 +114,15 @@ export function isTags (
  * @return
  * True, if the JSON object has a TagStatistic structure.
  */
-export function isTagStatistic (
+export function isTagStatistic(
     json: Partial<TagStatistic>
 ): json is TagStatistic {
     return (
-        typeof json === 'object' &&
-        typeof json.accounts === 'number' &&
-        typeof json.day === 'number' &&
-        typeof json.uses === 'number'
-    );
+        typeof json === "object" &&
+        typeof json.accounts === "number" &&
+        typeof json.day === "number" &&
+        typeof json.uses === "number"
+    )
 }
 
 /* *
@@ -145,4 +131,4 @@ export function isTagStatistic (
  *
  * */
 
-export default Tag;
+export default Tag

@@ -16,13 +16,13 @@
  *
  * */
 
-import type Emoji from './Emoji.js';
-import type Reaction from './Reaction.js';
-import type Tag from './Tag.js';
+import type Emoji from "./Emoji.js"
+import type Reaction from "./Reaction.js"
+import type Tag from "./Tag.js"
 
-import { isEmojis } from './Emoji.js';
-import { isReactions } from './Reaction.js';
-import { isTags } from './Tag.js';
+import { isEmojis } from "./Emoji.js"
+import { isReactions } from "./Reaction.js"
+import { isTags } from "./Tag.js"
 
 /* *
  *
@@ -40,72 +40,72 @@ export interface Announcement {
      * datetimes. Will be false if there is no `starts_at` or `ends_at` time.
      * @since 3.1.0
      */
-    all_day: boolean;
+    all_day: boolean
     /**
      * The text of the announcement.
      * @since 3.1.0
      */
-    content: string;
+    content: string
     /**
      * Custom emoji used in the announcement text.
      * @since 3.1.0
      */
-    emojis: Array<Emoji>;
+    emojis: Array<Emoji>
     /**
      * When the announcement will start.
      * @since 3.1.0
      */
-    ends_at?: ( string | null );
+    ends_at?: string | null
     /**
      * The ID of the announcement in the database.
      * @since 3.1.0
      */
-    id: string;
+    id: string
     /**
      * Accounts mentioned in the announcement text.
      * @since 3.1.0
      */
-    mentions: Array<AnnouncementAccount>;
+    mentions: Array<AnnouncementAccount>
     /**
      * Whether the announcement is currently active.
      * @since 3.1.0
      */
-    published?: boolean;
+    published?: boolean
     /**
      * When the announcement was published.
      * @since 3.1.0
      */
-    published_at?: ( string | null );
+    published_at?: string | null
     /**
      * Whether the announcement has been read by the current user.
      * @since 3.1.0
      */
-    read?: boolean;
+    read?: boolean
     /**
      * Emoji reactions attached to the announcement.
      * @since 3.1.0
      */
-    reactions: Array<Reaction>;
+    reactions: Array<Reaction>
     /**
      * When the announcement will start.
      * @since 3.1.0
      */
-    starts_at?: ( string | null );
+    starts_at?: string | null
     /**
      * Statuses linked in the announcement text.
      * @since 3.1.0
      */
-    statuses: Array<AnnouncementStatus>;
+    statuses: Array<AnnouncementStatus>
     /**
      * Tags linked in the announcement text.
      * @since 3.1.0
      */
-    tags: Array<Tag>;
+    tags: Array<Tag>
     /**
      * When the announcement was last updated.
      * @since 3.1.0
      */
-    updated_at?: ( string | null );
+    updated_at?: string | null
 }
 
 /**
@@ -118,22 +118,22 @@ export interface AnnouncementAccount {
      * `username@domain` for remote users.
      * @since 3.1.0
      */
-    acct: string;
+    acct: string
     /**
      * The account ID of the mentioned user.
      * @since 3.1.0
      */
-    id: string;
+    id: string
     /**
      * The location of the mentioned user’s profile.
      * @since 3.1.0
      */
-    url: string;
+    url: string
     /**
      * The username of the mentioned user.
      * @since 3.1.0
      */
-    username: string;
+    username: string
 }
 
 /**
@@ -145,12 +145,12 @@ export interface AnnouncementStatus {
      * The ID of an attached Status in the database.
      * @since 3.1.0
      */
-    id: string;
+    id: string
     /**
      * The URL of an attached Status.
      * @since 3.1.0
      */
-    url: string;
+    url: string
 }
 
 /* *
@@ -168,25 +168,25 @@ export interface AnnouncementStatus {
  * @return
  * True, if the JSON object has a Announcement structure.
  */
-export function isAnnouncement (
+export function isAnnouncement(
     json: Partial<Announcement>
 ): json is Announcement {
     return (
-        typeof json === 'object' &&
-        typeof json.all_day === 'boolean' &&
-        typeof json.content === 'string' &&
-        typeof json.emojis === 'object' &&
-        typeof json.id === 'string' &&
-        typeof json.mentions === 'object' &&
-        typeof json.reactions === 'object' &&
-        typeof json.statuses === 'object' &&
-        typeof json.tags === 'object' &&
-        isAnnouncementAccounts( json.mentions ) &&
-        isAnnouncementStatuses( json.statuses ) &&
-        isEmojis( json.emojis ) &&
-        isReactions( json.reactions ) &&
-        isTags( json.tags )
-    );
+        typeof json === "object" &&
+        typeof json.all_day === "boolean" &&
+        typeof json.content === "string" &&
+        typeof json.emojis === "object" &&
+        typeof json.id === "string" &&
+        typeof json.mentions === "object" &&
+        typeof json.reactions === "object" &&
+        typeof json.statuses === "object" &&
+        typeof json.tags === "object" &&
+        isAnnouncementAccounts(json.mentions) &&
+        isAnnouncementStatuses(json.statuses) &&
+        isEmojis(json.emojis) &&
+        isReactions(json.reactions) &&
+        isTags(json.tags)
+    )
 }
 
 /**
@@ -198,16 +198,16 @@ export function isAnnouncement (
  * @return
  * True, if the JSON object has a AnnouncementAccount structure.
  */
-export function isAnnouncementAccount (
+export function isAnnouncementAccount(
     json: Partial<AnnouncementAccount>
 ): json is AnnouncementAccount {
     return (
-        typeof json === 'object' &&
-        typeof json.acct === 'string' &&
-        typeof json.id === 'string' &&
-        typeof json.url === 'string' &&
-        typeof json.username === 'string'
-    );
+        typeof json === "object" &&
+        typeof json.acct === "string" &&
+        typeof json.id === "string" &&
+        typeof json.url === "string" &&
+        typeof json.username === "string"
+    )
 }
 
 /**
@@ -219,16 +219,13 @@ export function isAnnouncementAccount (
  * @return
  * True, if the JSON object has a AnnouncementAccount structure.
  */
-export function isAnnouncementAccounts (
+export function isAnnouncementAccounts(
     json: Partial<Array<Partial<AnnouncementAccount>>>
 ): json is Array<AnnouncementAccount> {
     return (
-        Array.isArray( json ) &&
-        (
-            !json.length ||
-            isAnnouncementAccount( json[0] || {} )
-        )
-    );
+        Array.isArray(json) &&
+        (!json.length || isAnnouncementAccount(json[0] || {}))
+    )
 }
 
 /**
@@ -240,18 +237,13 @@ export function isAnnouncementAccounts (
  * @return
  * True, if the JSON array contains a Announcement structure.
  */
-export function isAnnouncements (
+export function isAnnouncements(
     json: Partial<Array<Partial<Announcement>>>
 ): json is Array<Announcement> {
     return (
-        Array.isArray( json ) &&
-        (
-            !json.length ||
-            isAnnouncement( json[0] || {} )
-        )
-    );
+        Array.isArray(json) && (!json.length || isAnnouncement(json[0] || {}))
+    )
 }
-
 
 /**
  * Tests the JSON object for a AnnouncementStatus structure.
@@ -262,14 +254,14 @@ export function isAnnouncements (
  * @return
  * True, if the JSON object has a AnnouncementStatus structure.
  */
-export function isAnnouncementStatus (
+export function isAnnouncementStatus(
     json: Partial<AnnouncementStatus>
 ): json is AnnouncementStatus {
     return (
-        typeof json === 'object' &&
-        typeof json.id === 'string' &&
-        typeof json.url === 'string'
-    );
+        typeof json === "object" &&
+        typeof json.id === "string" &&
+        typeof json.url === "string"
+    )
 }
 
 /**
@@ -281,16 +273,13 @@ export function isAnnouncementStatus (
  * @return
  * True, if the JSON object has a AnnouncementStatus structure.
  */
-export function isAnnouncementStatuses (
+export function isAnnouncementStatuses(
     json: Partial<Array<Partial<AnnouncementStatus>>>
 ): json is Array<AnnouncementStatus> {
     return (
-        Array.isArray( json ) &&
-        (
-            !json.length ||
-            isAnnouncementStatus( json[0] || {} )
-        )
-    );
+        Array.isArray(json) &&
+        (!json.length || isAnnouncementStatus(json[0] || {}))
+    )
 }
 
 /* *
@@ -299,4 +288,4 @@ export function isAnnouncementStatuses (
  *
  * */
 
-export default Announcement;
+export default Announcement
