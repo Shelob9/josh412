@@ -13,8 +13,8 @@ export type Mastodon_Api_Pagination = {
 export class MastodonApi {
 
     instanceUrl: string
-    token: string
-    constructor(instanceUrl: string, token: string) {
+    token?: string
+    constructor(instanceUrl: string, token?: string) {
         this.instanceUrl = instanceUrl
         this.token = token
     }
@@ -39,7 +39,7 @@ export class MastodonApi {
         limit,
         excludeReblogs,
     }: {
-        accountId: number
+        accountId: string|number
         excludeReblogs?: boolean
     } & Mastodon_Api_Pagination) {
         return await getStatuses(

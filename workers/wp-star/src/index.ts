@@ -15,6 +15,7 @@ export default {
 			{asset: 'frontEnd', key: queryCacheKey, regex: /^.*\.(css|js)/, info: 0, ok: 3600, redirects: 30, clientError: 10, serverError: 0 },
 		];
 		const { asset, regex, ...cache } = cacheAssets.find( ({regex}) => originalUrl.pathname.match(regex)) ?? {}
+
 		const newResponse = await fetch(newUrl,
 				{ cf:
 					{
@@ -37,9 +38,12 @@ export default {
 				console.log(cache);
 
 		const response = new Response(newResponse.body, newResponse)
+		ctx.waitUntil(
+			caches.default.put(request, response.clone())
 
-		// For debugging purposes
-		response.headers.set('debug', JSON.stringify(cache))
+		);
+
+
 		return withWorkerName( {
 			response,
 			workerName

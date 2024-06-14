@@ -6,6 +6,28 @@ export const withWorkerName = ({response,workerName}:{
     return response;
 }
 
+export const returnJson = ({
+    data,
+    workerName,
+    status = 200,
+}:{
+    data: any,
+    workerName: string,
+    status?: number
+}) => {
+    return withWorkerName({
+        response: new Response(JSON.stringify(data), {
+            status,
+            headers: {
+
+                'content-type': 'application/json',
+            },
+        }),
+        workerName
+    });
+
+}
+
 export default class ResponseFactory {
     response: Response;
     constructor(response: Response) {
