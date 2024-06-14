@@ -8,12 +8,12 @@ export default {
             {
                 name:'josh412',
                 instanceUrl: 'https://mastodon.social',
-                accountId: 425078,
+                accountId: '425078',
             },
             {
                 name: "josh412",
                 instanceUrl: 'https://fosstodon.org',
-                accountId: 109276361938539865,
+                accountId: '109276361938539865',
             }
         ],
         bluesky: [
