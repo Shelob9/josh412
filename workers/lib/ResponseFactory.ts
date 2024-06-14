@@ -28,6 +28,31 @@ export const returnJson = ({
 
 }
 
+//with cache headers ttl
+export const returnJsonWithCache = ({
+    data,
+    workerName,
+    status = 200,
+    ttl = 60,
+}:{
+    data: any,
+    workerName: string,
+    status?: number,
+    ttl?: number
+}) => {
+    return withWorkerName({
+        response: new Response(JSON.stringify(data), {
+            status,
+            headers: {
+                'content-type': 'application/json',
+                'Cache-Control': `max-age=${ttl}`,
+            },
+        }),
+        workerName
+    });
+
+}
+
 export default class ResponseFactory {
     response: Response;
     constructor(response: Response) {

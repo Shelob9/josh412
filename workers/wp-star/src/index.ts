@@ -31,7 +31,7 @@ export default {
 							},
 						cacheTags: [
 							'static'
-							]
+						]
 					},
 
 				})
@@ -40,7 +40,6 @@ export default {
 		const response = new Response(newResponse.body, newResponse)
 		ctx.waitUntil(
 			caches.default.put(request, response.clone())
-
 		);
 
 
