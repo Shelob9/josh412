@@ -1,12 +1,25 @@
-#
+# Josh412
 
-##
 
-- `npm run start --workspace=joshdata`
-- `npm run start --workspace=tooter`
+## Workers
 
-## Run Tests
+- cdn
+- search
+- wordpress-proxy
+- wp-star
 
-- In link collection
-    - `wp-env run tests-cli composer --env-cwd=/var/www/html/wp-content/plugins/link-collection test`
-    - `wp-env run tests-cli composer --env-cwd=/var/www/html/wp-content/plugins/link-collection test:watch`
+
+### WordPress
+
+- Start local dev
+    - Run in main directory
+    - `npx wp-env start`
+- Stop local dev
+    - `npx wp-env-stop`
+- mu-plugins
+    - ./mu-plugins
+- Plugin:
+    - ./plugins/garden-source
+    - Local dev:
+        - `cd plugins/garden-source`
+        - `npm run start`

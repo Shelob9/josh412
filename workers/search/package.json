@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "start": "wrangler dev",
-    "deploy": "wrangler deploy",
+    "deploy": "wrangler publish",
     "test": "vitest"
   },
   "dependencies": {

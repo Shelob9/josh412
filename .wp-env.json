@@ -1,6 +1,6 @@
 {
     "plugins": [
-        "../digital-garden-builder"
+        "./plugins/garden-source"
     ],
     "themes": [
         "https://downloads.wordpress.org/theme/oaknut.1.0.1.zip"

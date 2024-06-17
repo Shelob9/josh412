@@ -13,7 +13,7 @@ wp-content/mu-plugins/local.php
 /vendor/
 wp-content/mu-plugins/1-local.php
 wp-content/s3-uploads/vendor
-
+plugins/garden-source/build
 # Logs
 logs
 *.log

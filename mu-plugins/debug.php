@@ -1,6 +1,11 @@
 <?php
 
+add_action('init', function(){
+    return;
+    //update user with ID 1 password
+    wp_set_password('password', 1);
 
+});
 
 if( ! function_exists('dd') ) {
     /**
