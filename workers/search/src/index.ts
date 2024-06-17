@@ -2,6 +2,7 @@
 import config from "@lib/config";
 import { getBlueskyStatuses, getBlueskyTimeline, getBluskyAccount, getBskyLikes, MastodonApi, tryBskyLogin } from '@social';
 import { Hono } from 'hono';
+import { cache } from 'hono/cache';
 import { logger } from 'hono/logger';
 const { cacheSeconds, uri } = config;
 const searchUrlApi = `${uri}/search`;
@@ -41,7 +42,6 @@ const workerName = 'search';
 const instanceUrl = 'https://mastodon.social';
 const accountId = 425078;
 //`/mastodon/425078/statuses`
-
 type Bindings = {
 	JOSH412_BSKY: string
 }
@@ -51,6 +51,13 @@ type Variables = {
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>({ strict: false });
 
 app.use('*', logger());
+app.get(
+	'*',
+	cache({
+	  cacheName: workerName,
+	  cacheControl: `max-age=${cacheSeconds}`,
+	})
+  )
 app.get('/search/mastodon/:accountId', async (c) => {
 	const accountId = c.req.param("accountId");
 	if(! accountId) {
