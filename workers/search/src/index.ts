@@ -3,7 +3,9 @@ import config from "@lib/config";
 import { getBlueskyStatuses, getBlueskyTimeline, getBluskyAccount, getBskyLikes, MastodonApi, tryBskyLogin } from '@social';
 import { Hono } from 'hono';
 import { cache } from 'hono/cache';
+import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
+
 const { cacheSeconds, uri } = config;
 const searchUrlApi = `${uri}/search`;
 
@@ -29,8 +31,12 @@ function mastodonAccountIdToConfig(accountId: string):{
 	name: string,
 	instanceUrl: string,
 	accountId: string
-}|undefined {
-	return config.social.mastodon.find( a => a.accountId === accountId);
+} {
+	return config.social.mastodon.find( a => a.accountId === accountId) as {
+		name: string,
+		instanceUrl: string,
+		accountId: string
+	};
 
 }
 
@@ -39,7 +45,6 @@ function blueskyDidToCongig(did:string): {name:string,did:string} | undefined {
 }
 const workerName = 'search';
 
-const instanceUrl = 'https://mastodon.social';
 const accountId = 425078;
 //`/mastodon/425078/statuses`
 type Bindings = {
@@ -51,6 +56,15 @@ type Variables = {
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>({ strict: false });
 
 app.use('*', logger());
+app.use(
+	'/search/*',
+	cors({
+	  origin: 'http://localhost:2112',
+	  allowMethods: ['POST', 'GET', 'OPTIONS'],
+	  maxAge: 600,
+	  credentials: true,
+	})
+  )
 app.get(
 	'*',
 	cache({
@@ -66,6 +80,7 @@ app.get('/search/mastodon/:accountId', async (c) => {
 	if( ! isValidAccontId(accountId,'mastodon') ){
 		return c.json({error: 'account not found'}, 404);
 	}
+	const {instanceUrl} = mastodonAccountIdToConfig(accountId);
 
 	const api = new MastodonApi(instanceUrl);
 	const account = await api.getAccountById(accountId,instanceUrl);
@@ -82,6 +97,7 @@ app.get('/search/mastodon/:accountId/statuses', async (c) => {
 		return c.json({error: 'accountId is required'}, 400);
 	}
 	const maxId = c.req.query("maxId") || undefined;
+	const {instanceUrl} = mastodonAccountIdToConfig(accountId);
 
 	const api = new MastodonApi(instanceUrl);
 	const statuses = await api.getStatuses({accountId,maxId});

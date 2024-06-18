@@ -6,12 +6,13 @@
   },
   "private": true,
   "scripts": {
-    "dev": "wrangler dev",
-    "start": "wrangler dev",
+    "dev": "wrangler dev --port=5050",
+    "start": "wrangler dev --port=5050",
     "deploy": "wrangler publish",
     "test": "vitest"
   },
   "dependencies": {
+    "@atproto/api": "^0.12.20",
     "@hono/zod-validator": "^0.2.2",
     "hono": "^4.4.6",
     "zod": "^3.23.8"

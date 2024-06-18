@@ -7,7 +7,7 @@ import './editor.scss';
 import { Accounts, See } from './types';
 
 export default function Edit({ attributes, setAttributes}) {
-	const [see,setSee] = useState<See>('posts');
+	const [see,setSee] = useState<See>('statuses');
 	const [account,setAccount] = useState<Accounts>('mastodonSocial');
 	return (
 		<div { ...useBlockProps() }>
@@ -19,14 +19,16 @@ export default function Edit({ attributes, setAttributes}) {
 				<div>
 					<TimelineViewToggles
 						see={see}
-						onChangeSee={(see) => setSee(see)}
+						onChangeSee={(see) => setSee(see as See)}
 						account={account}
 						onChangeAccount={(update) => setAccount(update)}
 					/>
 				</div>
 				<div>
 
-					<Timeline see={see} account={account} />
+					<Timeline see={see} account={account}
+
+					onChangeAccount={setAccount} />
 				</div>
 			</div>
 		</div>

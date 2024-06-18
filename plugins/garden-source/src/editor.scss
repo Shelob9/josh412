@@ -1,9 +1,41 @@
-/**
- * The following styles get applied inside the editor only.
- *
- * Replace them with your own styles or remove the file completely.
- */
-
 .wp-block-josh412-garden-source {
 	border: 1px dotted #f00;
+
+
+/** https://css-tricks.com/dont-overthink-flexbox-grids/ **/
+
+	.flex-grid {
+	display: flex;
+	}
+	.flex-grid .col {
+	flex: 1;
+
+	}
+
+	.flex-grid img.col {
+		object-fit: cover;
+		margin-right: 1rem;
+		overflow: hidden;
+		height: 200px;
+	}
+
+	.flex-grid-thirds {
+	display: flex;
+	justify-content: space-between;
+	}
+	.flex-grid-thirds .col {
+	width: 32%;
+	}
+
+	@media (max-width: 400px) {
+	.flex-grid,
+	.flex-grid-thirds {
+		display: block;
+		.col {
+		width: 100%;
+		margin: 0 0 10px 0;
+		}
+	}
+	}
+
 }

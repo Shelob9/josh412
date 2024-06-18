@@ -2,6 +2,7 @@ import { SelectControl, Spinner } from '@wordpress/components';
 import React, { useEffect, useMemo, useState } from 'react';
 import { accountOptions, accounts } from '../accounts';
 import { Accounts, See } from '../types';
+import MastodonPosts from './MastodonPosts';
 
 type TimelineProps = {
     see: See;
@@ -57,14 +58,17 @@ type AccountDetailsMinimal = {
 
 function fetchTimeline(account:AccountDetailsMinimal, see:See){
     if( 'mastodon' === account.type ){
-        return fetch(`/search/mastodon/${account.id}/statuses`)
+        return fetch(`http://localhost:5050/search/mastodon/${account.id}/statuses`)
             .then(response => response.json())
             .then(json => json);
     }
     if( 'bluesky' === account.type ){
-        return fetch(`/search/bluesky/${account.id}/${see}`)
+        return fetch(`http://localhost:5050/search/bluesky/${account.id}/${see}`)
             .then(response => response.json())
-            .then(json => json);
+            .then(json => {
+                console.log({json})
+                return json;
+            });
     }
     return Promise.reject('Invalid account type');
 }
@@ -73,25 +77,32 @@ export default function Timeline({
     see,
 }:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>){
     const [next, setNext] = useState<string|undefined>(undefined);
+    const [statuses, setStatuses] = useState<any[]>([]);
     const accountDetails = useMemo(() => {
         console.log({account, accounts});
         return accounts[account] as AccountDetailsMinimal;
     }, [account]);
     useEffect(() => {
+        if( ! accountDetails ){
+            return;
+        }
         fetchTimeline(accountDetails, see).then(r => {
-            console.log({statuses:r.statues, nextCursor:r.nextCursor});
+            console.log({r});
             setNext(r.nextCursor);
+            setStatuses(r.statuses);
         })
     },[accountDetails, see])
-    return (
-        <div>
-            <h3>Timeline</h3>
-            {accountDetails ? (
-                <div>
-                    <p>{accountDetails.name}</p>
-                    <p>{accountDetails.type}</p>
-                </div>
-            ) : (<Spinner />)}
-        </div>
-    );
+    const isMastodon = 'mastodon' === accountDetails?.type;
+
+    if( ! accountDetails ){
+        return <div>Account not found</div>
+    }
+    if(  ! statuses || !statuses.length ){
+        return <Spinner />
+    }
+
+    if( isMastodon ){
+        return <MastodonPosts posts={statuses} />
+    }
+    return <div>Not working yet</div>
 }
