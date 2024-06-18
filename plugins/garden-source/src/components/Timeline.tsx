@@ -55,15 +55,17 @@ type AccountDetailsMinimal = {
     name: string;
     id: string;
 }
+//const apiUrl = 'http://localhost:5050';
+
 
 function fetchTimeline(account:AccountDetailsMinimal, see:See){
     if( 'mastodon' === account.type ){
-        return fetch(`http://localhost:5050/search/mastodon/${account.id}/statuses`)
+        return fetch(`/search/mastodon/${account.id}/statuses`)
             .then(response => response.json())
             .then(json => json);
     }
     if( 'bluesky' === account.type ){
-        return fetch(`http://localhost:5050/search/bluesky/${account.id}/${see}`)
+        return fetch(`/search/bluesky/${account.id}/${see}`)
             .then(response => response.json())
             .then(json => {
                 console.log({json})
@@ -72,10 +74,17 @@ function fetchTimeline(account:AccountDetailsMinimal, see:See){
     }
     return Promise.reject('Invalid account type');
 }
+
+export type UseProps = {
+    onCopy: (content: string) => void;
+    onQuote: (content: string, citation: string) => void;
+}
 export default function Timeline({
     account,
     see,
-}:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>){
+    onCopy,
+    onQuote
+}:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps){
     const [next, setNext] = useState<string|undefined>(undefined);
     const [statuses, setStatuses] = useState<any[]>([]);
     const accountDetails = useMemo(() => {
@@ -102,7 +111,7 @@ export default function Timeline({
     }
 
     if( isMastodon ){
-        return <MastodonPosts posts={statuses} />
+        return <MastodonPosts posts={statuses} onCopy={onCopy} onQuote={onQuote} />
     }
     return <div>Not working yet</div>
 }

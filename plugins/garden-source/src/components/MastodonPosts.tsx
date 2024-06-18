@@ -1,5 +1,6 @@
 import React from 'react';
 import Images from './Images';
+import { UseProps } from './Timeline';
 
 type MastodonMedia = {
     id: string,
@@ -66,9 +67,9 @@ type MastodonStatus = {
     media_attachments?: MastodonMedia[]
 };
 
-function MastodonPost({post}:{
+function MastodonPost({post,onCopy,onQuote}:{
     post: MastodonStatus
-}){
+}&UseProps){
     const images = post.media_attachments ?  post.media_attachments.map((media) => {
         return {
             key: media.id,
@@ -77,24 +78,33 @@ function MastodonPost({post}:{
         }
     } ) : [];
     return (
-        <div >
+        <div>
             <h3><a href={post.account.url} target="_blank">{post.account.display_name}</a></h3>
             <p dangerouslySetInnerHTML={{ __html: post.content }} />
             {post.media_attachments && (
                 <Images images={images} />
             )}
-            <a href={post.url} target="_blank">View</a>
+            <div className="flex-grid">
+                <a href={post.url} target="_blank" className="col">View</a>
+
+                <button className="col" onClick={() => onCopy(post.content)}>Copy</button>
+                <button className="col"
+                    onClick={() => onQuote(post.content,`<a href="${post.account.url}">${post.account.display_name}</a>`)}
+                    >Quote</button>
+            </div>
         </div>
     )
 }
 export default function MastodonPosts({
     posts,
+    onCopy,
+    onQuote
 }: {
     posts: MastodonStatus[]
-}) {
+}&UseProps) {
     return (
         <div>
-            {posts.map((post) => <MastodonPost key={post.id} post={post} />)}
+            {posts.map((post) => <MastodonPost key={post.id} post={post} onCopy={onCopy} onQuote={onQuote} />)}
         </div>
     );
 }
