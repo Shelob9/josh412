@@ -19,6 +19,17 @@ const allowed = {
         startsWith: [
             '/2024',
             '/blog',
+            '/music',
+            '/internet',
+            '/software',
+            '/dogs',
+            '/photos',
+            '/pittsburgh',
+            '/cats',
+            '/memes',
+            '/books',
+            '/time-and-space',
+            '/cats'
         ],
     }
 }
