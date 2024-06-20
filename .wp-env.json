@@ -6,10 +6,16 @@
         "https://downloads.wordpress.org/theme/oaknut.1.0.1.zip"
     ],
     "port": 2112,
+    "config": {
+        "WP_DEBUG": "true",
+        "WP_DEBUG_DISPLAY": true,
+        "WP_DEBUG_LOG": true,
+        "CF_ACCOUNT_ID": "1234567890"
+    },
     "env": {
         "tests": {
             "config": {
-                "KEY_1": false
+                "CF_ACCOUNT_ID": "1234567890"
             },
             "port": 2113
         }

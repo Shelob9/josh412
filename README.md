@@ -11,6 +11,13 @@
 
 ### WordPress
 
+#### Install
+
+- git clone
+- `npm i`
+- `bash scripts/mu-plugins.sh`
+#### Local Dev
+
 - Start local dev
     - Run in main directory
     - `npx wp-env start`
