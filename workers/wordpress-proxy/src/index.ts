@@ -26,6 +26,20 @@ export default {
             const originalUrl = new URL(request.url);
             const cacheKey = `${originalUrl.hostname}${originalUrl.pathname}${originalUrl.search}`;
             const allowed = isAllowed(originalUrl);
+            if( ! allowed ){
+                console.log({
+                    message: 'not allowed',
+                    pathname: originalUrl.pathname,
+                    allowed
+                })
+                //redirect to /404
+                return new Response(null, {
+                    status: 301,
+                    headers: {
+                        'Location': `${uri}/404`
+                    }
+                })
+            }
             const newUrl = allowed ? new URL(`${uri}${originalUrl.pathname}`) : new URL(`${uri}/404`);
             const response = await fetch(newUrl, {
                 cf: {

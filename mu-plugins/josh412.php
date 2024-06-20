@@ -2,6 +2,7 @@
 /**
  * Plugin name: Josh412
  */
+add_filer( 'show_admin_bar', '__return_false' );
 /**
  * Category validation
  */

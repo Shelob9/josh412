@@ -9,7 +9,19 @@ export function isAuthed(cookie: string | null):boolean{
     || cookie.includes(`wordpress_sec`);
   }
 
-
+const categories = [
+    'music',
+    'internet',
+    'software',
+    'dogs',
+    'photos',
+    'pittsburgh',
+    'cats',
+    'memes',
+    'books',
+    'time-and-space',
+    'cats'
+]
 const allowed = {
     public: {
         is: [
@@ -17,19 +29,13 @@ const allowed = {
             '/wp-login.php',
         ],
         startsWith: [
+            '/404',
+            '/403',
             '/2024',
             '/blog',
-            '/music',
-            '/internet',
-            '/software',
-            '/dogs',
-            '/photos',
-            '/pittsburgh',
-            '/cats',
-            '/memes',
-            '/books',
-            '/time-and-space',
-            '/cats'
+            '/tag',
+            ...categories.map( category => `/category/${category}`),
+            ...categories.map( category => `/${category}/`),
         ],
     }
 }
