@@ -3,6 +3,11 @@ import { withWorkerName } from '@lib/ResponseFactory';
 const workerName = 'wp-star';
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+		//If not GET, return unmodified request
+		if (request.method !== 'GET') {
+			return fetch(request)
+		}
+
 		// Instantiate new URL to make it mutable
 		const originalUrl = new URL(request.url)
 		const newUrl = new URL(`${config.uri}${originalUrl.pathname}${originalUrl.search}`)
@@ -15,11 +20,11 @@ export default {
 			{asset: 'frontEnd', key: queryCacheKey, regex: /^.*\.(css|js)/, info: 0, ok: 3600, redirects: 30, clientError: 10, serverError: 0 },
 		];
 		const { asset, regex, ...cache } = cacheAssets.find( ({regex}) => originalUrl.pathname.match(regex)) ?? {}
-
+		const cacheKey = cache ? cache.key : queryCacheKey;//@ts-ignore
 		const newResponse = await fetch(newUrl,
 				{ cf:
 					{
-						cacheKey: cache ? cache.key : queryCacheKey,
+						cacheKey,
 						polish: false,
 						cacheEverything: true,
 						cacheTtlByStatus: {
@@ -35,14 +40,11 @@ export default {
 					},
 
 				})
-				console.log(cache);
 
 		const response = new Response(newResponse.body, newResponse)
 		ctx.waitUntil(
 			caches.default.put(request, response.clone())
 		);
-
-
 		return withWorkerName( {
 			response,
 			workerName
