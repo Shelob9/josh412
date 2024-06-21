@@ -31,6 +31,25 @@ export class MastodonApi {
         )
     }
 
+    async search(q:string, {instanceUrl, following, account_id } : {
+        instanceUrl?: string,
+        following?: boolean,
+        account_id?: string|number
+    } = {
+    }) {
+        const query = new URLSearchParams({
+            q,
+
+        })
+        if( following ){
+            query.set('following',following.toString())
+        }
+        if( account_id ){
+            query.set('account_id',account_id.toString())
+        }
+        return await fetch(`${instanceUrl ?? this.instanceUrl}/api/v2/search?${query.toString()}`).then((r) => r.json())
+    }
+
     async getStatuses({
         accountId,
         maxId,

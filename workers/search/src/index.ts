@@ -82,12 +82,19 @@ app.get('/search/mastodon/:accountId', async (c) => {
 		return c.json({error: 'account not found'}, 404);
 	}
 	const {instanceUrl} = mastodonAccountIdToConfig(accountId);
-
 	const api = new MastodonApi(instanceUrl);
 	const account = await api.getAccountById(accountId,instanceUrl);
 	if( !  account ){
 		return c.json({error: 'account not found'}, 404);
 	}
+	if (c.req.query("q")) {
+		const instanceUrl = c.req.query("instanceUrl") || undefined;
+		const statuses = await api.search(c.req.query("q") as string,{
+			instanceUrl,
+		});
+		return c.json({accountId,account,statuses});
+	}
+
 	return c.json({accountId,account,});
 });
 
