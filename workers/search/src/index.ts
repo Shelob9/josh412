@@ -6,7 +6,8 @@ import { cache } from 'hono/cache';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 
-const { cacheSeconds, uri } = config;
+const {  uri } = config;
+const cacheSeconds = 600;
 const searchUrlApi = `${uri}/search`;
 
 type SOCIAL_NETWORK = 'mastodon' | 'bluesky';
@@ -61,7 +62,7 @@ app.use(
 	cors({
 	  origin: 'http://localhost:2112',
 	  allowMethods: ['POST', 'GET', 'OPTIONS'],
-	  maxAge: 600,
+	  maxAge: cacheSeconds,
 	  credentials: true,
 	})
   )
@@ -71,7 +72,7 @@ app.get(
 	  cacheName: workerName,
 	  cacheControl: `max-age=${cacheSeconds}`,
 	})
-  )
+)
 app.get('/search/mastodon/:accountId', async (c) => {
 	const accountId = c.req.param("accountId");
 	if(! accountId) {
