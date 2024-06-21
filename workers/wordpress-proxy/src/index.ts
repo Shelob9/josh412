@@ -7,7 +7,14 @@ export default {
     async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
          // Determine which group this request is in.
          const cookie = request.headers.get('Cookie')
+            //If is DELETE to /purge
+        if ('DELETE' === request.method && request.url.endsWith('/purge')) {
+            fetch('https://api.cloudflare.com/client/v4/zones/eb01bf7538cc82efe2ffe883d0d229e9/purge_cache',{
+                method: 'POST',
 
+            })
+            return new Response(null, { status: 200 })
+        }
          if ('POST' ===  request.method || isAuthed(cookie)) {
             const bustedRequest = new Request(request, { cf: { cacheTtl: -1 } })
             const response = await fetch(bustedRequest)

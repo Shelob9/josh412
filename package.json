@@ -10,10 +10,10 @@
   "license": "ISC",
   "workspaces": [
     "packages/*",
-    "workers/*",
-    "clients/*"
+    "workers/*"
   ],
   "dependencies": {
+    "@atproto/api": "^0.12.21",
     "wrangler": "^3.11.0"
   }
 }

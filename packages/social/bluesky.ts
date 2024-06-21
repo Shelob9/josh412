@@ -241,6 +241,10 @@ export async function getBlueskyStatus({
         cursor: did,
     });
 
+    const posts: Array<{}> = [];
+    for (const feedViewPost of data.feed) {
+        posts.push(feedViewPost.post);
+    }
     if (!data) {
         throw new Error("no data")
     }

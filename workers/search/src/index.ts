@@ -1,6 +1,11 @@
 
+import { AppBskyFeedDefs } from "@atproto/api";
 import config from "@lib/config";
-import { getBlueskyStatuses, getBlueskyTimeline, getBluskyAccount, getBskyLikes, MastodonApi, tryBskyLogin } from '@social';
+import {
+	BskyPostSimple,
+	getBlueskyStatuses, getBlueskyTimeline, getBluskyAccount, getBskyLikes,
+	MastodonApi, tryBskyLogin
+} from '@social';
 import { Hono } from 'hono';
 import { cache } from 'hono/cache';
 import { cors } from 'hono/cors';
@@ -44,6 +49,14 @@ function mastodonAccountIdToConfig(accountId: string):{
 function blueskyDidToCongig(did:string): {name:string,did:string} | undefined {
 	return config.social.bluesky.find( a => a.did === did);
 }
+function postUriToUrl(uri:string,authorHandle:string){
+    //take only the part after app.bsky.feed.post/ in uri
+    uri = uri.split('/').slice(-1)[0];
+    return `https://bsky.app/profile/${authorHandle}/post/${uri}`;
+
+}
+
+
 const workerName = 'search';
 
 const accountId = 425078;
@@ -168,18 +181,60 @@ app.get('/search/bluesky/:did/statuses', async (c) => {
 			password: c.env.JOSH412_BSKY,
 
 		});
-		const statuses = await getBlueskyStatuses({
-			agent: agent.agent,
-			actor: account.did,
-			cursor,
-		});
-		return c.json({
-			did,
-			next: `${searchUrlApi}/bluesky/${did}/statuses?cursor=${statuses.statusesCursor}`,
-			nextCursor:statuses.statusesCursor,
-			statuses:statuses.statuses,
-		});
+		try {
+			const statuses = await getBlueskyStatuses({
+				agent: agent.agent,
+				actor: account.did,
+				cursor,
+			});
+			function statusToSimple(s:AppBskyFeedDefs.FeedViewPost):BskyPostSimple|undefined {
+				const {post} = s;
+				if( ! post ){
+					return undefined;
+				}
+
+				const {uri,cid,author,record,replyCount,likeCount,repostCount,} = post;
+				const {handle} = author;
+				const url = postUriToUrl(uri,handle);
+				if( s.reply && s.reply.root ){
+					console.log( s.reply);
+				}
+				return {
+					uri,
+					cid,
+					url,
+					author: {
+						url: `https://bsky.app/profile/${handle}`,
+						avatar: author.avatar ?? '',
+						displayName: author.displayName?? '',
+						handle,
+						did: author.did,
+					},
+					//@ts-ignore
+					text: record.text,
+					replyCount: replyCount ?? 0,
+					likeCount: likeCount ?? 0,
+					repostCount: repostCount ?? 0,
+					//@ts-ignore
+					hasrSr: s.reply && s.reply.root ? true : false,
+					//reply: s.reply && s.reply.root ? s.reply.root.cid : false
+				}
+			}
+			const returnStatuses = statuses.statuses.map(statusToSimple).filter( s => s !== undefined) as BskyPostSimple[];
+			return c.json({
+				did,
+				next: `${searchUrlApi}/bluesky/${did}/statuses?cursor=${statuses.statusesCursor}`,
+				nextCursor:statuses.statusesCursor,
+				statuses:	returnStatuses
+
+			});
+		} catch (error) {
+			console.log(error);
+			return c.json({error: 'Error1'}, 501);
+
+		}
 	} catch (error) {
+		console.log(error);
 		return c.json({error: 'Error'}, 500);
 	}
 });
