@@ -2,6 +2,7 @@ import { SelectControl, Spinner } from '@wordpress/components';
 import React, { useEffect, useMemo, useState } from 'react';
 import { accountOptions, accounts } from '../accounts';
 import { Accounts, See } from '../types';
+import BlueskyPosts from './BlueskyPosts';
 import MastodonPosts from './MastodonPosts';
 
 type TimelineProps = {
@@ -113,5 +114,5 @@ export default function Timeline({
     if( isMastodon ){
         return <MastodonPosts posts={statuses} onCopy={onCopy} onQuote={onQuote} />
     }
-    return <div>Not working yet</div>
+    return <BlueskyPosts posts={statuses} onCopy={onCopy} onQuote={onQuote} />
 }
