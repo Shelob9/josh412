@@ -102,8 +102,12 @@ app.get('/search/mastodon/:accountId', async (c) => {
 	}
 	if (c.req.query("q")) {
 		const instanceUrl = c.req.query("instanceUrl") || undefined;
+		const following = c.req.query("following") || false;
+		const accountId = c.req.query("accountId") || undefined;
 		const statuses = await api.search(c.req.query("q") as string,{
 			instanceUrl,
+			following: following ? true : undefined,
+			account_id: accountId ? accountId : undefined,
 		});
 		return c.json({accountId,account,statuses});
 	}
@@ -336,6 +340,10 @@ app.get('/search', async (c) => {
 		});
 	}
 	return c.json({routes});
+});
+
+app.notFound(async (c) => {
+	return c.json({error: 'Not found'}, 404);
 });
 
 export default {
