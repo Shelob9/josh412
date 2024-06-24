@@ -1,5 +1,6 @@
 import React from 'react';
 import Images from './Images';
+import { PostAuthor } from './Posts';
 import { UseProps } from './Timeline';
 
 type MastodonMedia = {
@@ -79,7 +80,7 @@ function MastodonPost({post,onCopy,onQuote}:{
     } ) : [];
     return (
         <div>
-            <h3><a href={post.account.url} target="_blank">{post.account.display_name}</a></h3>
+            <PostAuthor url={post.account.url} displayName={post.account.display_name} avatar={post.account.avatar}  />
             <p dangerouslySetInnerHTML={{ __html: post.content }} />
             {post.media_attachments && (
                 <Images images={images} />

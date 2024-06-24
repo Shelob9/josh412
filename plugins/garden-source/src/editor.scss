@@ -8,11 +8,11 @@
 	display: flex;
 	}
 	.flex-grid .col {
-	flex: 1;
+		flex: 1;
 
 	}
 
-	.flex-grid img.col {
+	.flex-grid img.col, .flex-grid-thirds img.col-1, .flex-grid-thirds img.col-2, .flex-grid img.col {
 		object-fit: cover;
 		margin-right: 1rem;
 		overflow: hidden;
@@ -20,11 +20,20 @@
 	}
 
 	.flex-grid-thirds {
-	display: flex;
-	justify-content: space-between;
+		display: flex;
+		justify-content: space-between;
 	}
+
 	.flex-grid-thirds .col {
-	width: 32%;
+		width: 32%;
+	}
+
+	.flex-grid-thirds .col-1 {
+		width: 32%;
+	}
+
+	.flex-grid-thirds .col-2 {
+		width: 64%;
 	}
 
 	@media (max-width: 400px) {

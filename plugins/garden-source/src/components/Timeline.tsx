@@ -4,6 +4,7 @@ import { accountOptions, accounts } from '../accounts';
 import { Accounts, See } from '../types';
 import BlueskyPosts from './BlueskyPosts';
 import MastodonPosts from './MastodonPosts';
+import { BskyPostSimple } from './bluesky';
 
 type TimelineProps = {
     see: See;
@@ -56,17 +57,17 @@ type AccountDetailsMinimal = {
     name: string;
     id: string;
 }
-//const apiUrl = 'http://localhost:5050';
+const apiUrl = 'http://localhost:5050';
 
 
 function fetchTimeline(account:AccountDetailsMinimal, see:See){
     if( 'mastodon' === account.type ){
-        return fetch(`/search/mastodon/${account.id}/statuses`)
+        return fetch(`${apiUrl}/search/mastodon/${account.id}/statuses`)
             .then(response => response.json())
             .then(json => json);
     }
     if( 'bluesky' === account.type ){
-        return fetch(`/search/bluesky/${account.id}/${see}`)
+        return fetch(`${apiUrl}/search/bluesky/${account.id}/${see}`)
             .then(response => response.json())
             .then(json => {
                 console.log({json})
@@ -87,6 +88,7 @@ export default function Timeline({
     onQuote
 }:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps){
     const [next, setNext] = useState<string|undefined>(undefined);
+    const [bskyPosts, setBskyPosts] = useState<BskyPostSimple[]>([]);
     const [statuses, setStatuses] = useState<any[]>([]);
     const accountDetails = useMemo(() => {
         console.log({account, accounts});
@@ -97,9 +99,12 @@ export default function Timeline({
             return;
         }
         fetchTimeline(accountDetails, see).then(r => {
-            console.log({r});
             setNext(r.nextCursor);
-            setStatuses(r.statuses);
+            if( 'mastodon' === accountDetails.type ){
+                setStatuses(r.statuses);
+            } else {
+                setBskyPosts(r.statuses);
+            }
         })
     },[accountDetails, see])
     const isMastodon = 'mastodon' === accountDetails?.type;
@@ -107,12 +112,16 @@ export default function Timeline({
     if( ! accountDetails ){
         return <div>Account not found</div>
     }
-    if(  ! statuses || !statuses.length ){
-        return <Spinner />
-    }
+
 
     if( isMastodon ){
+        if(  ! statuses || !statuses.length ){
+            return <Spinner />
+        }
         return <MastodonPosts posts={statuses} onCopy={onCopy} onQuote={onQuote} />
     }
-    return <BlueskyPosts posts={statuses} onCopy={onCopy} onQuote={onQuote} />
+    if(  ! bskyPosts || !bskyPosts.length ){
+        return <Spinner />
+    }
+    return <BlueskyPosts posts={bskyPosts} onCopy={onCopy} onQuote={onQuote} />
 }

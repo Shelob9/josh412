@@ -1,5 +1,6 @@
 import React from 'react';
 import { BskyPostSimple } from "./bluesky";
+import { PostAuthor } from './Posts';
 import { UseProps } from './Timeline';
 
 function postUriToUrl(uri:string,authorHandle:string){
@@ -12,12 +13,10 @@ function BlueskyPost({post,onCopy,onQuote,}:{
     post: BskyPostSimple
 
 }&UseProps){
-
     return (
         <div key={post.cid}>
-            <h2><a href={post.author.url} target="__blank">{post.author.displayName}</a></h2>
-            <p dangerouslySetInnerHTML={{__html: post.text}} />
-            <a href={postUriToUrl(post.uri,post.author.handle)} target="__blank">View</a>
+            <PostAuthor {...post.author} />
+            <div dangerouslySetInnerHTML={{__html:post.text}}></div>
             <div className="flex-grid">
                 <a href={post.url} target="_blank" className="col">View</a>
 
