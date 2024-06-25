@@ -1,4 +1,3 @@
-import config from '@lib/config';
 import { withWorkerName } from '@lib/ResponseFactory';
 const workerName = 'wp-star';
 export default {

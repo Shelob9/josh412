@@ -1,6 +1,7 @@
-import { allowedPaths, isAuthed } from "@lib/allowed";
-import config from "@lib/config";
-
+const config = {
+  cacheSeconds: 604800,
+  uri: `https://josh412.com`,
+}
 import {
   MethodNotAllowedError,
   NotFoundError,
@@ -25,78 +26,6 @@ type Data = {
   completed: boolean;
 };
 
-async function proxyResponse(
-  originalUrl:URL,
-  {headers,cacheSeconds}:{
-    headers?:[string, string][] | Record<string, string> | Headers,
-    cacheSeconds?:number
-  }
-): Promise<Response> {
-  const cacheTtl = cacheSeconds ?? config.cacheSeconds;
-  const cacheKey = `${originalUrl.hostname}${originalUrl.pathname}${originalUrl.search}`;
-  const newUrl = new URL(`${config.uri}${originalUrl.pathname}`);
-  const response = await fetch(newUrl, {
-      cf: {
-          cacheKey,
-          cacheTtl
-      },
-      headers: {
-          ...headers,
-          'x-josh412-proxy': 'true',
-          'x-josh412-proxied': 'true',
-          'Cache-Control': `public, max-age=${cacheTtl}`
-      },
-  });
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: response.headers
-  });
-}
-
-function createProxyHandler(app:Hono<{ Bindings: Bindings }>,path:string){
-  return app.get(path, async (c) => {
-    const cookie = c.req.headers.get('Cookie')
-    const authed = isAuthed(cookie);
-    const originalUrl = new URL(c.req.url);
-    if(authed || path == '/wp-login.php'){
-      const r = await proxyResponse(originalUrl, {
-        headers: c.req.headers,
-        cacheSeconds: -1
-      });
-    }
-    const response = await proxyResponse(originalUrl, {
-      headers: {
-        ...c.req.headers,
-        'x-josh412-route': path
-      }
-    });
-    return response;
-
-
-  });
-}
-allowedPaths.public.is.forEach((path) => {
-  createProxyHandler(app,path);
-});
-allowedPaths.public.startsWith.forEach((path) => {
-  createProxyHandler(app,`${path}/*`);
-
-});
-
-app.get('/wp-includes/*', async (c) => {
-  //5 days in seconds
-  const cacheSeconds = 5 * 24 * 60 * 60;
-  const originalUrl = new URL(c.req.url);
-  const response = await proxyResponse(originalUrl, {
-    headers: {
-      ...c.req.headers,
-      'x-josh412-route': 'wp-includes'
-    },
-    cacheSeconds,
-  });
-  return response;
-});
 
 app
   .get(
@@ -142,7 +71,7 @@ app
       }
     }
   })
-  .get("*", async (c) => c.newResponse(await SSRRender()))
+  .get("/notes/*", async (c) => c.newResponse(await SSRRender()))
   .notFound((c) =>
     c.json(
       {
