@@ -2,6 +2,22 @@
 /**
  * Plugin name: Josh412
  */
+add_action('init', function(){
+    if( ! is_user_logged_in() ){
+        $token = $_REQUEST['x-josh412-token'] ?? null;
+        if( ! defined('JOSH412_SECRET_TOKEN') ){
+            header('HTTP/1.1 401 Unauthorized');
+            die('No Token Configured');
+        }
+        if( ! $token ){
+            header('HTTP/1.1 401 Unauthorized');
+            die('No Token');
+        }
+        if( hash_equals( $token, JOSH412_SECRET_TOKEN ) ){
+            return;
+        }
+    }
+});
 add_filter( 'show_admin_bar', '__return_true' );
 /**
  * Category validation
