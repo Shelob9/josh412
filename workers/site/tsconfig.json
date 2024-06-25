@@ -21,9 +21,24 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@app/*": ["src/*"]
-    }
+      "@app/*": [
+        "src/*"
+      ],
+			"@lib/allowed": [
+				"../lib/allowed",
+			],
+			"@lib/config": [
+				"../lib/config",
+			]
+		},
   },
-  "include": ["vite.config.ts", "src", "server.ts", "*.ts"],
+  "include": [
+    "vite.config.ts",
+    "src",
+    "server.ts",
+    "*.ts",
+    "../lib/allowed",
+    "../lib/config.ts"
+  ],
   "exclude": ["node_modules"]
 }

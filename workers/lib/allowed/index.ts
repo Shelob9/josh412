@@ -22,7 +22,7 @@ const categories = [
     'time-and-space',
     'cats'
 ]
-const allowed = {
+export const allowedPaths = {
     public: {
         is: [
             '/',
@@ -35,15 +35,16 @@ const allowed = {
             '/blog',
             '/tag',
             ...categories.map( category => `/category/${category}`),
-            ...categories.map( category => `/${category}/`),
+            ...categories.map( category => `/${category}`),
         ],
     }
 }
 
+
 export function isAllowed(originalUrl:URL ){
-    if( allowed.public.is.includes(originalUrl.pathname) ){
+    if( allowedPaths.public.is.includes(originalUrl.pathname) ){
         return true
     }
-    return allowed.public.startsWith.some(allowedPath => originalUrl.pathname.startsWith(allowedPath))
+    return allowedPaths.public.startsWith.some(allowedPath => originalUrl.pathname.startsWith(allowedPath))
 
 }

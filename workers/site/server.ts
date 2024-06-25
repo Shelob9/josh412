@@ -1,6 +1,5 @@
-//
-// BEGIN
-//
+import { allowedPaths } from "@lib/allowed";
+import config from "@lib/config";
 
 import {
   MethodNotAllowedError,
@@ -26,12 +25,44 @@ type Data = {
   completed: boolean;
 };
 
+function createProxyHandler(app:Hono<{ Bindings: Bindings }>,path:string){
+  return app.get(path, async (c) => {
+    const originalUrl = new URL(c.req.url);
+    const cacheKey = `${originalUrl.hostname}${originalUrl.pathname}${originalUrl.search}`;
+    const newUrl = new URL(`${config.uri}${originalUrl.pathname}`);
+    const response = await fetch(newUrl, {
+        cf: {
+            cacheKey,
+            cacheTtl: config.cacheSeconds },
+        headers: {
+            ...c.req.headers,
+            'x-josh412-proxy': 'true',
+            'x-josh412-proxied': 'true',
+            'Cache-Control': `public, max-age=${config.cacheSeconds}`
+        },
+    });
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers
+    });
+  });
+}
+allowedPaths.public.is.forEach((path) => {
+  createProxyHandler(app,path);
+});
+allowedPaths.public.startsWith.forEach((path) => {
+  console.log(`${path}/*`);
+  createProxyHandler(app,`${path}/*`);
+
+});
+
 app
   .get(
     "*",
     cache({
-      cacheName: "my-app",
-      cacheControl: "max-age=3600",
+      cacheName: "josh412-cache",
+      cacheControl: `max-age=${config.cacheSeconds}`,
     })
   )
   .get("/api/posts", async (c) => {
@@ -91,7 +122,3 @@ app
   );
 
 export default app;
-
-//
-// END
-//
