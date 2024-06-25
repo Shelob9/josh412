@@ -91,7 +91,6 @@ export default function Timeline({
     const [bskyPosts, setBskyPosts] = useState<BskyPostSimple[]>([]);
     const [statuses, setStatuses] = useState<any[]>([]);
     const accountDetails = useMemo(() => {
-        console.log({account, accounts});
         return accounts[account] as AccountDetailsMinimal;
     }, [account]);
     useEffect(() => {
