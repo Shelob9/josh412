@@ -1,4 +1,4 @@
-name = "hono-react-ssr"
+name = "josh412-site"
 main = "server.ts"
 compatibility_date = "2023-09-20"
 
@@ -6,6 +6,5 @@ compatibility_date = "2023-09-20"
 bucket = "dist"
 
 [build]
-command = "npm run build"
 cwd = "dist"
 watch_dir = "src"

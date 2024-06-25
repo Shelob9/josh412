@@ -25,57 +25,55 @@ type Data = {
   completed: boolean;
 };
 
-function createProxyHandler(app:Hono<{ Bindings: Bindings }>,path:string){
-  return app.all(path, async (c) => {
+async function proxyResponse(
+  originalUrl:URL,
+  {headers,cacheSeconds}:{
+    headers?:[string, string][] | Record<string, string> | Headers,
+    cacheSeconds?:number
+  }
+): Promise<Response> {
+  const cacheTtl = cacheSeconds ?? config.cacheSeconds;
+  const cacheKey = `${originalUrl.hostname}${originalUrl.pathname}${originalUrl.search}`;
+  const newUrl = new URL(`${config.uri}${originalUrl.pathname}`);
+  const response = await fetch(newUrl, {
+      cf: {
+          cacheKey,
+          cacheTtl
+      },
+      headers: {
+          ...headers,
+          'x-josh412-proxy': 'true',
+          'x-josh412-proxied': 'true',
+          'Cache-Control': `public, max-age=${cacheTtl}`
+      },
+  });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers
+  });
+}
 
+function createProxyHandler(app:Hono<{ Bindings: Bindings }>,path:string){
+  return app.get(path, async (c) => {
     const cookie = c.req.headers.get('Cookie')
     const authed = isAuthed(cookie);
     const originalUrl = new URL(c.req.url);
     if(authed || path == '/wp-login.php'){
-      const bustedRequest = new Request(c.req.url, {
-          method: c.req.method,
-          headers:{
-            'x-josh412-proxy': 'from',
-            //use this as a token to verify the request in wordpress
-            'x-josh412-token': '1234',
-            ...c.req.headers,
-          },
-          cf: { cacheTtl: -1 }
-      })
-      const noCacheResponse = await fetch(bustedRequest)
-      const newHeaders = new Headers(noCacheResponse.headers)
-      newHeaders.append('x-josh412-proxy', 'true' )
-      newHeaders.append('x-josh412-proxied', 'false')
-      newHeaders.append('x-josh412-allowed', 'true')
-      newHeaders.append('Cache-Control', `no-cache, max-age=0`)
-      return new Response(noCacheResponse.body, {
-          status: noCacheResponse.status,
-          statusText: noCacheResponse.statusText,
-          headers: newHeaders
-      })
+      const r = await proxyResponse(originalUrl, {
+        headers: c.req.headers,
+        cacheSeconds: -1
+      });
     }
-    if( ['GET', 'get'].includes(c.req.method )){
-      return new Response('Method Not Allowed', { status: 405 })
-    }
+    const response = await proxyResponse(originalUrl, {
+      headers: {
+        ...c.req.headers,
+        'x-josh412-route': path
+      }
+    });
+    return response;
 
-    const cacheKey = `${originalUrl.hostname}${originalUrl.pathname}${originalUrl.search}`;
-    const newUrl = new URL(`${config.uri}${originalUrl.pathname}`);
-    const response = await fetch(newUrl, {
-        cf: {
-            cacheKey,
-            cacheTtl: config.cacheSeconds },
-        headers: {
-            ...c.req.headers,
-            'x-josh412-proxy': 'true',
-            'x-josh412-proxied': 'true',
-            'Cache-Control': `public, max-age=${config.cacheSeconds}`
-        },
-    });
-    return new Response(response.body, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers
-    });
+
   });
 }
 allowedPaths.public.is.forEach((path) => {
@@ -86,6 +84,19 @@ allowedPaths.public.startsWith.forEach((path) => {
 
 });
 
+app.get('/wp-includes/*', async (c) => {
+  //5 days in seconds
+  const cacheSeconds = 5 * 24 * 60 * 60;
+  const originalUrl = new URL(c.req.url);
+  const response = await proxyResponse(originalUrl, {
+    headers: {
+      ...c.req.headers,
+      'x-josh412-route': 'wp-includes'
+    },
+    cacheSeconds,
+  });
+  return response;
+});
 
 app
   .get(
@@ -141,14 +152,20 @@ app
       404
     )
   )
-  .onError((err, c) =>
+  //@ts-ignore
+  .onError((err, c) => {
+    //console.log({err})
     c.json(
       {
         name: err.name,
         message: err.message,
       },
       500
-    )
+    );
+  }
+
   );
 
-export default app;
+export default {
+  fetch: app.fetch,
+};
