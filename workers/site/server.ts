@@ -13,7 +13,7 @@ import { honoType } from "app.types";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
 import { SSRRender } from "src/entry-server";
-import api from "./api";
+import api from "./src/api";
 
 
 const app  = new Hono<honoType>();
@@ -28,7 +28,7 @@ type Data = {
 
 app
   .get(
-    "*",
+    "/assets/*",
     cache({
       cacheName: "josh412-cache",
       cacheControl: `max-age=${config.cacheSeconds}`,

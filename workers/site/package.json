@@ -8,8 +8,8 @@
     "build": "tsc && vite build",
     "server": "tsx server.ts",
     "deploy": "wrangler deploy",
-    "migrate:local":"wrangler d1 execute josh412-02 --local --file=./db/schema.sql",
-    "migrate:prod":"wrangler d1 execute josh412-02 --remote --file=./db/schema.sql"
+    "migrate:local": "wrangler d1 execute josh412-02 --local --file=./db/schema.sql",
+    "migrate:prod": "wrangler d1 execute josh412-02 --remote --file=./db/schema.sql"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.1.10",
