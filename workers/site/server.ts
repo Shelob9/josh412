@@ -9,15 +9,14 @@ import {
   serveSinglePageApp,
 } from "@cloudflare/kv-asset-handler";
 import assetManifest from "__STATIC_CONTENT_MANIFEST";
+import { honoType } from "app.types";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
 import { SSRRender } from "src/entry-server";
+import api from "./api";
 
-type Bindings = {
-  __STATIC_CONTENT: KVNamespace;
-};
 
-const app = new Hono<{ Bindings: Bindings }>();
+const app  = new Hono<honoType>();
 
 type Data = {
   userId: number;
@@ -35,12 +34,6 @@ app
       cacheControl: `max-age=${config.cacheSeconds}`,
     })
   )
-  .get("/api/posts", async (c) => {
-    const url = "https://jsonplaceholder.typicode.com/posts";
-    const response = await fetch(url);
-    const result: Data[] = await response.json();
-    return c.json(result);
-  })
   .get("/assets/*", async (c) => {
     try {
       return await getAssetFromKV(
@@ -72,6 +65,11 @@ app
     }
   })
   .get("/notes/*", async (c) => c.newResponse(await SSRRender()))
+  .get('/', async (c) => {
+    return c.json({
+      ok: true,
+    });
+  })
   .notFound((c) =>
     c.json(
       {
@@ -94,6 +92,8 @@ app
   }
 
   );
+
+app.route('/api', api);
 
 export default {
   fetch: app.fetch,
