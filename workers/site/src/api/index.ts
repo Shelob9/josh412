@@ -105,4 +105,85 @@ api.delete('/clippings/:id', async (c) => {
         return c.json({ err: e.message }, 500);
     }
 });
+
+api.post('/classiy', async (c) => {
+    const body = await c.req.json();
+    if( ! body.classification) {
+        return c.json({ err: "classification is required" });
+    }
+    if( ! body.source)  {
+        return c.json({ err: "source is required" });
+    }
+    const uuid = crypto.randomUUID();
+    try {
+        const { lastInsertRowid } = await c.env.DB.prepare(
+            "INSERT INTO classifications (uuid, classification, source) VALUES (?, ?, ?)",
+        )
+            .bind(uuid, body.classification, body.source)
+            .run();
+        return c.json({ lastInsertRowid,uuid });
+    } catch (e) {
+        return c.json({ err: e.message }, 500);
+    }
+
+});
+
+api.get('/classifications', async (c) => {
+    try {
+        const { results } = await c.env.DB.prepare(
+            "SELECT * FROM classifications",
+        )
+            .all();
+        return c.json(results);
+    } catch (e) {
+        return c.json({ err: e.message }, 500);
+    }
+});
+
+api.get('/classifications/:id', async (c) => {
+    const uuid = c.req.param('id');
+    try {
+        const { results } = await c.env.DB.prepare(
+            "SELECT * FROM classifications WHERE uuid = ?",
+        )
+            .bind(uuid)
+            .all();
+        if( ! results.length) {
+            return c.json({ err: "Not found",uuid }, 404);
+        }
+        return c.json({ classification: results[0],uuid });
+    } catch (e) {
+        return c.json({ err: e.message, uuid}, 500);
+    }
+});
+
+api.put('/classifications/:id', async (c) => {
+    const uuid = c.req.param('id');
+
+    try {
+        const body = await c.req.json();
+        const { changes } = await c.env.DB.prepare(
+            "UPDATE classifications SET classification = ?, source = ? WHERE uuid = ?",
+        )
+            .bind(body.classification, body.source, uuid)
+            .run();
+        return c.json({ changes,uuid });
+    } catch (e) {
+        return c.json({ err: e.message }, 500);
+    }
+});
+
+api.delete('/classifications/:id', async (c) => {
+    const uuid = c.req.param('id');
+    try {
+        const { changes } = await c.env.DB.prepare(
+            "DELETE FROM classifications WHERE uuid = ?",
+        )
+            .bind(uuid)
+            .run();
+        return c.json({ changes,uuid });
+    } catch (e) {
+        return c.json({ err: e.message }, 500);
+    }
+});
 export default api;
