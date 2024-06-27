@@ -1,9 +1,9 @@
-
-CREATE TABLE IF NOT EXISTS classifications {
+DROP TABLE IF EXISTS classifications;
+CREATE TABLE IF NOT EXISTS classifications (
     uuid UUID PRIMARY KEY NOT NULL,
-    source UUID,
-    classification VARCHAR(256)
-};
-CREATE INDEX idx_source ON classifications (source);
-CREATE INDEX idx_classification ON classifications (classification);
-CREATE INDEX idx_source_classification ON classifications (source, classification);
+    classification VARCHAR(64) NOT NULL,
+    item VARCHAR(256) NOT NULL,
+    parent VARCHAR(256),
+);
+CREATE INDEX IF NOT EXISTS idx_parent ON classifications (parent);
+CREATE INDEX IF NOT EXISTS idx_item ON classifications (item);

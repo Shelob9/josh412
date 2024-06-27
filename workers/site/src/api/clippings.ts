@@ -1,81 +1,10 @@
 import { Hono } from "hono";
 import { honoType } from "../../app.types";
+import ClippingsApi from "./database/Clippings";
 const api = new Hono<honoType>();
 
 
-type Clipping = {
-    uuid: string;
-    domain: string;
-    path: string;
-    text:string
-};
-class ClippingsApi{
-    constructor(private DB: D1Database) {
 
-    }
-
-    async getClipping(uuid:string):Promise<Clipping>{
-        const { results } = await this.DB.prepare(
-            "SELECT * FROM clippings WHERE uuid = ?",
-        )
-            .bind(uuid)
-            .all();
-        if( ! results.length) {
-            throw new Error("Not found");
-        }
-        return results[0];
-    }
-
-    async updateClipping({text,uuid}:{
-        uuid:string,
-        text:string
-    }):Promise<boolean>{
-        await this.DB.prepare(
-            "UPDATE clippings SET text = ? WHERE uuid = ?",
-        )
-            .bind(text, uuid)
-            .run();
-        return true;
-    }
-
-    async create({domain, path, text}:{
-        domain:string,
-        text:string,
-        path?:string
-    }):Promise<string>{
-        path = path || '';
-        const uuid = crypto.randomUUID();
-        await this.DB.prepare(
-            "INSERT INTO clippings (uuid, domain, path, text) VALUES (?, ?, ?, ?)",
-        )
-            .bind(uuid,domain, path, text)
-            .run();
-        return uuid;
-    }
-
-    async delete(uuid:string):Promise<boolean>{
-        try {
-            await this.DB.prepare(
-                "DELETE FROM clippings WHERE uuid = ?",
-            )
-                .bind(uuid)
-                .run();
-            return true;
-
-//DOES NOT ACTUALLY THROW
-        } catch (error) {
-            console.log({error})
-            return false
-        }
-        return true;
-    }
-
-
-}
-api.use("*", async (c, next) => {
-    c.set('data', new ClippingsApi(c.env.DB));
-    await next()
-});
 
  api.get('/:uuid', async (c) => {
      const uuid = c.req.param('uuid');
@@ -83,21 +12,21 @@ api.use("*", async (c, next) => {
             return c.json({ err: "uuid is required",route:'/clippings/:uuid' });
     }
      try {
-         const clipping = await c.get<ClippingsApi>('data').getClipping(uuid);
+         const clipping = await c.get<ClippingsApi>('clippings').get(uuid);
          return c.json({ clipping,uuid, route:'/clippings/:uuid' });
      } catch (e) {
          return c.json({ err: e.message, uuid,route:'/clippings/:uuid'}, 500);
      }
  });
  api.get('/', async (c) => {
+    const route = 'GET /clippings';
+    const clippingsDb = c.get('clippings') as ClippingsApi
+
     try {
-     let { results } = await c.env.DB.prepare(
-       "SELECT * FROM clippings",
-     )
-       .all();
-     return c.json(results);
+        const clippings = await clippingsDb.all();
+        return c.json({ clippings,route });
    } catch (e) {
-     return c.json({ err: e.message,route:`clippings` }, 500);
+     return c.json({ err: e.message,route }, 500);
    }
 
 });
@@ -113,7 +42,7 @@ api.use("*", async (c, next) => {
                     route
              });
          }
-         const uuid = await c.get<ClippingsApi>('data').create({
+         const uuid = await c.get<ClippingsApi>('clippings').create({
                 domain: body.domain,
                 text: body.text,
                 path: body.hasOwnProperty('path') ? body.path : undefined,
@@ -130,19 +59,29 @@ api.use("*", async (c, next) => {
     if( ! uuid) {
         return c.json({ err: "uuid is required",route,uuid });
     }
-    const clipping = await c.get<ClippingsApi>('data').getClipping(uuid);
-    if( ! clipping) {
-        return c.json({ err: "Not found",uuid,route }, 404);
+
+    const clippingsDb = c.get('clippings') as ClippingsApi
+
+    try {
+        const clipping = await clippingsDb.get(uuid);
+        console.log({clipping});
+    } catch (error) {
+        console.log({error});
+
+            console.log(2);
+            return c.json({ err: "Not found",uuid,route }, 404);
+
     }
+
 
      try {
         const body = await c.req.json();
-        await c.get<ClippingsApi>('data').updateClipping({
+        await clippingsDb.update({
             uuid,
             text: body.text
         });
-        const updated = await c.get<ClippingsApi>('data').getClipping(uuid);
-         return c.json({ clipping:updated,uuid,route });
+        const updated = await clippingsDb.get(uuid);
+        return c.json({ clipping:updated,uuid,route });
      } catch (e) {
          return c.json({ err: e.message,route }, 500);
      }

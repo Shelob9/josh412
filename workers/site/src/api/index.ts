@@ -1,7 +1,15 @@
 import { Hono } from "hono";
 import { honoType } from "../../app.types";
+import classifications from "./classifications";
 import clippings from "./clippings";
+import ClassificationsApi from "./database/Classifications";
+import ClippingsApi from "./database/Clippings";
 const api = new Hono<honoType>();
+api.use("*", async (c, next) => {
+    c.set('clippings', new ClippingsApi(c.env.DB));
+    c.set('ClassificationsApi', new ClassificationsApi(c.env.DB));
+    await next()
+});
 api.get("/status", (c) => c.json({ status: "ok" }));
 api.get("/posts", async (c) => {
     const url = "https://jsonplaceholder.typicode.com/posts";
@@ -15,14 +23,23 @@ api.get('/status/db', async (c) => {
         const { results } = await c.env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table'")
             .all();
         const tables = results.map((r: any) => r.name);
-        return c.json({ tables });
+        const schema = {};
+        //get columns of each table
+        for (const table of tables) {
+            if('_cf_KV' === table) continue;
+            const { results } = await c.env.DB.prepare(`PRAGMA table_info(${table})`)
+                .all();
+            schema[table] = results;
+
+        }
+        return c.json({ tables,schema });
      } catch (error) {
         return c.json({ error: error.message },500);
 
      }
 });
 api.route('/clippings', clippings);
-
+api.route('/classifications', classifications );
 
 
 api.post('/classiy', async (c) => {
