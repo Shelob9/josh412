@@ -13,8 +13,7 @@ import { honoType } from "app.types";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
 import { SSRRender } from "src/entry-server";
-import api from "./src/api";
-
+import api from "./api/index";
 
 const app  = new Hono<honoType>();
 
@@ -75,6 +74,7 @@ app
       {
         message: "Not Found",
         ok: false,
+        route: '404'
       },
       404
     )
@@ -93,7 +93,7 @@ app
 
   );
 
-app.route('/api', api);
+app.route('/api', api );
 
 export default {
   fetch: app.fetch,

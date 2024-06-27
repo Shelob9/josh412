@@ -1,5 +1,5 @@
 name = "josh412-site"
-main = "server.ts"
+main = "src/server.ts"
 compatibility_date = "2023-09-20"
 
 [site]

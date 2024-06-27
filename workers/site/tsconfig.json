@@ -35,7 +35,7 @@
   "include": [
     "vite.config.ts",
     "src",
-    "server.ts",
+    "src/server.ts",
     "*.ts",
     "../lib/allowed",
     "../lib/config.ts"
