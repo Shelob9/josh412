@@ -1,5 +1,5 @@
 const config = {
-  cacheSeconds: 604800,
+  cacheSeconds: 0,
   uri: `https://josh412.com`,
 }
 import {
@@ -17,12 +17,6 @@ import api from "./api/index";
 
 const app  = new Hono<honoType>();
 
-type Data = {
-  userId: number;
-  id: number;
-  title: string;
-  completed: boolean;
-};
 
 
 app
@@ -41,6 +35,7 @@ app
           waitUntil: async (p) => c.executionCtx.waitUntil(p),
         },
         {
+            //@ts-ignore
           ASSET_NAMESPACE: c.env.__STATIC_CONTENT,
           ASSET_MANIFEST: assetManifest,
           //@ts-ignore
@@ -63,7 +58,7 @@ app
       }
     }
   })
-  .get("/notes/*", async (c) => c.newResponse(await SSRRender()))
+  .get("/app/*", async (c) => c.newResponse(await SSRRender()))
   .get('/', async (c) => {
     return c.json({
       ok: true,
@@ -93,6 +88,7 @@ app
 
   );
 
+//@ts-ignore
 app.route('/api', api );
 
 export default {

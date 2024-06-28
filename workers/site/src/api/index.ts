@@ -66,12 +66,14 @@ api.post('/classiy', async (c) => {
 
 api.get('/classifications', async (c) => {
     try {
+         //@ts-ignore
         const { results } = await c.env.DB.prepare(
             "SELECT * FROM classifications",
         )
             .all();
         return c.json(results);
     } catch (e) {
+         //@ts-ignore
         return c.json({ err: e.message }, 500);
     }
 });
@@ -80,6 +82,7 @@ api.get('/classifications/:id', async (c) => {
     const uuid = c.req.param('id');
     console.log({uuid,req:c.req});
     try {
+         //@ts-ignore
         const { results } = await c.env.DB.prepare(
             "SELECT * FROM classifications WHERE uuid = ?",
         )
@@ -90,6 +93,7 @@ api.get('/classifications/:id', async (c) => {
         }
         return c.json({ classification: results[0],uuid });
     } catch (e) {
+         //@ts-ignore
         return c.json({ err: e.message, uuid}, 500);
     }
 });
@@ -99,6 +103,7 @@ api.put('/classifications/:id', async (c) => {
 
     try {
         const body = await c.req.json();
+         //@ts-ignore
         const { changes } = await c.env.DB.prepare(
             "UPDATE classifications SET classification = ?, source = ? WHERE uuid = ?",
         )
@@ -113,6 +118,7 @@ api.put('/classifications/:id', async (c) => {
 api.delete('/classifications/:id', async (c) => {
     const uuid = c.req.param('id');
     try {
+        //@ts-ignore
         const { changes } = await c.env.DB.prepare(
             "DELETE FROM classifications WHERE uuid = ?",
         )
@@ -120,6 +126,7 @@ api.delete('/classifications/:id', async (c) => {
             .run();
         return c.json({ changes,uuid });
     } catch (e) {
+        //@ts-ignore
         return c.json({ err: e.message }, 500);
     }
 });

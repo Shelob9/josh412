@@ -1,12 +1,8 @@
+import { Clipping } from "@app/types";
 import { D1Database } from "@cloudflare/workers-types";
 import { Pagignation } from "./types";
 
-export type Clipping = {
-    uuid: string;
-    domain: string;
-    path: string;
-    text:string
-};
+
 export default class ClippingsApi{
     constructor(private DB: D1Database) {
 

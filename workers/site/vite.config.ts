@@ -1,16 +1,16 @@
-//
-// BEGIN
-//
 
-import { defineConfig, splitVendorChunkPlugin } from "vite";
+
 import react from "@vitejs/plugin-react";
 import { resolve } from "node:path";
+import tailwindcss from "tailwindcss";
+import { defineConfig, splitVendorChunkPlugin } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [
     splitVendorChunkPlugin(),
     tsconfigPaths(),
+    tailwindcss(),
     react({ include: "**/*.tsx" }),
   ],
   build: {
@@ -34,7 +34,3 @@ export default defineConfig({
     },
   },
 });
-
-//
-// END
-//

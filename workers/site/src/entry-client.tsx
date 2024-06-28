@@ -1,10 +1,8 @@
-//
-// BEGIN
-//
 
+
+import Application from "@app/app";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import Application from "@app/app";
 
 function Client() {
   return (
@@ -15,7 +13,3 @@ function Client() {
 }
 
 ReactDOM.hydrateRoot(document!, <Client />);
-
-//
-// END
-//

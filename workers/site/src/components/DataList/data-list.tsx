@@ -1,6 +1,4 @@
-//
-// BEGIN
-//
+
 
 import { usePosts } from "@app/hooks/usePosts";
 import { Fragment } from "react";
@@ -24,7 +22,3 @@ function DataList() {
 }
 
 export default DataList;
-
-//
-// END
-//
