@@ -7,6 +7,11 @@ import { defineConfig, splitVendorChunkPlugin } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
+  server: {
+    proxy: {
+      '/api': 'http://localhost:4000',
+    }
+  },
   plugins: [
     splitVendorChunkPlugin(),
     tsconfigPaths(),
@@ -20,6 +25,7 @@ export default defineConfig({
     ssrManifest: true,
     rollupOptions: {
       input: {
+        index: `${__dirname}/index.html`,
         main: resolve(__dirname, "src/entry-client.tsx"),
         globals: resolve(__dirname, "src/globals.css"),
       },

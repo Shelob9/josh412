@@ -1,23 +1,11 @@
 
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { lazy, useState } from "react";
+import { lazy } from "react";
 
-const DataList = lazy(() => import("@app/components/DataList/data-list"));
-const Heading = lazy(() => import("@app/components/Heading/heading"));
+const MainView = lazy(() => import("@app/components/MainView"));
 
 function Application() {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            retry: 0,
-          },
-        },
-      })
-  );
+
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -30,13 +18,7 @@ function Application() {
         <link href="/assets/globals.css" rel="stylesheet" />
       </head>
       <body>
-        <QueryClientProvider client={queryClient}>
-          <main className="main">
-            <Heading />
-
-          </main>
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
+        <MainView  />
       </body>
     </html>
   );

@@ -12,7 +12,7 @@ export function useClippings() {
       const url = "/api/clippings";
       const response = await fetch(url);
       const result: Clipping[] = await response.json();
-      return result;
+      return result.clippings;
     },
   });
 }
