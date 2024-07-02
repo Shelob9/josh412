@@ -39,4 +39,5 @@ api.get('/status/db', async (c) => {
 api.route('/clippings', clippings);
 api.route('/classifications', classifications );
 api.route('/items', items);
+
 export default api;
