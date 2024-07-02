@@ -1,8 +1,9 @@
-import { Pagignation } from "./database/types";
+import { Pagignation } from "./types";
 
 export type Classification = {
     uuid: string;
     item: string;
+    item_type: string;
     classification: string;
     parent?: string;
 };
@@ -19,7 +20,7 @@ export default class ClassificationsApi {
          )
              .bind(perPage, (page - 1) * perPage)
              .all();
-         return results;
+         return results as Classification[]|| [];
      }
      async get(uuid:string):Promise<Classification>{
          const { results } = await this.DB.prepare(
@@ -30,30 +31,26 @@ export default class ClassificationsApi {
          if( ! results.length) {
              throw new Error("Not found");
          }
-         return results[0];
+         return results[0] as Classification;
      }
 
 
-     async create({classification,item,parent}:Omit<Classification,'uuid'>):Promise<string>{
+     async create({classification,item,parent,item_type}:Omit<Classification,'uuid'>):Promise<string>{
          const uuid = crypto.randomUUID();
          if( parent ) {
             await this.DB.prepare(
-                "INSERT INTO classifications (uuid, classification, item, parent) VALUES (?, ?, ?, ?)",
+                "INSERT INTO classifications (uuid, classification, item, item_type, parent) VALUES (?, ?, ?, ?)",
             )
-                .bind(uuid, classification, item, parent)
+                .bind(uuid, classification, item,item_type, parent)
                 .run();
             return uuid;
          }else{
             await this.DB.prepare(
-                "INSERT INTO classifications (uuid, classification, item) VALUES (?, ?, ?)",
+                "INSERT INTO classifications (uuid, classification, item, item_type) VALUES (?, ?, ?)",
             )
-                .bind(uuid, classification, item)
+                .bind(uuid, classification, item, item_type)
                 .run();
-            await this.DB.prepare(
-             "INSERT INTO classifications (uuid, classification, item, parent) VALUES (?, ?, ?, ?)",
-         )
-             .bind(uuid, classification, item, parent)
-             .run();
+
          }
 
          return uuid;

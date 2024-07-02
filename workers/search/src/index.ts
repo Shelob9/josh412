@@ -201,7 +201,7 @@ app.get('/search/bluesky/:did/statuses', async (c) => {
 				const {handle} = author;
 				const url = postUriToUrl(uri,handle);
 				if( s.reply && s.reply.root ){
-					console.log( s.reply);
+					//console.log( s.reply);
 				}
 				return {
 					uri,
@@ -221,9 +221,13 @@ app.get('/search/bluesky/:did/statuses', async (c) => {
 					repostCount: repostCount ?? 0,
 					//@ts-ignore
 					hasrSr: s.reply && s.reply.root ? true : false,
+					//@ts-ignore
+					images: record.embed?.images ?? [],
 					//reply: s.reply && s.reply.root ? s.reply.root.cid : false
 				}
 			}
+
+
 			const returnStatuses = statuses.statuses.map(statusToSimple).filter( s => s !== undefined) as BskyPostSimple[];
 			return c.json({
 				did,

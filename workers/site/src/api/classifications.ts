@@ -25,37 +25,16 @@ const api = new Hono<honoType>();
     const service = c.get('ClassificationsApi') as ClassificationsApi;
 
     try {
-        const classifications = await service.all();
+        const classifications = await service.all({
+            page: 1,
+            perPage:25
+        });
         return c.json({ classifications,route });
    } catch (e) {
      return c.json({ err: e.message,route }, 500);
    }
 
 });
- api.post('/', async (c) => {
-    const route = 'POST /api/classifications';
-    const service = c.get('ClassificationsApi') as ClassificationsApi;
-
-     try {
-         const body = await c.req.json();
-
-         if(!body.classification || !body.item) {
-             return c.json({
-                 err: "classification and item are required",
-                 body,
-                 route
-             });
-         }
-         const uuid = await service.create({
-                classification: body.classification,
-                item: body.item,
-                parent: body.hasOwnProperty('parent') ? body.parent : undefined,
-         });
-         return c.json({ route,uuid,get: `${route}/${uuid}` });
-     } catch (e) {
-         return c.json({ err: e.message,route }, 500);
-     }
- });
 
 
 
@@ -65,9 +44,9 @@ const api = new Hono<honoType>();
     const uuid = c.req.param('uuid');
     try {
         await service.delete(uuid);
-        return c.json({ deleted:true,uuid });
+        return c.json({ deleted:true,uuid,route });
     } catch (e) {
-        return c.json({ deleted:false,err: e.message }, 500);
+        return c.json({ deleted:false,err: e.message,route }, 500);
     }
 });
  export default api;

@@ -1,21 +1,10 @@
 import { useClippings } from "@app/hooks/useClippings";
 import { Clipping } from "@app/types";
 import { useState } from "react";
-import { Button, Loading } from 'react-daisyui';
+import { Button } from 'react-daisyui';
+import LoadingOrError from "../LoadingOrError";
 
-function LoadingOrError({isLoading, isError,children}:{
-    isLoading: boolean;
-    isError: boolean;
-    children: React.ReactNode;
-}){
-    if(isLoading){
-        return <Loading/>
-    }
-    if(isError){
-        return <div>Failed to load data</div>
-    }
-    return <>{children}</>
-}
+
 export default function ClippingsList(){
     const [editId, setEditId] =  useState<string | null>(null);
     const isEditId = (id: string) => editId === id;
