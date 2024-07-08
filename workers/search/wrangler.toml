@@ -1,7 +1,0 @@
-name = "search"
-main = "src/index.ts"
-compatibility_date = "2024-06-14"
-
-kv_namespaces = [
-    {binding =  "KV",id = "5fa1278433e649bea6c4e5f13c6b7bd5",preview_id = "f5317bbca3864af0bdcde0d0763caf8c"}
-]

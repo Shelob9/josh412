@@ -1,12 +1,10 @@
 import { Hono } from "hono";
-import { honoType } from "../../app.types";
+import { Bindings, Variables } from "../../app.types";
 import { CLASSIFIERS } from "./classify/classifiers";
 import { Classification_Source, classifySources } from "./classify/classify";
 import ClassificationsApi from "./database/Classifications";
 import ItemsApi from "./database/Items";
-
-const api = new Hono<honoType>();
-
+const api = new Hono<{Variables: Variables,Bindings:Bindings}>({ strict: false });
 api.get('/classify', async (c) => {
     const route = 'GET /api/classify';
     const sources : Classification_Source[] = [

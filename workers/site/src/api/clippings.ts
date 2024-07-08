@@ -1,9 +1,6 @@
 import { Hono } from "hono";
-import { honoType } from "../../app.types";
-import ClippingsApi from "./database/Clippings";
-const api = new Hono<honoType>();
-
-
+import { Bindings, Variables } from "../../app.types";
+const api = new Hono<{Variables: Variables,Bindings:Bindings}>({ strict: false });
 
 
  api.get('/:uuid', async (c) => {
@@ -11,8 +8,10 @@ const api = new Hono<honoType>();
      if( ! uuid) {
             return c.json({ err: "uuid is required",route:'/clippings/:uuid' });
     }
+    const clippingsDb = c.get('clippings')
+
      try {
-         const clipping = await c.get<ClippingsApi>('clippings').get(uuid);
+         const clipping = await clippingsDb.get(uuid);
          return c.json({ clipping,uuid, route:'/clippings/:uuid' });
      } catch (e) {
          return c.json({ err: e.message, uuid,route:'/clippings/:uuid'}, 500);
@@ -20,10 +19,13 @@ const api = new Hono<honoType>();
  });
  api.get('/', async (c) => {
     const route = 'GET /clippings';
-    const clippingsDb = c.get('clippings') as ClippingsApi
+    const clippingsDb = c.get('clippings')
 
     try {
-        const clippings = await clippingsDb.all();
+        const clippings = await clippingsDb.all({
+            page: 1,
+            perPage:25
+        });
         return c.json({ clippings,route });
    } catch (e) {
      return c.json({ err: e.message,route }, 500);
@@ -34,6 +36,7 @@ const api = new Hono<honoType>();
     const route = 'POST /clippings';
      try {
          const body = await c.req.json();
+         const clippingsDb = c.get('clippings');
 
          if(!body.domain || !body.text) {
              return c.json({
@@ -42,7 +45,7 @@ const api = new Hono<honoType>();
                     route
              });
          }
-         const uuid = await c.get<ClippingsApi>('clippings').create({
+         const uuid = await clippingsDb.create({
                 domain: body.domain,
                 text: body.text,
                 path: body.hasOwnProperty('path') ? body.path : undefined,
@@ -60,7 +63,7 @@ const api = new Hono<honoType>();
         return c.json({ err: "uuid is required",route,uuid });
     }
 
-    const clippingsDb = c.get('clippings') as ClippingsApi
+    const clippingsDb = c.get('clippings');
 
     try {
         const clipping = await clippingsDb.get(uuid);

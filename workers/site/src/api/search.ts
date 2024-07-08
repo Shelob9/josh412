@@ -1,15 +1,17 @@
 
 import { AppBskyFeedDefs } from "@atproto/api";
 import config from "@lib/config";
-import {
-	BskyPostSimple,
-	getBlueskyStatuses, getBlueskyTimeline, getBluskyAccount, getBskyLikes,
-	MastodonApi, tryBskyLogin
-} from '@social';
 import { Hono } from 'hono';
-import { cache } from 'hono/cache';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
+import { Bindings, Variables } from "../../app.types";
+import {
+    BskyPostSimple,
+    getBlueskyStatuses, getBlueskyTimeline, getBluskyAccount, getBskyLikes,
+    MastodonApi, tryBskyLogin
+} from '../social';
+
+const api = new Hono<{Variables: Variables,Bindings:Bindings}>();
 
 const {  uri } = config;
 const cacheSeconds = 600;
@@ -61,17 +63,11 @@ const workerName = 'search';
 
 const accountId = 425078;
 //`/mastodon/425078/statuses`
-type Bindings = {
-	JOSH412_BSKY: string
-}
-type Variables = {
-	KV: KVNamespace
-}
-const app = new Hono<{ Bindings: Bindings; Variables: Variables }>({ strict: false });
 
-app.use('*', logger());
-app.use(
-	'/search/*',
+
+api.use('*', logger());
+api.use(
+	'/*',
 	cors({
 	  origin: 'http://localhost:2112',
 	  allowMethods: ['POST', 'GET', 'OPTIONS'],
@@ -79,14 +75,8 @@ app.use(
 	  credentials: true,
 	})
   )
-app.get(
-	'*',
-	cache({
-	  cacheName: workerName,
-	  cacheControl: `max-age=${cacheSeconds}`,
-	})
-)
-app.get('/search/mastodon/:accountId', async (c) => {
+
+api.get('/mastodon/:accountId', async (c) => {
 	const accountId = c.req.param("accountId");
 	if(! accountId) {
 		return c.json({error: 'accountId is required'}, 400);
@@ -116,7 +106,7 @@ app.get('/search/mastodon/:accountId', async (c) => {
 });
 
 
-app.get('/search/mastodon/:accountId/statuses', async (c) => {
+api.get('/mastodon/:accountId/statuses', async (c) => {
 	const accountId = c.req.param("accountId");
 	if(! accountId) {
 		return c.json({error: 'accountId is required'}, 400);
@@ -137,7 +127,7 @@ app.get('/search/mastodon/:accountId/statuses', async (c) => {
 })
 
 
-app.get('/search/bluesky/:did', async (c) => {
+api.get('/bluesky/:did', async (c) => {
 	const did = c.req.param("did");
 	if(! did) {
 		return c.json({error: 'did is required'}, 400);
@@ -149,6 +139,10 @@ app.get('/search/bluesky/:did', async (c) => {
 	if( ! account ){
 		return c.json({error: 'account not found'}, 404);
 	}
+    if( ! c.env.JOSH412_BSKY ){
+        return c.json({error: 'No BSKY password',}, 501);
+    }
+
 	try {
 		const agent = await tryBskyLogin({
 			identifier: account?.name,
@@ -165,7 +159,7 @@ app.get('/search/bluesky/:did', async (c) => {
 	}
 });
 
-app.get('/search/bluesky/:did/statuses', async (c) => {
+api.get('/bluesky/:did/statuses', async (c) => {
 	const did = c.req.param("did");
 	if(! did) {
 		return c.json({error: 'did is required'}, 400);
@@ -248,7 +242,7 @@ app.get('/search/bluesky/:did/statuses', async (c) => {
 });
 
 //Likes
-app.get('/search/bluesky/:did/likes', async (c) => {
+api.get('/bluesky/:did/likes', async (c) => {
 	const did = c.req.param("did");
 	if(! did) {
 		return c.json({error: 'did is required'}, 400);
@@ -284,7 +278,7 @@ app.get('/search/bluesky/:did/likes', async (c) => {
 
 
 //Timeline
-app.get('/search/bluesky/:did/timeline', async (c) => {
+api.get('/bluesky/:did/timeline', async (c) => {
 	//Add auth on this first?
 	return c.json({error: 'Not implemented'}, 501);
 	const did = c.req.param("did");
@@ -317,7 +311,7 @@ app.get('/search/bluesky/:did/timeline', async (c) => {
 	}
 });
 
-app.get('/search', async (c) => {
+api.get('/search', async (c) => {
 	const routes = [];
 	for(const m of config.social.mastodon){
 		routes.push({
@@ -346,10 +340,8 @@ app.get('/search', async (c) => {
 	return c.json({routes});
 });
 
-app.notFound(async (c) => {
-	return c.json({error: 'Not found'}, 404);
+api.notFound(async (c) => {
+	return c.json({error: 'Not found',api:"search"}, 404);
 });
 
-export default {
-	fetch: app.fetch,
-};
+export default api;

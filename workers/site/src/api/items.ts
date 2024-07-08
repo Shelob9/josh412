@@ -1,12 +1,13 @@
 import { Hono } from "hono";
-import { honoType } from "../../app.types";
+import { Bindings, Variables } from "../../app.types";
 import ItemsApi from "./database/Items";
-const api = new Hono<honoType>();
+
+const api = new Hono<{Variables: Variables,Bindings:Bindings}>();
 
 
 api.get('/', async (c) => {
     const route = 'GET /items';
-    const itemsDb = c.get('ItemsApi') as ItemsApi
+    const itemsDb = c.get('ItemsApi');
 
     try {
         const items = await itemsDb.all({
@@ -61,8 +62,9 @@ api.delete('/:uuid', async (c) => {
     if( ! uuid) {
         return c.json({ err: "uuid is required",route,uuid });
     }
+    const itemApi = c.get<ItemsApi>('ItemsApi') as ItemsApi;
     try {
-        await c.get<ItemsApi>('ItemsApi').delete(uuid);
+        await ItemsApi.delete(uuid);
         return c.json({ route,uuid });
     } catch (e) {
         return c.json({ err: e.message,route,uuid }, 500);

@@ -6,6 +6,7 @@ import { Hono } from "hono";
   export type Bindings = {
     __STATIC_CONTENT: KVNamespace;
     DB: D1Database;
+    JOSH412_BSKY: string;
   };
   export type Variables = {
     clippings: ClippingsApi;

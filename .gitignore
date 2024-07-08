@@ -278,3 +278,4 @@ workers/joshdata/.wrangler/
 workers/static-rewriter/.wrangler/
 workers/tooter/.wrangler/
 workers/*/.wrangler/
+workers/site/.dev.vars

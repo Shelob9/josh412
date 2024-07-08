@@ -1,12 +1,13 @@
 import { Hono } from "hono";
-import { honoType } from "../../app.types";
+import { Bindings, Variables } from "../../app.types";
 import classifications from "./classifications";
 import clippings from "./clippings";
 import ClassificationsApi from "./database/Classifications";
 import ClippingsApi from "./database/Clippings";
 import ItemsApi from "./database/Items";
 import items from "./items";
-const api = new Hono<honoType>();
+import search from "./search";
+const api = new Hono<{Variables:Variables,Bindings:Bindings}>({ strict: false });
 api.use("*", async (c, next) => {
     c.set('clippings', new ClippingsApi(c.env.DB));
     c.set('ClassificationsApi', new ClassificationsApi(c.env.DB));
@@ -39,5 +40,5 @@ api.get('/status/db', async (c) => {
 api.route('/clippings', clippings);
 api.route('/classifications', classifications );
 api.route('/items', items);
-
+api.route('/search', search);
 export default api;
