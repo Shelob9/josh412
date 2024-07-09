@@ -1,3 +1,4 @@
+import createClient from "@app/db";
 import { Hono } from "hono";
 import { Bindings, Variables } from "../../app.types";
 import classifications from "./classifications";
@@ -9,8 +10,10 @@ import items from "./items";
 import search from "./search";
 const api = new Hono<{Variables:Variables,Bindings:Bindings}>({ strict: false });
 api.use("*", async (c, next) => {
-    c.set('clippings', new ClippingsApi(c.env.DB));
-    c.set('ClassificationsApi', new ClassificationsApi(c.env.DB));
+    const prisma = createClient(c.env.DB);
+    c.set('prisma', prisma );
+    c.set('clippings', new ClippingsApi(prisma));
+    c.set('ClassificationsApi', new ClassificationsApi(prisma));
     c.set('ItemsApi', new ItemsApi(c.env.DB));
     await next()
 });

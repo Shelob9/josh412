@@ -19,14 +19,12 @@ const api = new Hono<{Variables: Variables,Bindings:Bindings}>({ strict: false }
  });
  api.get('/', async (c) => {
     const route = 'GET /clippings';
-    const clippingsDb = c.get('clippings')
-
     try {
-        const clippings = await clippingsDb.all({
-            page: 1,
-            perPage:25
-        });
-        return c.json({ clippings,route });
+        const prisma = c.get('prisma');
+        const clippings = await prisma.clipping.findMany({
+            take: 25
+       })
+       return c.json({ clippings,route })
    } catch (e) {
      return c.json({ err: e.message,route }, 500);
    }

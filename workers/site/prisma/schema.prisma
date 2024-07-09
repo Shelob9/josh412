@@ -14,8 +14,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+model Clipping {
+  uuid   String  @id @default(uuid())
+  domain String
+  path   String?
+  text   String
+}
+
+model Classification {
+  uuid           String   @id @default(uuid())
+  item           String
+  item_type      String
+  classification String
+  parent         String?  @map("parent_uuid")
 }

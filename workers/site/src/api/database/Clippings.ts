@@ -1,78 +1,78 @@
 import { Clipping } from "@app/types";
-import { D1Database } from "@cloudflare/workers-types";
+import { PrismaClient } from "@prisma/client";
 import { Pagignation } from "./types";
 
 
-export default class ClippingsApi{
-    constructor(private DB: D1Database) {
-
+export default class ClippingsApi {
+    constructor(private prisma: PrismaClient) {
     }
 
-    async all(args: Pagignation):Promise<Clipping[]>{
-       const page = args && args.page || 1;
-       const perPage = args && args.perPage || 10;
-        const {results} = await this.DB.prepare(
-            "SELECT * FROM clippings LIMIT ? OFFSET ?",
-        )
-            .bind(perPage, (page - 1) * perPage)
-            .all();
-        return results;
-    }
-    async get(uuid:string):Promise<Clipping>{
-        const { results } = await this.DB.prepare(
-            "SELECT * FROM clippings WHERE uuid = ?",
-        )
-            .bind(uuid)
-            .all();
-        if( ! results.length) {
-            throw new Error("Not found");
-        }
-        return results[0];
-    }
-
-    async update({text,uuid}:{
-        uuid:string,
-        text:string
-    }):Promise<boolean>{
-        await this.DB.prepare(
-            "UPDATE clippings SET text = ? WHERE uuid = ?",
-        )
-            .bind(text, uuid)
-            .run();
-        return true;
-    }
-
-    async create({domain, path, text}:{
-        domain:string,
-        text:string,
-        path?:string
-    }):Promise<string>{
-        path = path || '';
-        const uuid = crypto.randomUUID();
-        await this.DB.prepare(
-            "INSERT INTO clippings (uuid, domain, path, text) VALUES (?, ?, ?, ?)",
-        )
-            .bind(uuid,domain, path, text)
-            .run();
-        return uuid;
-    }
-
-    async delete(uuid:string):Promise<boolean>{
+    async all(args: Pagignation): Promise<Clipping[]> {
+        const perPage = args && args.perPage || undefined;
         try {
-            await this.DB.prepare(
-                "DELETE FROM clippings WHERE uuid = ?",
-            )
-                .bind(uuid)
-                .run();
+            const clippings = await this.prisma.clipping.findMany({
+                take: perPage
+            })
+            return clippings as Clipping[];
+        } catch (error) {
+            console.log({ error })
+            return [];
+
+        }
+    }
+    async get(uuid: string): Promise<Clipping> {
+        try {
+            return await this.prisma.clipping.findFirst({
+                where: { uuid }
+            }) as Clipping
+        } catch (error) {
+            throw new Error("Not found");
+
+        }
+
+    }
+
+    async update({ text, uuid }: {
+        uuid: string,
+        text: string
+    }): Promise<boolean> {
+        try {
+            this.prisma.clipping.update({
+                where: { uuid },
+                data: { text }
+            })
             return true;
 
-//DOES NOT ACTUALLY THROW
         } catch (error) {
             console.log({error})
-            return false
+            return false;
         }
-        return true;
+    }
+    async create({ domain, path, text }: {
+        domain: string,
+        text: string,
+        path?: string
+    }): Promise<string> {
+        const clipping = await this.prisma.clipping.create({
+            data: {
+                domain,
+                path,
+                text,
+            },
+        });
+        return clipping.uuid;
     }
 
+    async delete(uuid: string): Promise<boolean> {
+        try {
+            await this.prisma.clipping.delete({
+                where: { uuid },
+            });
+            return true;
+        } catch (error) {
+            console.log({ error });
+            return false;
+        }
+    }
 
 }
