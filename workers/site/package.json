@@ -1,5 +1,5 @@
 {
-  "name": "hono-vite",
+  "name": "site",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,11 +9,13 @@
     "build": "vite build",
     "server": "tsx server.ts",
     "deploy": "wrangler deploy",
-    "migrate:local": "wrangler d1 execute josh412-02 --local --file=./db/2-items.sql",
-    "migrate:prod": "wrangler d1 execute josh412-02 --remote"
+    "migrate:local": "wrangler d1 migrations apply josh412-02 --local",
+    "migrate:prod": " wrangler d1 migrations apply josh412-02 --remote",
+    "prisma": "prisma generate"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.1.10",
+    "@prisma/client": "^5.16.2",
     "@tanstack/react-query": "^5.0.5",
     "@tanstack/react-query-devtools": "^5.4.2",
     "hono": "^3.8.2",

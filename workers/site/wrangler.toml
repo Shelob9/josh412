@@ -1,6 +1,7 @@
 name = "josh412-site"
 main = "src/server.ts"
 compatibility_date = "2023-09-20"
+compatibility_flags = ["nodejs_compat"]
 
 [site]
 bucket = "dist"

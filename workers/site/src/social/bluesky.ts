@@ -221,38 +221,30 @@ export async function getBlueskyStatuses({
 
 export async function getBlueskyStatus({
     agent,
-    actor,
-    did,
+    uri,
 }: {
-    //Best to use a did
-    actor: string
+    uri: string
     agent: BskyAgent
-    did: string
 }): Promise<{
-    statusesCursor: string | undefined;
-    statuses: AppBskyFeedDefs.FeedViewPost[];
+    thread: AppBskyFeedDefs.ThreadViewPost
 }> {
-    // https://www.docs.bsky.app/docs/tutorials/viewing-feeds#author-feeds
-    const filter = 'posts_with_replies';
-    const { data } = await agent.getAuthorFeed({
-        actor,
-        filter,
-        limit: 1,
-        cursor: did,
+
+    const postThread = await agent.getPostThread({
+        uri,
+        //parentHeight: options.parentHeight!,
+       // depth: options.depth!,
+    }).catch((e:unknown) => {
+        throw new Error(`Failed to fetch post ${uri}`, { cause: e });
+    }).then( (r) => {
+        if( 'app.bsky.feed.defs#threadViewPost' !== r.data.thread.$type ){
+            throw new Error('Not a thread');
+        }
+        return r.data.thread as AppBskyFeedDefs.ThreadViewPost;
     });
 
-    const posts: Array<{}> = [];
-    for (const feedViewPost of data.feed) {
-        posts.push(feedViewPost.post);
-    }
-    if (!data) {
-        throw new Error("no data")
-    }
-
     return {
-        statusesCursor: data.cursor,
-        statuses: data.feed,
-    }
+        thread: postThread,
+    };
 }
 
 /**
