@@ -2,9 +2,10 @@ import { Hono } from "hono";
 import { Bindings, Variables } from "../../app.types";
 import { CLASSIFIERS } from "./classify/classifiers";
 import { Classification_Source, classifySources } from "./classify/classify";
-import ClassificationsApi from "./database/Classifications";
+import ClassificationsApi, { Classification } from "./database/Classifications";
 import ItemsApi from "./database/Items";
 const api = new Hono<{Variables: Variables,Bindings:Bindings}>({ strict: false });
+
 api.get('/classify', async (c) => {
     const route = 'GET /api/classify';
     const sources : Classification_Source[] = [
@@ -20,7 +21,7 @@ api.get('/classify', async (c) => {
 
 api.post('/process', async (c) => {
     const itemsApi = c.get('ItemsApi') as ItemsApi;
-    const classificationApi = c.get('ClassificationsApi') as ClassificationsApi;
+    const classificationApi = c.get('classifications');
     const body = await c.req.json() as unknown as {
         items: {
             content: string,
@@ -76,9 +77,9 @@ api.get('/byitem/:item', async (c) => {
     if( ! item) {
         return c.json({ err: "item is required",route });
     }
-    const service = c.get('ClassificationsApi') as ClassificationsApi;
+    const service = c.get('classifications') as ClassificationsApi;
     try {
-        const classifications = await service.byItem(item);
+        const classifications: Classification[] = [];
         return c.json({ classifications,route });
     } catch (e) {
         return c.json({ err: e.message,route }, 500);
@@ -91,7 +92,7 @@ api.get('/byitem/:item', async (c) => {
      if( ! uuid) {
             return c.json({ err: "uuid is required",route });
         }
-        const service = c.get('ClassificationsApi') as ClassificationsApi;
+        const service = c.get('classifications') as ClassificationsApi;
      try {
          const classification = await service.get(uuid);
          return c.json({ classification,uuid, route });
@@ -101,7 +102,7 @@ api.get('/byitem/:item', async (c) => {
  });
  api.get('/', async (c) => {
     const route = 'GET /api/classifications';
-    const service = c.get('ClassificationsApi') as ClassificationsApi;
+    const service = c.get('classifications') as ClassificationsApi;
 
     try {
         const classifications = await service.all({
@@ -119,7 +120,7 @@ api.get('/byitem/:item', async (c) => {
 
  api.delete('/:uuid', async (c) => {
     const route = 'DELETE /api/classifications/:uuid';
-    const service = c.get('ClassificationsApi') as ClassificationsApi;
+    const service = c.get('classifications') as ClassificationsApi;
     const uuid = c.req.param('uuid');
     try {
         await service.delete(uuid);

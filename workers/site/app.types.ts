@@ -11,7 +11,7 @@ import { Hono } from "hono";
   };
   export type Variables = {
     clippings: ClippingsApi;
-    ClassificationsApi: ClassificationsApi
+    classifications: ClassificationsApi
     ItemsApi: ItemsApi
     prisma: PrismaClient
   }

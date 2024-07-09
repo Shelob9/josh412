@@ -13,7 +13,7 @@ api.use("*", async (c, next) => {
     const prisma = createClient(c.env.DB);
     c.set('prisma', prisma );
     c.set('clippings', new ClippingsApi(prisma));
-    c.set('ClassificationsApi', new ClassificationsApi(prisma));
+    c.set('classifications', new ClassificationsApi(prisma));
     c.set('ItemsApi', new ItemsApi(c.env.DB));
     await next()
 });
