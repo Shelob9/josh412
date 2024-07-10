@@ -13,7 +13,7 @@ import { honoType } from "app.types";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
 import { SSRRender } from "src/entry-server";
-import api from "./api/index";
+import api from "./api";
 
 const app  = new Hono<honoType>();
 

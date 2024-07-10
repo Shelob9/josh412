@@ -19,12 +19,47 @@ model Clipping {
   domain String
   path   String?
   text   String
+  @@index([domain])
 }
 
 model Classification {
-  uuid           String   @id @default(uuid())
+  uuid           String  @id @default(uuid())
   item           String
   item_type      String
   classification String
-  parent         String?  @map("parent_uuid")
+  parent         String? @map("parent_uuid")
+  @@index([item_type])
+}
+
+model Source {
+  uuid          String         @id @default(uuid())
+  //enum of mastodon|bluesky|wordpress
+  type          String @unique
+  url           String
+  RemoteAuthors RemoteAuthor[]
+  Items         Item[]
+}
+
+model RemoteAuthor {
+  uuid              String  @id @default(uuid())
+  source            Source  @relation(fields: [sourceId], references: [uuid])
+  sourceId          String
+  remoteId          String
+  remoteHandle      String
+  remoteDisplayName String?
+  Items             Item[]
+  @@unique([sourceId, remoteId])
+}
+
+model Item {
+  uuid            String       @id @default(uuid())
+  content         String
+  source          Source       @relation(fields: [sourceId], references: [uuid])
+  sourceId        String
+  remoteId        String
+  remoteReplyToId String?
+  remoteAuthor    RemoteAuthor @relation(fields: [remoteAuthorId], references: [uuid])
+  remoteAuthorId  String
+  @@unique([sourceId, remoteId])
+  @@index([remoteAuthorId])
 }
