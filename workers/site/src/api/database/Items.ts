@@ -15,16 +15,18 @@ const validateSourceType = (type: string): boolean => {
 export type SourceArgs = {
     url: string,
     type: string
+    uuid?: string
 }
-export type SourceArg = string | SourceArgs
+export type SourceArg = SourceArgs
 
 export type CreateRemoteAuthorArgs = {
     remoteId: string
     remoteHandle: string
     remoteDisplayName?: string | null
     source: SourceArg
+    uuid?: string
 }
-export type RemoteAuthorArg = string | CreateRemoteAuthorArgs
+export type RemoteAuthorArg =  CreateRemoteAuthorArgs
 export type CreateItemArgs = {
     content: string;
     source: SourceArg;
@@ -35,7 +37,7 @@ export type CreateItemArgs = {
 }
 export default class ItemsApi {
 
-
+    perPage: number = 25;
 
     public constructor(private prisma: PrismaClient) {
     }
@@ -45,70 +47,50 @@ export default class ItemsApi {
         remoteId,
         source,
         remoteAuthor,
-        remoteReplyAuthor,
         remoteReplyToId
     }: CreateItemArgs) {
-        const sourceModel = await this.sourceArgToSource(source);
-        if( ! sourceModel || null === sourceModel ){
-            throw new Error(`Source ${source} does not exist`);
-        }
-        const sourceId = await this.sourceArgToSourceUuid(source);
-        let remoteAuthorUuid : string;
-        let remoteReplyAuthorUuid : string | null = null;
-        if ('string' === typeof remoteAuthor) {
-            const exists = await this.remoteAuthorExists({ remoteId: remoteAuthor, sourceId });
-            if (!exists ) {
-                throw new Error(`Remote Author ${remoteId} does not exist`);
-            }
-            remoteAuthorUuid = exists.uuid;
-        }else{
-            const  createdRemoteAuthor = await this.createOrFindRemoteAuthor(remoteAuthor);
-            if( !createdRemoteAuthor ){
-                throw new Error(`Failed to create remote author ${remoteId} `);
-            }
-            remoteAuthorUuid = createdRemoteAuthor.uuid;
-        }
 
-        if (remoteReplyAuthor) {
-            if ('string' === typeof remoteReplyAuthor) {
-                const exists = await this.remoteAuthorExists({ remoteId: remoteReplyAuthor, sourceId });
-                if (!exists) {
-                    throw new Error(`Remote Reply Author ${remoteReplyAuthor} does not exist`);
-                }
-                remoteReplyAuthorUuid = exists.uuid;
-            }else{
-                const  createdRemoteAuthor = await this.createOrFindRemoteAuthor(remoteReplyAuthor);
-                if( !createdRemoteAuthor ){
-                    throw new Error(`Failed to create remote author ${remoteReplyAuthor.remoteId}`);
-                }
-                remoteReplyAuthorUuid = createdRemoteAuthor.uuid;
-            }
-        }
-
+        const sourceModel = await this.createOrFindSource(source);
 
         const item = await this.prisma.item.create({
             data: {
                 content,
                 remoteId,
-                sourceId,
                 remoteReplyToId,
-
-                remoteAuthor: {
-                    connect: {
-                        uuid: remoteAuthorUuid
+                source: {
+                    connectOrCreate: {
+                        where: {
+                            type: source.type,
+                            url: source.url,
+                            uuid: source.uuid ?? undefined
+                        },
+                        create: {
+                            type: source.type,
+                            url: source.url
+                        }
                     }
                 },
-                remoteReplyAuthor: remoteReplyAuthorUuid ? {
-                    connect: {
-                        uuid: remoteReplyAuthorUuid
+                remoteAuthor: {
+                    connectOrCreate: {
+                        where: {
+                            remoteId: remoteAuthor.remoteId,
+                            sourceId:sourceModel.uuid,
+                            uuid: remoteAuthor.uuid ?? undefined,
+                        },
+                        create: {
+                            remoteId: remoteAuthor.remoteId,
+                            remoteHandle: remoteAuthor.remoteHandle,
+                            remoteDisplayName: remoteAuthor.remoteDisplayName,
+                            source: {
+                                connect: {
+                                    uuid: sourceModel.uuid
+                                }
+                            }
+                        }
                     }
-                } : undefined,
-                source: {
-                    connect: {
-                        uuid: sourceModel.uuid,
-                        type: sourceModel.type,
-                    }
-                }
+                },
+
+
             }
         });
         return item;
@@ -116,15 +98,33 @@ export default class ItemsApi {
 
 
 
+
     async all(args: Pagignation): Promise<Item[]> {
         const page = args && args.page || 1;
-        const perPage = args && args.perPage || 10;
+        const perPage = args && args.perPage || this.perPage;
         const items = await this.prisma.item.findMany({
             skip: (page - 1) * perPage,
             take: perPage,
         });
         return items as Item[];
     }
+
+    async getBySourceUuid({sourceId,page,perPage}: {
+        sourceId: string;
+
+    }&Pagignation) {
+        page = page || 1;
+        perPage = perPage || this.perPage;
+        const items = await this.prisma.item.findMany({
+            skip: (page - 1) * perPage,
+            take: perPage,
+            where: {
+                sourceId,
+            }
+        });
+        return items;
+    }
+
     async get(uuid: string): Promise<Item> {
 
         const item = await this.prisma.item.findUnique({
