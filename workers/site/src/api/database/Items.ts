@@ -1,3 +1,7 @@
+import {
+    Account as MastodonAccount,
+    Status as MastodonStatus
+} from "@app/types/mastodon";
 import { PrismaClient, Source } from "@prisma/client";
 import { Pagignation } from "./types";
 
@@ -42,6 +46,59 @@ export default class ItemsApi {
     public constructor(private prisma: PrismaClient) {
     }
 
+    async injestMastodon({statuses}:{
+        statuses: MastodonStatus[]
+    }){
+        const remoteAuthorArg = (account:MastodonAccount) :RemoteAuthorArg => {
+            return {
+                remoteId: account.id,
+                remoteHandle: account.username,
+                remoteDisplayName: account.display_name,
+                source: {
+                    type: 'mastodon',
+                    url: account.url.replace(account.username,'')
+                }
+            }
+        }
+        const remoteSourceArg = (status:MastodonStatus) :SourceArg => {
+            return {
+                type: 'mastodon',
+                url: status.uri.replace(status.account.url,'')
+            }
+        }
+        const items: {
+            remoteAuthor: RemoteAuthorArg,
+            source: SourceArg,
+            content: string,
+            remoteId: string,
+            remoteReplyToId?: string,
+            uuid: string |false,
+        }[] = [];
+        for(const status of statuses){
+            const remoteAuthor = remoteAuthorArg(status.account);
+            const source = remoteSourceArg(status);
+            const created = await this.create({
+                remoteAuthor,
+                source,
+                content: status.content,
+                remoteId: status.id,
+                remoteReplyToId: status.in_reply_to_id ?? undefined
+            });
+            items.push({
+                remoteAuthor,
+                source,
+                content: status.content,
+                remoteId: status.id,
+                remoteReplyToId: status.in_reply_to_id ?? undefined,
+                uuid: created ? created.uuid : false
+            });
+
+
+        }
+        return items
+
+    }
+
     public async create({
         content,
         remoteId,
@@ -76,6 +133,10 @@ export default class ItemsApi {
                             remoteId: remoteAuthor.remoteId,
                             sourceId:sourceModel.uuid,
                             uuid: remoteAuthor.uuid ?? undefined,
+                            sourceId_remoteId: {
+                                remoteId: remoteAuthor.remoteId,
+                                sourceId: sourceModel.uuid
+                            }
                         },
                         create: {
                             remoteId: remoteAuthor.remoteId,

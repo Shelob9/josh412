@@ -34,7 +34,7 @@ model Classification {
 model Source {
   uuid          String         @id @default(uuid())
   //enum of mastodon|bluesky|wordpress
-  type          String @unique
+  type          String
   url           String
   RemoteAuthors RemoteAuthor[]
   Items         Item[]

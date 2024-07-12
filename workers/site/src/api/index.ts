@@ -6,7 +6,9 @@ import clippings from "./clippings";
 import ClassificationsApi from "./database/Classifications";
 import ClippingsApi from "./database/Clippings";
 import ItemsApi from "./database/Items";
+import items from "./items";
 import search from "./search";
+
 const api = new Hono<{Variables:Variables,Bindings:Bindings}>({ strict: false });
 api.use("*", async (c, next) => {
     const prisma = createClient(c.env.DB);
@@ -203,6 +205,6 @@ api.get('/remoteAuthors/:sourceId/:remoteId', async (c) => {
 
 api.route('/clippings', clippings);
 api.route('/classifications', classifications );
-//api.route('/items', items);
+api.route('/items', items);
 api.route('/search', search);
 export default api;

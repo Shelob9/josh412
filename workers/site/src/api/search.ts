@@ -6,8 +6,12 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { Bindings, Variables } from "../../app.types";
 import {
+	blueskyDidToCongig,
+	blueskyPostUriToUrl,
 	BskyPostSimple,
 	getBlueskyStatuses, getBlueskyTimeline, getBluskyAccount, getBskyLikes,
+	isValidAccontId,
+	mastodonAccountIdToConfig,
 	MastodonApi, tryBskyLogin
 } from '../social';
 
@@ -16,53 +20,6 @@ const api = new Hono<{Variables: Variables,Bindings:Bindings}>();
 const {  uri } = config;
 const cacheSeconds = 600;
 const searchUrlApi = `${uri}/search`;
-
-type SOCIAL_NETWORK = 'mastodon' | 'bluesky';
-export interface Env {
-	JOSH412_BSKY: string;
-	KV: KVNamespace;
-}
-function isValidAccontId(accountId: string,network:SOCIAL_NETWORK): boolean {
-	if( accountId.length > 0 && ['mastodon','bluesky'].includes(network) ){
-		switch (network) {
-			case 'mastodon':
-				return undefined != mastodonAccountIdToConfig(accountId);
-			case 'bluesky':
-				return undefined != blueskyDidToCongig(accountId);
-			default:
-				return false;
-		}
-	}
-	return false;
-}
-function mastodonAccountIdToConfig(accountId: string):{
-	name: string,
-	instanceUrl: string,
-	accountId: string
-} {
-	return config.social.mastodon.find( a => a.accountId === accountId) as {
-		name: string,
-		instanceUrl: string,
-		accountId: string
-	};
-
-}
-
-function blueskyDidToCongig(did:string): {name:string,did:string} | undefined {
-	return config.social.bluesky.find( a => a.did === did);
-}
-function postUriToUrl(uri:string,authorHandle:string){
-    //take only the part after app.bsky.feed.post/ in uri
-    uri = uri.split('/').slice(-1)[0];
-    return `https://bsky.app/profile/${authorHandle}/post/${uri}`;
-
-}
-
-
-const workerName = 'search';
-
-const accountId = 425078;
-//`/mastodon/425078/statuses`
 
 
 api.use('*', logger());
@@ -197,7 +154,7 @@ api.get('/bluesky/:did/statuses', async (c) => {
 
 				const {uri,cid,author,record,replyCount,likeCount,repostCount,} = post;
 				const {handle} = author;
-				const url = postUriToUrl(uri,handle);
+				const url = blueskyPostUriToUrl(uri,handle);
 				if( s.reply && s.reply.root ){
 					//console.log( s.reply);
 				}

@@ -1,3 +1,4 @@
+import { mastodonAccountIdToConfig, MastodonApi } from "@app/social";
 import { Hono } from "hono";
 import { Bindings, Variables } from "../../app.types";
 
@@ -17,6 +18,45 @@ api.get('/', async (c) => {
    } catch (e) {
      return c.json({ err: e.message,route }, 500);
    }
+
+});
+
+api.get('/injest/mastodon/:accountId', async (c) => {
+    const accountId = c.req.param("accountId");
+	if(! accountId) {
+		return c.json({error: 'accountId is required'}, 400);
+	}
+	const maxId = c.req.query("maxId") || undefined;
+	const {instanceUrl} = mastodonAccountIdToConfig(accountId);
+
+
+    const itemsDb = c.get('ItemsApi');
+    const api = new MastodonApi(instanceUrl);
+	try {
+        const statuses = await api.getStatuses({accountId,maxId});
+        const lastId = statuses[statuses.length - 1].id;
+        try {
+            const items = await itemsDb.injestMastodon({statuses});
+            return c.json({
+                maxId,
+                cursor:`maxId=${lastId}`,
+                next: `$/mastodon/${accountId}/statuses?maxId=${lastId}`,
+                statuses,
+                accountId,
+                items: items.map( i => {
+                    return {
+                        uuid: i.uuid,
+                        remoteId: i.remoteId,
+                    }
+                } )
+            });
+        } catch (error) {
+            return c.json({ err: error.message,accountId }, 500);
+        }
+    } catch (error) {
+        return c.json({ err: error.message,accountId }, 500);
+    }
+
 
 });
 
