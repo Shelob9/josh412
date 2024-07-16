@@ -297,6 +297,11 @@ export default class ItemsApi {
         return author;
     }
 
+    async allRemoteAuthors(args: Pagignation) {
+        const authors = await this.prisma.remoteAuthor.findMany(this.argsToSkipTake(args));
+        return authors;
+    }
+
     async getRemoteAuthor({ remoteId, sourceId }: {
         remoteId: string;
         sourceId: string;

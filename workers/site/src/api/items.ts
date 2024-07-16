@@ -70,6 +70,19 @@ api.get('/injest/mastodon/:accountId', async (c) => {
 
 
 });
+api.get('/authors', async (c) => {
+    const itemsDb = c.get('ItemsApi');
+    const route = 'GET /authors';
+    try {
+        const authors = await itemsDb.allRemoteAuthors({
+            page: 1,
+            perPage:25
+        });
+        return c.json({ authors,route });
+    } catch (e) {
+        return c.json({ err: e.message,route }, 500);
+    }
+});
 api.get('/sources', async (c) => {
     const itemsDb = c.get('ItemsApi');
     const route = 'GET /sources';
@@ -169,4 +182,5 @@ api.delete('/:uuid', async (c) => {
         return c.json({ err: e.message,route,uuid }, 500);
     }
 });
+
 export default api;
