@@ -27,35 +27,48 @@ api.get('/injest/mastodon/:accountId', async (c) => {
 		return c.json({error: 'accountId is required'}, 400);
 	}
 	const maxId = c.req.query("maxId") || undefined;
-	const {instanceUrl} = mastodonAccountIdToConfig(accountId);
-
-
-    const itemsDb = c.get('ItemsApi');
-    const api = new MastodonApi(instanceUrl);
 	try {
-        const statuses = await api.getStatuses({accountId,maxId});
-        const lastId = statuses[statuses.length - 1].id;
+        const {instanceUrl} = mastodonAccountIdToConfig(accountId);
+        const itemsDb = c.get('ItemsApi');
+        const api = new MastodonApi(instanceUrl);
         try {
-            const items = await itemsDb.injestMastodon({statuses});
-            return c.json({
-                maxId,
-                cursor:`maxId=${lastId}`,
-                next: `$/mastodon/${accountId}/statuses?maxId=${lastId}`,
-                statuses,
-                accountId,
-                items: items.map( i => {
-                    return {
-                        uuid: i.uuid,
-                        remoteId: i.remoteId,
-                    }
-                } )
-            });
+            const statuses = await api.getStatuses({accountId,maxId});
+            if( ! statuses || statuses.length === 0) {
+                return c.json({ err: "No statuses found",accountId,maxId });
+            }
+            const lastId = statuses[statuses.length - 1].id;
+            try {
+                const items = await itemsDb.injestMastodon({statuses});
+                console.log({items})
+
+                return c.json({
+                    maxId,
+                    cursor:`maxId=${lastId}`,
+                    items: items.map( i => {
+                        return {
+                            uuid: i.uuid,
+                            remoteId: i.remoteId,
+                            created: i.created,
+                        }
+                    } ),
+                    next: `$/mastodon/${accountId}/statuses?maxId=${lastId}`,
+                    statuses,
+                    accountId,
+
+                });
+            } catch (error) {
+                return c.json({ err: error.message,accountId,l:58 }, 500);
+            }
         } catch (error) {
-            return c.json({ err: error.message,accountId }, 500);
+            return c.json({ err: error.message,accountId, l:61 }, 500);
         }
+
     } catch (error) {
         return c.json({ err: error.message,accountId }, 500);
     }
+
+
+
 
 
 });

@@ -47,6 +47,7 @@ export class MastodonApi {
         if( account_id ){
             query.set('account_id',account_id.toString())
         }
+        console.log({account_id,query:query.toString()})
         return await fetch(`${instanceUrl ?? this.instanceUrl}/api/v2/search?${query.toString()}`).then((r) => r.json())
     }
 

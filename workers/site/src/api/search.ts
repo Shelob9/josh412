@@ -50,13 +50,14 @@ api.get('/mastodon/:accountId', async (c) => {
 	if (c.req.query("q")) {
 		const instanceUrl = c.req.query("instanceUrl") || undefined;
 		const following = c.req.query("following") || false;
-		const accountId = c.req.query("accountId") || undefined;
-		const statuses = await api.search(c.req.query("q") as string,{
+		const queryAccountId = c.req.query("accountId") || undefined;
+		const q = c.req.query("q") as string || '';
+		const statuses = await api.search(q as string,{
 			instanceUrl,
 			following: following ? true : undefined,
-			account_id: accountId ? accountId : undefined,
+			account_id: queryAccountId ?? accountId
 		});
-		return c.json({accountId,account,statuses});
+		return c.json({accountId,account,statuses,q});
 	}
 
 	return c.json({accountId,account,});

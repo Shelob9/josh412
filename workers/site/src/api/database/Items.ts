@@ -43,9 +43,20 @@ export default class ItemsApi {
 
     perPage: number = 25;
 
-    public constructor(private prisma: PrismaClient) {
+    public constructor(private prisma: PrismaClient,private kv: KVNamespace) {
+        this.prisma = prisma;
+        this.kv = kv;
     }
 
+    private cacheKey({
+        accountId,
+        sourceId,
+    }:{
+        accountId: string,
+        sourceId: string
+    }) {
+        return `items-${accountId}-${sourceId}`;
+    }
     async injestMastodon({statuses}:{
         statuses: MastodonStatus[]
     }){
@@ -61,44 +72,94 @@ export default class ItemsApi {
             }
         }
         const remoteSourceArg = (status:MastodonStatus) :SourceArg => {
-            return {
-                type: 'mastodon',
-                url: status.uri.replace(status.account.url,'')
-            }
+              // Split the URL at '/@' and take the first part
+                const baseUrl = status.account.url.split('/@')[0];
+                return {
+                    type: 'mastodon',
+                    url: baseUrl
+                };
         }
-        const items: {
+
+
+        const processed: {
             remoteAuthor: RemoteAuthorArg,
             source: SourceArg,
             content: string,
             remoteId: string,
             remoteReplyToId?: string,
             uuid: string |false,
+            created:boolean
         }[] = [];
         for(const status of statuses){
             const remoteAuthor = remoteAuthorArg(status.account);
             const source = remoteSourceArg(status);
-            const created = await this.create({
-                remoteAuthor,
-                source,
-                content: status.content,
-                remoteId: status.id,
-                remoteReplyToId: status.in_reply_to_id ?? undefined
+            console.log({source});
+
+            const sourceId = await this.sourceArgToSourceUuid(source);
+            console.log({sourceId,source});
+
+            const exists = await this.hasItem({
+                sourceId: sourceId,
+                remoteId: status.id
             });
-            items.push({
-                remoteAuthor,
-                source,
-                content: status.content,
-                remoteId: status.id,
-                remoteReplyToId: status.in_reply_to_id ?? undefined,
-                uuid: created ? created.uuid : false
-            });
+            if( exists ){
+                processed.push({
+                    created: false,
+                    remoteAuthor,
+                    source,
+                    content: status.content,
+                    remoteId: status.id,
+                    remoteReplyToId: status.in_reply_to_id ?? undefined,
+                    uuid: sourceId
+                });
+                continue;
+            }
+            try {
+                const created = await this.create({
+                    remoteAuthor,
+                    source,
+                    content: status.content,
+                    remoteId: status.id,
+                    remoteReplyToId: status.in_reply_to_id ?? undefined
+                });
+                processed.push({
+                    created: true,
+                    remoteAuthor,
+                    source,
+                    content: status.content,
+                    remoteId: status.id,
+                    remoteReplyToId: status.in_reply_to_id ?? undefined,
+                    uuid: created ? created.uuid : false
+                });
+            } catch (error) {
+                console.log({error});
+
+            }
+
 
 
         }
-        return items
+        return processed
 
     }
 
+    public async hasItem({
+        sourceId,
+        remoteId,
+
+    }:{
+        sourceId: string,
+        remoteId: string,
+    }){
+        const item = await this.prisma.item.findFirst({
+            where: {
+                remoteId,
+                sourceId,
+
+            }
+        });
+        return !!item;
+    }
     public async create({
         content,
         remoteId,
@@ -106,55 +167,62 @@ export default class ItemsApi {
         remoteAuthor,
         remoteReplyToId
     }: CreateItemArgs) {
-
-        const sourceModel = await this.createOrFindSource(source);
-
-        const item = await this.prisma.item.create({
-            data: {
-                content,
-                remoteId,
-                remoteReplyToId,
-                source: {
-                    connectOrCreate: {
-                        where: {
-                            type: source.type,
-                            url: source.url,
-                            uuid: source.uuid ?? undefined
-                        },
-                        create: {
-                            type: source.type,
-                            url: source.url
+        try {
+            if( ! await this.hasSource(source) ){
+                 await this.createSource(source);
+            }
+            const sourceModel = await this.prisma.source.findFirst({
+                where: source
+            });
+            if( ! sourceModel ){
+                throw new Error('Could not create source');
+            }
+            const item = await this.prisma.item.create({
+                data: {
+                    content,
+                    remoteId,
+                    remoteReplyToId,
+                    source: {
+                        connect: {
+                            uuid: sourceModel.uuid,
+                            type: sourceModel.type
                         }
-                    }
-                },
-                remoteAuthor: {
-                    connectOrCreate: {
-                        where: {
-                            remoteId: remoteAuthor.remoteId,
-                            sourceId:sourceModel.uuid,
-                            uuid: remoteAuthor.uuid ?? undefined,
-                            sourceId_remoteId: {
+                    },
+                    remoteAuthor: {
+                        connectOrCreate: {
+                            where: {
                                 remoteId: remoteAuthor.remoteId,
-                                sourceId: sourceModel.uuid
-                            }
-                        },
-                        create: {
-                            remoteId: remoteAuthor.remoteId,
-                            remoteHandle: remoteAuthor.remoteHandle,
-                            remoteDisplayName: remoteAuthor.remoteDisplayName,
-                            source: {
-                                connect: {
-                                    uuid: sourceModel.uuid
+                                sourceId:sourceModel.uuid,
+                                uuid: remoteAuthor.uuid ?? undefined,
+                                sourceId_remoteId: {
+                                    remoteId: remoteAuthor.remoteId,
+                                    sourceId: sourceModel.uuid
+                                }
+                            },
+                            create: {
+                                remoteId: remoteAuthor.remoteId,
+                                remoteHandle: remoteAuthor.remoteHandle,
+                                remoteDisplayName: remoteAuthor.remoteDisplayName,
+                                source: {
+                                    connect: {
+                                        uuid: sourceModel.uuid
+                                    }
                                 }
                             }
                         }
-                    }
-                },
+                    },
 
 
-            }
-        });
-        return item;
+                }
+            });
+            return item;
+        } catch (error) {
+            throw new Error('Could not create source');
+        }
+
+
+
+
     }
 
 
@@ -322,6 +390,11 @@ export default class ItemsApi {
     private async sourceArgToSourceUuid(source: SourceArg): Promise<string> {
         const sourceId = 'object' === typeof source ? await this.createOrFindSourceUuid(source.type, source.url) : source;
         return sourceId;
+    }
+
+    private async hasSource(source: SourceArg) {
+        const sourceRecord = await this.prisma.source.findFirst({ where: source });
+        return !!sourceRecord;
     }
 
     private async createOrFindSource(where:SourceArgs): Promise<Source> {

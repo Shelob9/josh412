@@ -54,10 +54,6 @@ CREATE INDEX "Clipping_domain_idx" ON "Clipping"("domain");
 
 -- CreateIndex
 CREATE INDEX "Classification_item_type_idx" ON "Classification"("item_type");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Source_type_key" ON "Source"("type");
-
 -- CreateIndex
 CREATE UNIQUE INDEX "RemoteAuthor_sourceId_remoteId_key" ON "RemoteAuthor"("sourceId", "remoteId");
 
