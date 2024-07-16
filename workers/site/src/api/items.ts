@@ -39,8 +39,6 @@ api.get('/injest/mastodon/:accountId', async (c) => {
             const lastId = statuses[statuses.length - 1].id;
             try {
                 const items = await itemsDb.injestMastodon({statuses});
-                console.log({items})
-
                 return c.json({
                     maxId,
                     cursor:`maxId=${lastId}`,
@@ -72,7 +70,19 @@ api.get('/injest/mastodon/:accountId', async (c) => {
 
 
 });
-
+api.get('/sources', async (c) => {
+    const itemsDb = c.get('ItemsApi');
+    const route = 'GET /sources';
+    try {
+        const sources = await itemsDb.allSources({
+            page: 1,
+            perPage:25
+        });
+        return c.json({ sources,route });
+    } catch (e) {
+        return c.json({ err: e.message,route }, 500);
+    }
+});
 api.get('/sources/:sourceId', async (c) => {
     const sourceId = c.req.param('sourceId');
     const itemsDb = c.get('ItemsApi');

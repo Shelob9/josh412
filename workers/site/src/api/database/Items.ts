@@ -229,12 +229,8 @@ export default class ItemsApi {
 
 
     async all(args: Pagignation): Promise<Item[]> {
-        const page = args && args.page || 1;
-        const perPage = args && args.perPage || this.perPage;
-        const items = await this.prisma.item.findMany({
-            skip: (page - 1) * perPage,
-            take: perPage,
-        });
+
+        const items = await this.prisma.item.findMany( this.argsToSkipTake(args));
         return items as Item[];
     }
 
@@ -245,8 +241,7 @@ export default class ItemsApi {
         page = page || 1;
         perPage = perPage || this.perPage;
         const items = await this.prisma.item.findMany({
-            skip: (page - 1) * perPage,
-            take: perPage,
+            ...this.argsToSkipTake({page,perPage}),
             where: {
                 sourceId,
             }
@@ -487,6 +482,12 @@ export default class ItemsApi {
         }
     }
 
+    private argsToSkipTake(args: Pagignation) {
+        return {
+            skip: args?.page ? args.page - 1: 0,
+            take: args?.perPage ?? 25
+        }
+    }
     async allSources(args: Pagignation & {
         type?: string
     }) {
@@ -497,10 +498,7 @@ export default class ItemsApi {
                 type: string
             }
 
-        } = {
-            skip: args?.page ?? 0,
-            take: args?.perPage ?? 25
-        };
+        } = this.argsToSkipTake(args);
         if (args.type) {
             query = {
                 ...query,
@@ -509,7 +507,7 @@ export default class ItemsApi {
                 }
             }
         }
-
+        console.log({args,query});
         const sources = await this.prisma.source.findMany(query);
         return sources
     }
