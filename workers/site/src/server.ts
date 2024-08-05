@@ -69,7 +69,8 @@ app
       {
         message: "Not Found",
         ok: false,
-        route: '404'
+        route: '404',
+        worker: 'josh412-site'
       },
       404
     )
@@ -81,6 +82,7 @@ app
       {
         name: err.name,
         message: err.message,
+        worker: 'josh412-site'
       },
       500
     );
