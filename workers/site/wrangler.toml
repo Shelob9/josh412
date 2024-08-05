@@ -17,3 +17,7 @@ database_name = "josh412-02"
 database_id = "06b68e8f-0a21-42d6-9673-6dfffabfd1c0"
 migrations_table = "d1_migrations" # Customize this value to change your applied migrations table name
 migrations_dir = "migrations"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "57f0bd6a06dd4e2287d18fb4360adb5b"

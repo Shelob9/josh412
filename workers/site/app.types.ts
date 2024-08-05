@@ -8,6 +8,7 @@ import { Hono } from "hono";
     __STATIC_CONTENT: KVNamespace;
     DB: D1Database;
     JOSH412_BSKY: string;
+    KV: KVNamespace;
   };
   export type Variables = {
     clippings: ClippingsApi;

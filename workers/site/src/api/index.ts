@@ -15,7 +15,7 @@ api.use("*", async (c, next) => {
     c.set('prisma', prisma );
     c.set('clippings', new ClippingsApi(prisma));
     c.set('classifications', new ClassificationsApi(prisma));
-    c.set('ItemsApi', new ItemsApi(prisma));
+    c.set('ItemsApi', new ItemsApi(prisma,c.env.KV));
     await next()
 });
 api.get("/status", (c) => c.json({ status: "ok" }));
