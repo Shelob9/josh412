@@ -19,7 +19,7 @@ const api = new Hono<{Variables: Variables,Bindings:Bindings}>();
 
 const {  uri } = config;
 const cacheSeconds = 600;
-const searchUrlApi = `${uri}/search`;
+const searchUrlApi = `${uri}/api/search`;
 
 
 api.use('*', logger());
