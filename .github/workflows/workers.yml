@@ -23,7 +23,24 @@ jobs:
               - 'workers/wordpress-proxy/**'
             wpstar:
               - 'workers/wpstar/**'
+            api:
+              - 'workers/site/**'
+  api:
+    runs-on: ubuntu-latest
+    needs: paths-filter
+    if: needs.paths-filter.outputs.api == 'true'
+    steps:
+      - uses: actions/checkout@v3
 
+      - name: Install site
+        run: npm i
+        working-directory: workers/site
+
+      - name: Deploy
+        run: npm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        working-directory: workers/site
   cdn:
     runs-on: ubuntu-latest
     needs: paths-filter
