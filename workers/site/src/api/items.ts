@@ -1,4 +1,5 @@
 import { mastodonAccountIdToConfig, MastodonApi } from "@app/social";
+import config from "@lib/config";
 import { Hono } from "hono";
 import { Bindings, Variables } from "../../app.types";
 
@@ -41,6 +42,7 @@ api.get('/injest/mastodon/:accountId', async (c) => {
                 const items = await itemsDb.injestMastodon({statuses});
                 return c.json({
                     maxId,
+                    next: `${config.uri}/api/items/injest/mastodon/${accountId}?maxId=${lastId}`,
                     cursor:`maxId=${lastId}`,
                     items: items.map( i => {
                         return {
@@ -49,8 +51,6 @@ api.get('/injest/mastodon/:accountId', async (c) => {
                             created: i.created,
                         }
                     } ),
-                    next: `$/mastodon/${accountId}/statuses?maxId=${lastId}`,
-                    statuses,
                     accountId,
 
                 });
