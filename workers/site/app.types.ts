@@ -9,6 +9,7 @@ import { Hono } from "hono";
     DB: D1Database;
     JOSH412_BSKY: string;
     KV: KVNamespace;
+    TOKEN: string;
   };
   export type Variables = {
     clippings: ClippingsApi;

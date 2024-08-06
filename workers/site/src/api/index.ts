@@ -10,6 +10,7 @@ import items from "./items";
 import search from "./search";
 
 const api = new Hono<{Variables:Variables,Bindings:Bindings}>({ strict: false });
+
 api.use("*", async (c, next) => {
     const prisma = createClient(c.env.DB);
     c.set('prisma', prisma );
@@ -20,7 +21,9 @@ api.use("*", async (c, next) => {
 });
 api.get("/status", (c) => c.json({ status: "ok" }));
 
-api.get('/status/db', async (c) => {
+api.get('/status/db',
+
+    async (c) => {
      // If you did not use `DB` as your binding name, change it here
      try {
         const { results } = await c.env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table'")

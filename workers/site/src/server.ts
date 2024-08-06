@@ -9,17 +9,21 @@ import {
   serveSinglePageApp,
 } from "@cloudflare/kv-asset-handler";
 import assetManifest from "__STATIC_CONTENT_MANIFEST";
-import { honoType } from "app.types";
+import { Bindings, Variables } from "app.types";
 import { Hono } from "hono";
+import { bearerAuth } from 'hono/bearer-auth';
 import { cache } from "hono/cache";
 import { SSRRender } from "src/entry-server";
 import api from "./api";
 
-const app  = new Hono<honoType>();
-
-
+const app  = new Hono<{Variables:Variables,Bindings:Bindings}>();
 
 app
+  .use("*",async (c, next) => {
+    console.log(`[${c.req.method}] ${c.req.url}`)
+    const bearer = bearerAuth({ token: [c.env.TOKEN] })
+    return bearer(c, next)
+  })
   .get(
     "/assets/*",
     cache({
@@ -77,6 +81,15 @@ app
   )
   //@ts-ignore
   .onError((err, c) => {
+    console.log(typeof err)
+    if( 401 === err.getResponse().status ){
+      return new Response(JSON.stringify({message:'Unauthorized'}), {
+        status: 401,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+    }
     //console.log({err})
     c.json(
       {
