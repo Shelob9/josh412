@@ -156,9 +156,8 @@ api.get('/bluesky/:did/statuses', async (c) => {
 				const {uri,cid,author,record,replyCount,likeCount,repostCount,} = post;
 				const {handle} = author;
 				const url = blueskyPostUriToUrl(uri,handle);
-				if( s.reply && s.reply.root ){
-					//console.log( s.reply);
-				}
+
+
 				return {
 					uri,
 					cid,
@@ -179,7 +178,30 @@ api.get('/bluesky/:did/statuses', async (c) => {
 					hasrSr: s.reply && s.reply.root ? true : false,
 					//@ts-ignore
 					images: record.embed?.images ?? [],
-					//reply: s.reply && s.reply.root ? s.reply.root.cid : false
+					//@ts-ignore
+					reply: s.reply && s.reply.root && s.reply.root.$type === 'app.bsky.feed.defs#postView' ? {
+						"uri": s.reply.root.uri,
+						"cid":  s.reply.root.cid,
+						//@ts-ignore
+						"url": blueskyPostUriToUrl(s.reply.root.uri,s.reply.root.author.handle),
+						author: {
+							//@ts-ignore
+							url: `https://bsky.app/profile/${s.reply.root.author.handle}`,
+							//@ts-ignore
+							avatar: s.reply.root.author.avatar ?? '',
+							//@ts-ignore
+							displayName: s.reply.root.author.displayName?? '',
+							//@ts-ignore
+							handle: s.reply.root.author.handle,
+							//@ts-ignore
+							did: s.reply.root.author.did,
+						},
+						//@ts-ignore
+						"text": s.reply.root.record.text,
+						"replyCount": s.reply.root.replyCount,
+						"likeCount": s.reply.root.likeCount,
+						"repostCount": s.reply.root.repostCount,
+					} : false
 				}
 			}
 

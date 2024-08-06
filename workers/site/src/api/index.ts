@@ -1,4 +1,5 @@
 import createClient from "@app/db";
+import config from "@lib/config";
 import { Hono } from "hono";
 import { Bindings, Variables } from "../../app.types";
 import classifications from "./classifications";
@@ -20,7 +21,11 @@ api.use("*", async (c, next) => {
     await next()
 });
 api.get("/status", (c) => c.json({ status: "ok" }));
-
+api.get('/status/accounts', (c) => {
+    return c.json({
+        accounts: config.social
+    });
+})
 api.get('/status/db',
 
     async (c) => {
