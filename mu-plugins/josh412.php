@@ -2,7 +2,7 @@
 /**
  * Plugin name: Josh412
  */
-add_action('init', function(){
+add_action('-init', function(){
     if( ! is_user_logged_in() ){
         $token = $_REQUEST['x-josh412-token'] ?? null;
         if( ! defined('JOSH412_SECRET_TOKEN') ){

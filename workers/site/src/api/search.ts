@@ -2,7 +2,6 @@
 import { AppBskyFeedDefs } from "@atproto/api";
 import config from "@lib/config";
 import { Hono } from 'hono';
-import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { Bindings, Variables } from "../../app.types";
 import {
@@ -18,20 +17,11 @@ import {
 const api = new Hono<{Variables: Variables,Bindings:Bindings}>();
 
 const {  uri } = config;
-const cacheSeconds = 600;
 const searchUrlApi = `${uri}/api/search`;
 
 
 api.use('*', logger());
-api.use(
-	'/*',
-	cors({
-	  origin: 'http://localhost:2112',
-	  allowMethods: ['POST', 'GET', 'OPTIONS'],
-	  maxAge: cacheSeconds,
-	  credentials: true,
-	})
-  )
+
 
 api.get('/mastodon/:accountId', async (c) => {
 	const accountId = c.req.param("accountId");

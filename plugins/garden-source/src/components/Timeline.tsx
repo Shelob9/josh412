@@ -57,17 +57,23 @@ type AccountDetailsMinimal = {
     name: string;
     id: string;
 }
-//const apiUrl = 'http://localhost:5050';
+const apiUrl = 'http://localhost:4000/api';
 
+const headers = {
+    Authorization: `Bearer ${window.GARDEN ? window.GARDEN.token : ''}`,
+    'Content-Type': 'application/json',
+}
 
 function fetchTimeline(account:AccountDetailsMinimal, see:See){
     if( 'mastodon' === account.type ){
-        return fetch(`/search/mastodon/${account.id}/statuses`)
+        return fetch(`${apiUrl}/search/mastodon/${account.id}/statuses`,{
+            headers,
+        })
             .then(response => response.json())
             .then(json => json);
     }
     if( 'bluesky' === account.type ){
-        return fetch(`/search/bluesky/${account.id}/${see}`)
+        return fetch(`${apiUrl}/search/bluesky/${account.id}/${see}`,{headers})
             .then(response => response.json())
             .then(json => {
                 console.log({json})

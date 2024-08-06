@@ -10,12 +10,14 @@
         "WP_DEBUG": "true",
         "WP_DEBUG_DISPLAY": true,
         "WP_DEBUG_LOG": true,
-        "CF_ACCOUNT_ID": "1234567890"
+        "CF_ACCOUNT_ID": "1234567890",
+        "JOSH412_SECRET_TOKEN": "12345"
     },
     "env": {
         "tests": {
             "config": {
-                "CF_ACCOUNT_ID": "1234567890"
+                "CF_ACCOUNT_ID": "1234567890",
+                "JOSH412_SECRET_TOKEN": "12345"
             },
             "port": 2113
         }
