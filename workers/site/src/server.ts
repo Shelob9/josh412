@@ -101,24 +101,21 @@ app
   )
   //@ts-ignore
   .onError((err, c) => {
-    console.log(typeof err)
-    if( 401 === err.getResponse().status ){
-      return new Response(JSON.stringify({message:'Unauthorized'}), {
+    if('object' === typeof err && 'function' === typeof err.getResponse){
+      const response = err.getResponse();
+      const statusText = response.statusText;
+      return new Response(JSON.stringify({message:statusText || 'error'}), {
         status: 401,
         headers: {
+          ...response.headers,
           'Content-Type': 'application/json',
         }
       });
+
     }
-    //console.log({err})
-    c.json(
-      {
-        name: err.name,
-        message: err.message,
-        worker: 'josh412-site'
-      },
-      500
-    );
+
+    return c.json({error: 'Error'}, 500);
+
   }
 
   );

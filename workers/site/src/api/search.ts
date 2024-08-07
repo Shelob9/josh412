@@ -63,15 +63,22 @@ api.get('/mastodon/:accountId/statuses', async (c) => {
 	const {instanceUrl} = mastodonAccountIdToConfig(accountId);
 
 	const api = new MastodonApi(instanceUrl);
-	const statuses = await api.getStatuses({accountId,maxId});
-	const lastId = statuses[statuses.length - 1].id;
-	return c.json({
-		maxId,
-		cursor:`maxId=${lastId}`,
-		next: `${searchUrlApi}/mastodon/${accountId}/statuses?maxId=${lastId}`,
-		statuses,
-		accountId,
-	});
+	try {
+		console.log({accountId,maxId});
+		const statuses = await api.getStatuses({accountId,maxId});
+		const lastId = statuses[statuses.length - 1].id;
+		return c.json({
+			maxId,
+			cursor:`maxId=${lastId}`,
+			next: `${searchUrlApi}/mastodon/${accountId}/statuses?maxId=${lastId}`,
+			statuses,
+			accountId,
+		});
+	} catch (error) {
+		console.log({error});
+		return c.json({error: 'Could not get statuses'}, 400);
+
+	}
 })
 
 
