@@ -61,7 +61,6 @@ api.get('/mastodon/:accountId/statuses', async (c) => {
 	}
 	const maxId = c.req.query("maxId") || undefined;
 	const {instanceUrl} = mastodonAccountIdToConfig(accountId);
-
 	const api = new MastodonApi(instanceUrl);
 	try {
 		console.log({accountId,maxId});

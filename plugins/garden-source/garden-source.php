@@ -32,9 +32,22 @@ function josh412_garden_source_block_init() {
 			$block->editor_script_handles[0],
 			'GARDEN',
 			[
-				'token' => JOSH412_SECRET_TOKEN
+				'token' => JOSH412_SECRET_TOKEN,
+				'apiUrl' => '12345' == JOSH412_SECRET_TOKEN ? 'http://localhost:4000/api' : 'https://josh412.com/api'
 			]
 		);
+		add_action('enqueue_block_editor_assets',function(){
+			//register sidebar.js
+			$assets = include plugin_dir_path( __FILE__ ) . 'build/sidebar.asset.php';
+			wp_enqueue_script(
+				'josh412-garden-source-sidebar',
+				plugin_dir_url( __FILE__ ) . 'build/sidebar.js',
+				$assets['dependencies'],
+				$assets['version'],
+				true
+			);
+		});
+
 	}
 
 

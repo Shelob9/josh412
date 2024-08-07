@@ -57,7 +57,8 @@ type AccountDetailsMinimal = {
     name: string;
     id: string;
 }
-const apiUrl = 'http://localhost:4000/api';
+//@ts-ignore
+const apiUrl = window.GARDEN.apiUrl;
 
 const headers = {
     Authorization: `Bearer ${window.GARDEN ? window.GARDEN.token : ''}`,
