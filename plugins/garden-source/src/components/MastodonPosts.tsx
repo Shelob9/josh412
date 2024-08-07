@@ -1,3 +1,4 @@
+import { Button } from '@wordpress/components';
 import React from 'react';
 import Images from './Images';
 import { PostAuthor } from './Posts';
@@ -79,7 +80,9 @@ function MastodonPost({post,onCopy,onQuote}:{
         }
     } ) : [];
     return (
-        <div>
+        <div style={{
+            borderBottom: '1px solid #ccc',
+        }}>
             <PostAuthor url={post.account.url} displayName={post.account.display_name} avatar={post.account.avatar}  />
             <p dangerouslySetInnerHTML={{ __html: post.content }} />
             {post.media_attachments && (
@@ -88,10 +91,10 @@ function MastodonPost({post,onCopy,onQuote}:{
             <div className="flex-grid">
                 <a href={post.url} target="_blank" className="col">View</a>
 
-                <button className="col" onClick={() => onCopy(post.content)}>Copy</button>
-                <button className="col"
+                <Button className="col" onClick={() => onCopy(post.content)}>Copy</Button>
+                <Button className="col"
                     onClick={() => onQuote(post.content,`<a href="${post.account.url}">${post.account.display_name}</a>`)}
-                    >Quote</button>
+                    >Quote</Button>
             </div>
         </div>
     )

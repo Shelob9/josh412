@@ -14,7 +14,9 @@ function BlueskyPost({post,onCopy,onQuote,}:{
 
 }&UseProps){
     return (
-        <div key={post.cid}>
+        <div key={post.cid} style={{
+            borderBottom: '1px solid #ccc',
+        }}>
             <PostAuthor {...post.author} />
             <div dangerouslySetInnerHTML={{__html:post.text}}></div>
             <div className="flex-grid">
