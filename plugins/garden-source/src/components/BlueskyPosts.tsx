@@ -22,7 +22,7 @@ function BlueskyPost({post,onCopy,onQuote,}:{
 
                 <button className="col" onClick={() => onCopy(post.text)}>Copy</button>
                 <button className="col"
-                    onClick={() => onQuote(post.text,`<a href="${post.author.url}">${post.author.displayName}</a>`)}
+                    onClick={() => onQuote(`<p>${post.text}</p>`,`<a href="${post.author.url}">${post.author.displayName}</a>`)}
                     >Quote</button>
             </div>
         </div>

@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function josh412_garden_source_block_init() {
 
 	$block = register_block_type( __DIR__ . '/build' );
-	if( defined('JOSH412_SECRET_TOKEN'() && $block && ! is_wp_error( $block ) ){
+	if( defined('JOSH412_SECRET_TOKEN') && $block && ! is_wp_error( $block ) ){
 		wp_localize_script(
 			$block->editor_script_handles[0],
 			'GARDEN',
