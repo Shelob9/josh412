@@ -1,6 +1,6 @@
 {
 	"name": "garden-source",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Example block scaffolded with Create Block tool.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -12,7 +12,7 @@
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
 		"plugin:zip": "npm run plugin:copy && npm run build && npm run plugin-zip",
-		"plugin:copy": "cp garden-source.zip gardne-source-prev.zip",
+		"plugin:copy": "cp garden-source.zip garden-source-prev.zip",
 		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start --webpack-copy-php"
 	},
