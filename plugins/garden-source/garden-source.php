@@ -33,7 +33,7 @@ function josh412_garden_source_block_init() {
 			'GARDEN',
 			[
 				'token' => JOSH412_SECRET_TOKEN,
-				'apiUrl' => '12345' == JOSH412_SECRET_TOKEN ? 'http://localhost:4000/api' : 'https://josh412.com/api'
+				'apiUrl' => defined('JOSH412_API_URL') ? JOSH412_API_URL : 'https://josh412.com/api'
 			]
 		);
 		add_action('enqueue_block_editor_assets',function(){

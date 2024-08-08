@@ -57,11 +57,19 @@ type AccountDetailsMinimal = {
     name: string;
     id: string;
 }
+const  { apiUrl,token } : {
+    apiUrl: string;
+    token: string;
+}
 //@ts-ignore
-const apiUrl = window.GARDEN.apiUrl;
+= window.GARDEN || {
+    apiUrl: '',
+    token: '',
+};
+
 
 const headers = {
-    Authorization: `Bearer ${window.GARDEN ? window.GARDEN.token : ''}`,
+    Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
 }
 
