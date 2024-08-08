@@ -1,47 +1,44 @@
+import {
+    Button,
+    __experimentalHStack as HStack,
+    __experimentalVStack as VStack,
+} from '@wordpress/components';
 import React from 'react';
 import { BskyPostSimple } from "./bluesky";
 import { PostAuthor } from './Posts';
 import { UseProps } from './Timeline';
-
 function postUriToUrl(uri:string,authorHandle:string){
     //take only the part after app.bsky.feed.post/ in uri
     uri = uri.split('/').slice(-1)[0];
     return `https://bsky.app/profile/${authorHandle}/post/${uri}`;
 
 }
-function BlueskyPost({post,onCopy,onQuote,}:{
-    post: BskyPostSimple
 
-}&UseProps){
-    return (
-        <div key={post.cid} style={{
-            borderBottom: '1px solid #ccc',
-        }}>
-            <PostAuthor {...post.author} />
-            <div dangerouslySetInnerHTML={{__html:post.text}}></div>
-            <div className="flex-grid">
-                <a href={post.url} target="_blank" className="col">View</a>
-
-                <button className="col" onClick={() => onCopy(post.text)}>Copy</button>
-                <button className="col"
-                    onClick={() => onQuote(`<p>${post.text}</p>`,`<a href="${post.author.url}">${post.author.displayName}</a>`)}
-                    >Quote</button>
-            </div>
-        </div>
-    )
-}
 export default function BlueskyPosts({posts,onCopy,onQuote}:{
     posts: BskyPostSimple[]
 }&UseProps){
 
     return (
-        <div>
-            {posts.map((post:BskyPostSimple) => <BlueskyPost
-                post={post}
-                key={post.cid}
-                onCopy={onCopy}
-                onQuote={onQuote}
-            />)}
-        </div>
+        <>
+            {posts.map((post:BskyPostSimple) => (
+                <VStack key={post.cid}>
+                    <PostAuthor url={post.author.url} displayName={post.author.displayName} avatar={post.author.avatar}  />
+                    <div dangerouslySetInnerHTML={
+                        { __html: post.text }
+                    }/>
+                     <HStack>
+                            <a href={post.url} target="_blank">View</a>
+
+                            <Button  onClick={() => onCopy(post.text)}>Copy</Button>
+                            <Button
+                                onClick={() => onQuote(
+                                    `<p>${post.text}</p>`,
+                                    `<a href="${post.author.url}">${post.author.displayName}</a>`)}
+                            >Quote</Button>
+                            {post.reply ? (<a href={post.reply.url} target="_blank">See Reply</a>) : null}
+                        </HStack>
+                </VStack>
+            ))}
+        </>
     );
 }

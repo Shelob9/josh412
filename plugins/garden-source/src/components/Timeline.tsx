@@ -1,4 +1,7 @@
-import { SelectControl, Spinner } from '@wordpress/components';
+import {
+    SelectControl,
+    Spinner
+} from '@wordpress/components';
 import React, { useEffect, useMemo, useState } from 'react';
 import { accountOptions, accounts } from '../accounts';
 import { Accounts, See } from '../types';

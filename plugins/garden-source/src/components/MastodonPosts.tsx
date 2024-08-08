@@ -1,8 +1,15 @@
-import { Button } from '@wordpress/components';
+import {
+    Button,
+    Flex,
+    FlexItem,
+    __experimentalHStack as HStack,
+    __experimentalVStack as VStack
+} from '@wordpress/components';
 import React from 'react';
-import Images from './Images';
 import { PostAuthor } from './Posts';
 import { UseProps } from './Timeline';
+
+
 
 type MastodonMedia = {
     id: string,
@@ -69,36 +76,6 @@ type MastodonStatus = {
     media_attachments?: MastodonMedia[]
 };
 
-function MastodonPost({post,onCopy,onQuote}:{
-    post: MastodonStatus
-}&UseProps){
-    const images = post.media_attachments ?  post.media_attachments.map((media) => {
-        return {
-            key: media.id,
-            src: media.url,
-            alt: media.description,
-        }
-    } ) : [];
-    return (
-        <div style={{
-            borderBottom: '1px solid #ccc',
-        }}>
-            <PostAuthor url={post.account.url} displayName={post.account.display_name} avatar={post.account.avatar}  />
-            <p dangerouslySetInnerHTML={{ __html: post.content }} />
-            {post.media_attachments && (
-                <Images images={images} />
-            )}
-            <div className="flex-grid">
-                <a href={post.url} target="_blank" className="col">View</a>
-
-                <Button className="col" onClick={() => onCopy(post.content)}>Copy</Button>
-                <Button className="col"
-                    onClick={() => onQuote(post.content,`<a href="${post.account.url}">${post.account.display_name}</a>`)}
-                    >Quote</Button>
-            </div>
-        </div>
-    )
-}
 export default function MastodonPosts({
     posts,
     onCopy,
@@ -106,9 +83,45 @@ export default function MastodonPosts({
 }: {
     posts: MastodonStatus[]
 }&UseProps) {
+
     return (
-        <div>
-            {posts.map((post) => <MastodonPost key={post.id} post={post} onCopy={onCopy} onQuote={onQuote} />)}
-        </div>
+        <>
+            {posts.map((post) => {
+                return (
+                    <VStack
+                        key={post.id}
+
+                    >
+                        <PostAuthor url={post.account.url} displayName={post.account.display_name} avatar={post.account.avatar}  />
+                        <div dangerouslySetInnerHTML={
+                            { __html: post.content }
+                        }/>
+                        <FlexItem>
+                            {post.media_attachments && (
+                                <Flex>
+                                    {post.media_attachments.map((media) => {
+                                        return (
+                                            <FlexItem key={media.id}>
+                                                <img src={media.preview_url} alt={media.description} />
+                                            </FlexItem>
+                                        )
+                                    })}
+                                </Flex>
+                            )}
+                        </FlexItem>
+
+                        <HStack>
+                            <a href={post.url} target="_blank">View</a>
+
+                            <Button  onClick={() => onCopy(post.content)}>Copy</Button>
+                            <Button
+                                onClick={() => onQuote(post.content,`<a href="${post.account.url}">${post.account.display_name}</a>`)}
+                                >Quote</Button>
+                        </HStack>
+
+                    </VStack>
+                )
+            })}
+        </>
     );
 }

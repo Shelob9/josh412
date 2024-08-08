@@ -1,15 +1,21 @@
+import { Flex, FlexItem } from '@wordpress/components';
 import React from 'react';
 export const PostAuthor = ({displayName,url,avatar}:{displayName:string,url:string,avatar:string}) => {
     return (
-        <div className="flex-grid-thirds">
-            <a href={url} target="__blank">
-                <img className="col-1" style={{
-                    maxHeight: '100px'
-                }}
-                    src={avatar} />
-            </a>
-            <div className="col-2"><a href={url} target="__blank">{displayName}</a></div>
-        </div>
+        <Flex>
+            <FlexItem>
+                <a href={url} target="__blank">
+                    <img  style={{
+                        maxHeight: '60px',
+                        width: 'auto',
+                    }}
+                        src={avatar} />
+                </a>
+            </FlexItem>
+            <FlexItem>
+                <a href={url} target="__blank">{displayName}</a>
+            </FlexItem>
+        </Flex>
     )
 
 }
