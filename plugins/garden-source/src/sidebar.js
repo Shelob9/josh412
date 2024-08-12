@@ -23,6 +23,7 @@ registerPlugin( 'garden-source-bar', {
                         search={search}
                         setSearch={(update) => setSearch(update)}
                     />
+
                 </PanelBody>
             </PluginSidebar>
 		</>

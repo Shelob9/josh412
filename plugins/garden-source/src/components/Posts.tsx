@@ -3,7 +3,8 @@ import React from 'react';
 export const PostAuthor = ({displayName,url,avatar}:{displayName:string,url:string,avatar:string}) => {
     return (
         <Flex>
-            <FlexItem>
+            <FlexItem
+            >
                 <a href={url} target="__blank">
                     <img  style={{
                         maxHeight: '60px',
@@ -12,7 +13,10 @@ export const PostAuthor = ({displayName,url,avatar}:{displayName:string,url:stri
                         src={avatar} />
                 </a>
             </FlexItem>
-            <FlexItem>
+            <FlexItem
+
+
+            >
                 <a href={url} target="__blank">{displayName}</a>
             </FlexItem>
         </Flex>

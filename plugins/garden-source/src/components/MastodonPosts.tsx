@@ -1,13 +1,6 @@
-import {
-    Button,
-    Flex,
-    FlexItem,
-    __experimentalHStack as HStack,
-    __experimentalVStack as VStack
-} from '@wordpress/components';
 import React from 'react';
-import { PostAuthor } from './Posts';
 import { UseProps } from './Timeline';
+import TimelinePost from './TimelinePost';
 
 
 
@@ -86,42 +79,31 @@ export default function MastodonPosts({
 
     return (
         <>
-            {posts.map((post) => {
-                return (
-                    <VStack
-                        key={post.id}
+            {posts.map((post) => (
+                <TimelinePost
+                    key={post.id}
+                    postUrl={post.url}
+                    onCopy={onCopy }
+                    onQuote={onQuote }
+                    content={post.content}
+                    postAuthor={{
+                        url: post.account.url,
+                        displayName: post.account.display_name,
+                        avatar: post.account.avatar
+                    }}
+                    reply={post.reblog ? {
+                        url: post.reblog.url
+                    } : undefined}
+                    medias={post.media_attachments?.map((media) => ({
+                        id: media.id,
+                        preview_url: media.preview_url,
+                        url: media.url,
+                        description: media.description
+                    }))}
+                    />
 
-                    >
-                        <PostAuthor url={post.account.url} displayName={post.account.display_name} avatar={post.account.avatar}  />
-                        <div dangerouslySetInnerHTML={
-                            { __html: post.content }
-                        }/>
-                        <FlexItem>
-                            {post.media_attachments && (
-                                <Flex>
-                                    {post.media_attachments.map((media) => {
-                                        return (
-                                            <FlexItem key={media.id}>
-                                                <img src={media.preview_url} alt={media.description} />
-                                            </FlexItem>
-                                        )
-                                    })}
-                                </Flex>
-                            )}
-                        </FlexItem>
+            ))}
 
-                        <HStack>
-                            <a href={post.url} target="_blank">View</a>
-
-                            <Button  onClick={() => onCopy(post.content)}>Copy</Button>
-                            <Button
-                                onClick={() => onQuote(post.content,`<a href="${post.account.url}">${post.account.display_name}</a>`)}
-                                >Quote</Button>
-                        </HStack>
-
-                    </VStack>
-                )
-            })}
         </>
     );
 }

@@ -30,3 +30,6 @@
     - Local dev:
         - `cd plugins/garden-source`
         - `npm run start`
+- API
+    - `cd workers/site`
+    - `bun run dev`

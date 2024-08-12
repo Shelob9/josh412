@@ -1,8 +1,5 @@
 
 import { createBlock } from '@wordpress/blocks';
-import {
-    __experimentalVStack as VStack
-} from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import React, { useState } from 'react';
 import { Accounts, See } from '../types';
@@ -27,11 +24,8 @@ export default function GardenSource({search,setSearch}) {
 		insertBlocks( block );
 	}
 	return (
-        <VStack
-            alignment="edge"
-            spacing={'4px'}
-        >
-            <div>
+        <>
+            <section>
                 <SearchGardern
                     search={search}
                     onChangeSearch={(update) => setSearch({ search })}
@@ -42,13 +36,17 @@ export default function GardenSource({search,setSearch}) {
                         account={account}
                         onChangeAccount={(update) => setAccount(update)}
                 />
-            </div>
+            </section>
+            <section>
             <Timeline see={see} account={account}
                         onCopy={(content) => addParagraph(content)}
                         onQuote={(content,citation) => addBlockquote(content,citation)}
 
                         onChangeAccount={setAccount} />
-        </VStack>
+
+            </section>
+
+        </>
 
     )
 }
