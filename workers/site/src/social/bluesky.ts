@@ -200,7 +200,7 @@ export async function getBlueskyStatuses({
     statusesCursor: string | undefined;
     statuses: AppBskyFeedDefs.FeedViewPost[];
 }> {
-    // https://www.docs.bsky.app/docs/tutorials/viewing-feeds#author-feeds
+    // https://docs.bsky.app/docs/tutorials/viewing-feeds
     const filter = 'posts_with_replies';
     const { data } = await agent.getAuthorFeed({
         actor,

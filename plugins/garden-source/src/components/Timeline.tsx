@@ -1,13 +1,15 @@
 import {
+    ButtonGroup,
+    __experimentalGrid as Grid,
     SelectControl,
-    Spinner
+    Spinner,
 } from '@wordpress/components';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button } from 'react-daisyui';
 import { accountOptions, accounts } from '../accounts';
 import { Accounts, See } from '../types';
-import BlueskyPosts from './BlueskyPosts';
-import MastodonPosts from './MastodonPosts';
 import { BskyPostSimple } from './bluesky';
+import TimelinePost, { Timeline_Post } from './TimelinePost';
 
 type TimelineProps = {
     see: See;
@@ -76,16 +78,23 @@ const headers = {
     'Content-Type': 'application/json',
 }
 
-function fetchTimeline(account:AccountDetailsMinimal, see:See){
+function fetchTimeline(account:AccountDetailsMinimal, see:See,cursor?:string){
     if( 'mastodon' === account.type ){
-        return fetch(`${apiUrl}/search/mastodon/${account.id}/statuses`,{
+        let url = `${apiUrl}/search/mastodon/${account.id}/statuses`;
+        if( cursor ){
+            url += `?${cursor}`;
+        }
+        return fetch(url,{
             headers,
         })
             .then(response => response.json())
-            .then(json => json);
+            .then(json => {
+                console.log({json})
+                return json;
+            });
     }
     if( 'bluesky' === account.type ){
-        return fetch(`${apiUrl}/search/bluesky/${account.id}/${see}`,{headers})
+        return fetch(`${apiUrl}/search/bluesky/${account.id}/${see}?${cursor ? cursor : ''}`,{headers})
             .then(response => response.json())
             .then(json => {
                 console.log({json})
@@ -93,6 +102,36 @@ function fetchTimeline(account:AccountDetailsMinimal, see:See){
             });
     }
     return Promise.reject('Invalid account type');
+}
+function postUriToUrl(uri:string,authorHandle:string){
+    //take only the part after app.bsky.feed.post/ in uri
+    uri = uri.split('/').slice(-1)[0];
+    return `https://bsky.app/profile/${authorHandle}/post/${uri}`;
+
+}
+
+function PaginationButtons({
+    nextCursor,
+    prevCursor,
+    onClickNext,
+    onClickPrev
+}:{
+    nextCursor?: string;
+    prevCursor?: string;
+    onClickNext: () => void;
+    onClickPrev: () => void;
+}){
+    return (
+      nextCursor || prevCursor ? (
+        <div>
+             <ButtonGroup>
+                <Button variant={prevCursor ? 'outline':undefined} color={prevCursor ? 'secondary':undefined}  disabled={!prevCursor} onClick={onClickPrev}>Previous</Button>
+                <Button variant={nextCursor ? 'outline':undefined} color={nextCursor ? 'secondary':undefined} onClick={onClickNext}>Next</Button>
+            </ButtonGroup>
+        </div>
+
+      ) : null
+    );
 }
 
 export type UseProps = {
@@ -105,40 +144,124 @@ export default function Timeline({
     onCopy,
     onQuote
 }:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps){
-    const [next, setNext] = useState<string|undefined>(undefined);
+    const [isLoading, setIsLoading] = useState(false);
+    const [nextCursor, setNextCursor] = useState<string|undefined>(undefined);
+    const [cursor,setCursor] = useState<string|undefined>(undefined);
+    const [prevCursor,setPrevCursor] = useState<string|undefined>(undefined);
     const [bskyPosts, setBskyPosts] = useState<BskyPostSimple[]>([]);
     const [statuses, setStatuses] = useState<any[]>([]);
     const accountDetails = useMemo(() => {
         return accounts[account] as AccountDetailsMinimal;
     }, [account]);
+
+    const onClickNext = () => {
+        if(cursor){
+            setPrevCursor(cursor);
+        }
+        setCursor(nextCursor);
+    }
+    const onClickPrev = () => {
+
+        setCursor(prevCursor);
+        if(prevCursor){
+            setNextCursor(cursor);
+        }
+    }
     useEffect(() => {
         if( ! accountDetails ){
             return;
         }
-        fetchTimeline(accountDetails, see).then(r => {
-            setNext(r.nextCursor);
+        setIsLoading(true);
+        fetchTimeline(accountDetails, see,cursor).then(r => {
+            setNextCursor(r.nextCursor);
             if( 'mastodon' === accountDetails.type ){
                 setStatuses(r.statuses);
             } else {
                 setBskyPosts(r.statuses);
             }
-        })
-    },[accountDetails, see])
+        }).finally(() => {
+            setIsLoading(false);
+        });
+    },[accountDetails, see,cursor])
     const isMastodon = 'mastodon' === accountDetails?.type;
+
+    const posts = useMemo<Timeline_Post[]>(() => {
+        if( isMastodon ){
+            if(  ! statuses || !statuses.length ){
+                return []
+            }
+            return statuses.map((post) => ({
+                id: post.id,
+                postUrl: post.url,
+                content: post.content,
+                postAuthor: {
+                    url: post.account.url,
+                    displayName: post.account.display_name,
+                    avatar: post.account.avatar
+                },
+                reply: post.reblog ? {
+                    url: post.reblog.url
+                } : undefined,
+                medias: post.media_attachments?.map((media) => ({
+                    id: media.id,
+                    preview_url: media.preview_url,
+                    url: media.url,
+                    description: media.description
+                }))
+            }));
+        }
+        if(  ! bskyPosts || !bskyPosts.length ){
+            return []
+        }
+
+        return bskyPosts.map((post:BskyPostSimple) => ({
+            id: post.cid,
+            content: post.text,
+            postAuthor: post.author,
+            postUrl: postUriToUrl(post.uri,post.author.handle),
+            reply: post.reply ? {
+                url: postUriToUrl(post.reply.uri,post.reply.author.handle)
+            } : undefined,
+            medias: post.images ? post.images : undefined
+        }));
+
+
+    }, [statuses, bskyPosts]);
+
+    const Pagination = useCallback(() => (
+        <PaginationButtons
+            nextCursor={nextCursor}
+            prevCursor={prevCursor}
+            onClickNext={onClickNext}
+            onClickPrev={onClickPrev}
+        />
+    ), [nextCursor, prevCursor]);
 
     if( ! accountDetails ){
         return <div>Account not found</div>
     }
 
 
-    if( isMastodon ){
-        if(  ! statuses || !statuses.length ){
-            return <Spinner />
-        }
-        return <MastodonPosts posts={statuses} onCopy={onCopy} onQuote={onQuote} />
-    }
-    if(  ! bskyPosts || !bskyPosts.length ){
-        return <Spinner />
-    }
-    return <BlueskyPosts posts={bskyPosts} onCopy={onCopy} onQuote={onQuote} />
+    return (
+        <div>
+            <Grid>
+                <Pagination />
+                {isLoading && <Spinner />}
+            </Grid>
+            {! posts || !posts.length ? (<Spinner />) : (
+                <div>
+                    {posts.map((post:Timeline_Post) => (
+                        <TimelinePost
+                            key={post.postUrl}
+                            {...post}
+                            onCopy={onCopy}
+                            onQuote={onQuote}
+                        />
+                    ))}
+                </div>
+            )}
+                        <Pagination />
+
+        </div>
+    );
 }

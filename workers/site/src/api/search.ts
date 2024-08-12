@@ -67,7 +67,7 @@ api.get('/mastodon/:accountId/statuses', async (c) => {
 		const lastId = statuses[statuses.length - 1].id;
 		return c.json({
 			maxId,
-			cursor:`maxId=${lastId}`,
+			nextCursor:`maxId=${lastId}`,
 			next: `${searchUrlApi}/mastodon/${accountId}/statuses?maxId=${lastId}`,
 			statuses,
 			accountId,
@@ -130,7 +130,6 @@ api.get('/bluesky/:did/statuses', async (c) => {
 		const agent = await tryBskyLogin({
 			identifier: account?.name,
 			password: c.env.JOSH412_BSKY,
-
 		});
 		try {
 			const statuses = await getBlueskyStatuses({
@@ -143,8 +142,6 @@ api.get('/bluesky/:did/statuses', async (c) => {
 
 				return `https://cdn.bsky.app/img/feed_thumbnail/plain/${authorDid}/${link}@${type.replace('image/','')}`;
 			}
-
-
 
 
 			function statusToSimple(s:AppBskyFeedDefs.FeedViewPost):BskyPostSimple|undefined {
@@ -222,7 +219,7 @@ api.get('/bluesky/:did/statuses', async (c) => {
 			return c.json({
 				did,
 				next: `${searchUrlApi}/bluesky/${did}/statuses?cursor=${statuses.statusesCursor}`,
-				nextCursor:statuses.statusesCursor,
+				nextCursor:`cursor=${statuses.statusesCursor}`,
 				statuses:	returnStatuses
 
 			});

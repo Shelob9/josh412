@@ -13,7 +13,8 @@ import {
 } from '@wordpress/components';
 import { PostAuthor } from "./Posts";
 import { UseProps } from "./Timeline";
-export default function TimelinePost({medias,content,postAuthor,postUrl,reply,onCopy,onQuote }:{
+export type Timeline_Post = {
+    id:string,
     content:string,
     postAuthor: {
         url: string,
@@ -30,7 +31,8 @@ export default function TimelinePost({medias,content,postAuthor,postUrl,reply,on
         url:string;
         description:string;
     }[]
-}&UseProps){
+}
+export default function TimelinePost({medias,content,postAuthor,postUrl,reply,onCopy,onQuote }:TimelinePost&UseProps){
     return (
         <>
         <Card>

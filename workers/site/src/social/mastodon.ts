@@ -308,7 +308,6 @@ export async function getStatuses(
     if (minId) {
         url += `&min_id=${minId}`
     }
-    console.log({ url });
 
     const statuses = await fetch(url)
         .then((res) => res.json())
