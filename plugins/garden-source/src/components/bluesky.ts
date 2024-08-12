@@ -15,4 +15,10 @@ export type BskyPostSimple = {
     author: BskyAuthorSimple;
     text: string;
     reply?: BskyPostSimple;
+    images? :{
+        id: string;
+        description: string;
+        url: string;
+        preview_url: string;
+    }[]
 }

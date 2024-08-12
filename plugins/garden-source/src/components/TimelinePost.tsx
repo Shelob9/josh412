@@ -56,8 +56,8 @@ export default function TimelinePost({medias,content,postAuthor,postUrl,reply,on
 
                                     <img
                                         key={media.id}
-                                    src={media.preview_url} alt={media.description}
-
+                                        src={media.preview_url}
+                                        alt={media.description}
                                     />
                             )
                         })}
@@ -65,18 +65,18 @@ export default function TimelinePost({medias,content,postAuthor,postUrl,reply,on
                 )}
             </CardBody>
             <CardFooter>
-            <ButtonGroup>
-                <Button href={postUrl} target="_blank">View</Button>
+                <ButtonGroup>
+                    <Button href={postUrl} target="_blank">View</Button>
 
-                <Button variant='secondary' onClick={() => onCopy(content)}>Copy</Button>
-                <Button
-                variant='secondary'
-                    onClick={() => onQuote(
-                        `<p>${content}</p>`,
-                        `<a href="${postAuthor.url}">${postAuthor.displayName}</a>`)}
-                >Quote</Button>
-                {reply ? (<Button href={reply.url} target="_blank">View Reply</Button>) : null}
-            </ButtonGroup>
+                    <Button variant='secondary' onClick={() => onCopy(content)}>Copy</Button>
+                    <Button
+                    variant='secondary'
+                        onClick={() => onQuote(
+                            `<p>${content}</p>`,
+                            `<a href="${postAuthor.url}">${postAuthor.displayName}</a>`)}
+                    >Quote</Button>
+                    {reply ? (<Button href={reply.url} target="_blank">View Reply</Button>) : null}
+                </ButtonGroup>
             </CardFooter>
         </Card>
 

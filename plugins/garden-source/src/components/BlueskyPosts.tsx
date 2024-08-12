@@ -27,6 +27,7 @@ export default function BlueskyPosts({posts,onCopy,onQuote}:{
                     } : undefined}
                     onCopy={onCopy}
                     onQuote={onQuote}
+                    medias={post.images ? post.images : undefined}
 
                 />
             ))}

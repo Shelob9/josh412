@@ -119,4 +119,9 @@ export type BskyPostSimple = {
     author: BskyAuthorSimple;
     text: string;
     reply?: BskyPostSimple;
+    images:{
+        description: string;
+        url: string;
+        preview_url: string;
+    }
 }

@@ -63,7 +63,6 @@ api.get('/mastodon/:accountId/statuses', async (c) => {
 	const {instanceUrl} = mastodonAccountIdToConfig(accountId);
 	const api = new MastodonApi(instanceUrl);
 	try {
-		console.log({accountId,maxId});
 		const statuses = await api.getStatuses({accountId,maxId});
 		const lastId = statuses[statuses.length - 1].id;
 		return c.json({
@@ -140,6 +139,11 @@ api.get('/bluesky/:did/statuses', async (c) => {
 				cursor,
 			});
 
+			function postImageToUrl(authorDid:string,link:string,type:string){
+
+				return `https://cdn.bsky.app/img/feed_thumbnail/plain/${authorDid}/${link}@${type.replace('image/','')}`;
+			}
+
 
 
 
@@ -149,10 +153,13 @@ api.get('/bluesky/:did/statuses', async (c) => {
 					return undefined;
 				}
 
+
+
 				const {uri,cid,author,record,replyCount,likeCount,repostCount,} = post;
 				const {handle} = author;
 				const url = blueskyPostUriToUrl(uri,handle);
-
+				//@ts-ignore
+				const images = record.embed?.images ?? [];
 
 				return {
 					uri,
@@ -173,7 +180,16 @@ api.get('/bluesky/:did/statuses', async (c) => {
 					//@ts-ignore
 					hasrSr: s.reply && s.reply.root ? true : false,
 					//@ts-ignore
-					images: record.embed?.images ?? [],
+					images: record.embed?.images ? record.embed.images.map(image => {
+						const id = image.image.ref.toString();
+						const url = postImageToUrl(author.did, id,image.image.mimeType);
+						return {
+								description: image.alt,
+								url,
+								preview_url: url,
+								id
+						}
+					}) :[],
 					//@ts-ignore
 					reply: s.reply && s.reply.root && s.reply.root.$type === 'app.bsky.feed.defs#postView' ? {
 						"uri": s.reply.root.uri,
