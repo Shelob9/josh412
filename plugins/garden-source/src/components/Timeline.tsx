@@ -78,7 +78,11 @@ const headers = {
     'Content-Type': 'application/json',
 }
 
-function fetchTimeline(account:AccountDetailsMinimal, see:See,cursor?:string){
+function fetchTimeline(account:AccountDetailsMinimal, see:See,cursor?:string): Promise<{
+    statuses: any[];
+    nextCursor?: string;
+    cursor?: string;
+}>{
     if( 'mastodon' === account.type ){
         let url = `${apiUrl}/search/mastodon/${account.id}/statuses`;
         if( cursor ){
@@ -138,42 +142,105 @@ export type UseProps = {
     onCopy: (content: string) => void;
     onQuote: (content: string, citation: string) => void;
 }
+
+type Cursor = {
+    cursor?: string;
+    nextCursor?: string;
+    prevCursor?: string;
+};
+
+
 export default function Timeline({
     account,
     see,
     onCopy,
     onQuote
 }:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps){
+    const [currentCursor,setCurrentCursor] = useState<string|undefined>(undefined);
+    const [cursors,setCursors] = useState<Map<number,string>>(new Map().set(0,undefined));
+    const setCursor = (newCursor:string|undefined,nextCursor:string|undefined) => {
+        setCursors((cursorsState) => {
+            if( ! newCursor ){
+                if( nextCursor ){
+                    return new Map(cursorsState).set(cursorsState.size,nextCursor);
+                }else{
+                    return new Map(cursorsState);
+                }
+            }
+            const cursorKey = Array.from(cursorsState.keys()).find((key) => cursorsState.get(key) === newCursor);
+            if( cursorKey ){
+                const newState = new Map(cursorsState);
+                if( nextCursor ){
+                    newState.set(cursorKey+ 1,nextCursor);
+
+                }
+                return newState;
+            }else{
+                const newState = new Map(cursorsState).set(cursorsState.size + 1,newCursor);
+                if( nextCursor ){
+                    newState.set(cursorsState.size + 2,nextCursor);
+                }
+                return newState;
+
+            }
+        });
+    }
+    const prevCursor = useMemo<string|undefined>(() => {
+        if( ! cursors.size ){
+            return undefined;
+        }
+        if( ! currentCursor ){
+            return undefined;
+        }
+        const cursorKey = Array.from(cursors.keys()).find((key) => cursors.get(key) === currentCursor);
+        if( ! cursorKey ){
+            return undefined;
+        }
+        return cursors.get(cursorKey - 1);
+    },[currentCursor,cursors]);
+
+    const nextCursor = useMemo<string|undefined>(() => {
+        if( ! cursors.size ){
+            return undefined;
+        }
+        if( ! currentCursor  ){
+            //if has cursors[1]
+            if( cursors.has(1) ){
+                return cursors.get(1);
+            }
+            return undefined;
+        }
+        const cursorKey = Array.from(cursors.keys()).find((key) => cursors.get(key) === currentCursor);
+        if( ! cursorKey ){
+            return undefined;
+        }
+        return cursors.get(cursorKey + 1);
+    },[currentCursor,cursors]);
     const [isLoading, setIsLoading] = useState(false);
-    const [nextCursor, setNextCursor] = useState<string|undefined>(undefined);
-    const [cursor,setCursor] = useState<string|undefined>(undefined);
-    const [prevCursor,setPrevCursor] = useState<string|undefined>(undefined);
+
     const [bskyPosts, setBskyPosts] = useState<BskyPostSimple[]>([]);
     const [statuses, setStatuses] = useState<any[]>([]);
     const accountDetails = useMemo(() => {
         return accounts[account] as AccountDetailsMinimal;
     }, [account]);
 
-    const onClickNext = () => {
-        if(cursor){
-            setPrevCursor(cursor);
+    //when account changes, reset the cursor
+    useEffect(() => {
+        if( accountDetails ){
+            setCurrentCursor(undefined);
+            setCursors(new Map().set(0,undefined));
         }
-        setCursor(nextCursor);
-    }
-    const onClickPrev = () => {
+    },[accountDetails]);
 
-        setCursor(prevCursor);
-        if(prevCursor){
-            setNextCursor(cursor);
-        }
-    }
+
     useEffect(() => {
         if( ! accountDetails ){
             return;
         }
         setIsLoading(true);
-        fetchTimeline(accountDetails, see,cursor).then(r => {
-            setNextCursor(r.nextCursor);
+        fetchTimeline(accountDetails, see,currentCursor).then(r => {
+
+            setCursor(r.cursor,r.nextCursor);
             if( 'mastodon' === accountDetails.type ){
                 setStatuses(r.statuses);
             } else {
@@ -182,7 +249,22 @@ export default function Timeline({
         }).finally(() => {
             setIsLoading(false);
         });
-    },[accountDetails, see,cursor])
+    },[accountDetails, see,currentCursor])
+
+    const onClickNext = useCallback(() => {
+        if( ! nextCursor ){
+            return;
+        }
+        setCurrentCursor(nextCursor);
+    },[nextCursor]);
+
+    const onClickPrev = useCallback(() => {
+        if( ! prevCursor ){
+            return;
+        }
+        setCurrentCursor(prevCursor);
+    },[prevCursor]);
+
     const isMastodon = 'mastodon' === accountDetails?.type;
 
     const posts = useMemo<Timeline_Post[]>(() => {
@@ -232,7 +314,7 @@ export default function Timeline({
         <PaginationButtons
             nextCursor={nextCursor}
             prevCursor={prevCursor}
-            onClickNext={onClickNext}
+            onClickNext={onClickNext }
             onClickPrev={onClickPrev}
         />
     ), [nextCursor, prevCursor]);
@@ -240,7 +322,7 @@ export default function Timeline({
     if( ! accountDetails ){
         return <div>Account not found</div>
     }
-
+    console.log({cursors,currentCursor,nextCursor,prevCursor});
 
     return (
         <div>

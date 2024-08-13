@@ -1,5 +1,8 @@
 import { withWorkerName } from '@lib/ResponseFactory';
 const workerName = 'wp-star';
+const config = {
+	uri: 'https://josh412.com/'
+}
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		//If not GET, return unmodified request

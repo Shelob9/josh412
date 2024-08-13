@@ -67,7 +67,8 @@ api.get('/mastodon/:accountId/statuses', async (c) => {
 		const lastId = statuses[statuses.length - 1].id;
 		return c.json({
 			maxId,
-			nextCursor:`maxId=${lastId}`,
+			cursor: maxId ? `maxId=${maxId}` :undefined,
+			nextCursor:lastId ? `maxId=${lastId}` : undefined,
 			next: `${searchUrlApi}/mastodon/${accountId}/statuses?maxId=${lastId}`,
 			statuses,
 			accountId,
@@ -218,6 +219,7 @@ api.get('/bluesky/:did/statuses', async (c) => {
 			const returnStatuses = statuses.statuses.map(statusToSimple).filter( s => s !== undefined) as BskyPostSimple[];
 			return c.json({
 				did,
+				cursor,
 				next: `${searchUrlApi}/bluesky/${did}/statuses?cursor=${statuses.statusesCursor}`,
 				nextCursor:`cursor=${statuses.statusesCursor}`,
 				statuses:	returnStatuses
