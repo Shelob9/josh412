@@ -8,13 +8,13 @@ import {
     CardBody,
     CardFooter,
     CardHeader,
-    __experimentalGrid as Grid,
-    __experimentalHeading as Heading
+    __experimentalGrid as Grid
 } from '@wordpress/components';
-import { PostAuthor } from "./Posts";
+import { PostHeader } from "./Posts";
 import { UseProps } from "./Timeline";
 export type Timeline_Post = {
     id:string,
+    createdAt:string,
     content:string,
     postAuthor: {
         url: string,
@@ -32,18 +32,18 @@ export type Timeline_Post = {
         description:string;
     }[]
 }
-export default function TimelinePost({medias,content,postAuthor,postUrl,reply,onCopy,onQuote }:TimelinePost&UseProps){
+export default function TimelinePost({medias,content,postAuthor,postUrl,reply,createdAt,onCopy,onQuote }:Timeline_Post&UseProps){
     return (
         <>
         <Card>
             <CardHeader>
-                <Heading level={ 4 }>
-                    <PostAuthor
+                    <PostHeader
                         url={postAuthor.url}
                         displayName={postAuthor.displayName}
                         avatar={postAuthor.avatar}
+                        createdAt={createdAt}
                     />
-                </Heading>
+
             </CardHeader>
             <CardBody>
                 <div dangerouslySetInnerHTML={

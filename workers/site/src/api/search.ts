@@ -163,6 +163,8 @@ api.get('/bluesky/:did/statuses', async (c) => {
 					uri,
 					cid,
 					url,
+					//@ts-ignore
+					createdAt: record.createdAt ?? '',
 					author: {
 						url: `https://bsky.app/profile/${handle}`,
 						avatar: author.avatar ?? '',

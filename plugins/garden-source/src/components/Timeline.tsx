@@ -387,6 +387,7 @@ export default function Timeline({
                 id: post.id,
                 postUrl: post.url,
                 content: post.content,
+                createdAt: post.created_at,
                 postAuthor: {
                     url: post.account.url,
                     displayName: post.account.display_name,
@@ -408,6 +409,7 @@ export default function Timeline({
             id: post.cid,
             content: post.text,
             postAuthor: post.author,
+            createdAt: post.createdAt,
             postUrl: postUriToUrl(post.uri,post.author.handle),
             reply: post.reply ? {
                 url: postUriToUrl(post.reply.uri,post.reply.author.handle)

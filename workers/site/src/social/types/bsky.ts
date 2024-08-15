@@ -114,6 +114,7 @@ export type BskyPostSimple = {
     uri: string;
     cid: string;
     replyCount: number,
+    createdAt: string;
     repostCount: number;
     likeCount: number;
     author: BskyAuthorSimple;
