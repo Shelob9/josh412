@@ -1,13 +1,74 @@
 import { withWorkerName } from '@lib/ResponseFactory';
 const workerName = 'wp-star';
 const config = {
-	uri: 'https://josh412.com/'
+	uri: 'https://josh412.com'
 }
+function makeHeaders(httpMetadata: R2HTTPMetadata): Headers {
+	const headers = new Headers();
+
+	if (httpMetadata.contentEncoding) {
+	  headers.set('Content-Encoding', httpMetadata.contentEncoding);
+	}
+	if (httpMetadata.contentType) {
+	  headers.set('Content-Type', httpMetadata.contentType);
+	}
+	if (httpMetadata.contentLanguage) {
+	  headers.set('Content-Language', httpMetadata.contentLanguage);
+	}
+	if (httpMetadata.contentDisposition) {
+	  headers.set('Content-Disposition', httpMetadata.contentDisposition);
+	}
+	if (httpMetadata.cacheControl) {
+	  headers.set('Cache-Control', httpMetadata.cacheControl);
+	}else{
+		headers.set('Cache-Control', 'public, max-age=604800, immutable');
+	}
+	if (httpMetadata.cacheExpiry) {
+	  headers.set('Expires', httpMetadata.cacheExpiry.toUTCString());
+	}
+
+	return headers;
+  }
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		//If not GET, return unmodified request
 		if (request.method !== 'GET') {
 			return fetch(request)
+		}
+		//if it's from /wp-content/plugins/garden-source/build/
+		//get from BUCKET
+		if( request.url.replace(config.uri,'').startsWith('/wp-content/plugins/garden-source/build/') ){
+
+			//get from BUCKET
+			const bucket = env.BUCKET;
+			const url = request.url.replace(config.uri,'');
+			// if has ? remove it
+			let key = url.indexOf('?') > -1 ? url.split('?')[0] : url;
+			if( '/' === key.charAt(0) ){
+				key = key.substring(1);
+			}
+			console.log({key,url});
+
+			const obj = await bucket.get(key);
+			if( null === obj ){
+				console.log({obj})
+				return new Response(`${key} Not found`, {status: 404})
+			}
+			const metaData = await bucket.head(key);
+			if( ! metaData ){
+				return new Response(`${key} Not found at metaData`, {status: 404})
+			}
+			const body = await obj.text();
+			const headers = makeHeaders(metaData.httpMetadata ?? {})
+			console.log({metaData,headers});
+			return withWorkerName( {
+				response: new Response(body, {
+					status: 200,
+					statusText: 'OK',
+					headers: makeHeaders(metaData.httpMetadata ?? {})
+				}),
+				workerName
+			})
 		}
 
 		// Instantiate new URL to make it mutable
@@ -23,6 +84,13 @@ export default {
 		];
 		const { asset, regex, ...cache } = cacheAssets.find( ({regex}) => originalUrl.pathname.match(regex)) ?? {}
 		const cacheKey = cache ? cache.key : queryCacheKey;//@ts-ignore
+		console.log({
+			cache,
+			newUrl,
+			cacheKey,
+			url:request.url,
+			r: request.url.replace(config.uri,''),
+		})
 		const newResponse = await fetch(newUrl,
 				{ cf:
 					{
