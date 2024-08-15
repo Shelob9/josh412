@@ -4,7 +4,7 @@ import {
     SelectControl,
     Spinner,
 } from '@wordpress/components';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { Button } from 'react-daisyui';
 import { accountOptions, accounts } from '../accounts';
 import { Accounts, See } from '../types';
@@ -114,41 +114,215 @@ function postUriToUrl(uri:string,authorHandle:string){
 
 }
 
-function PaginationButtons({
-    nextCursor,
-    prevCursor,
-    onClickNext,
-    onClickPrev
-}:{
-    nextCursor?: string;
-    prevCursor?: string;
-    onClickNext: () => void;
-    onClickPrev: () => void;
-}){
-    return (
-      nextCursor || prevCursor ? (
-        <div>
-             <ButtonGroup>
-                <Button variant={prevCursor ? 'outline':undefined} color={prevCursor ? 'secondary':undefined}  disabled={!prevCursor} onClick={onClickPrev}>Previous</Button>
-                <Button variant={nextCursor ? 'outline':undefined} color={nextCursor ? 'secondary':undefined} onClick={onClickNext}>Next</Button>
-            </ButtonGroup>
-        </div>
 
-      ) : null
-    );
-}
 
 export type UseProps = {
     onCopy: (content: string) => void;
     onQuote: (content: string, citation: string) => void;
 }
 
-type Cursor = {
-    cursor?: string;
-    nextCursor?: string;
-    prevCursor?: string;
-};
 
+type pageState = {
+    mastodonSocial: {
+        currentPage: 0,
+        statuses: {[key: number]: {
+            cursor?: string|undefined;
+            statuses: any[];
+        }},
+    },
+    fosstodon: {
+        currentPage: 0,
+        statuses: {[key: number]: {
+            cursor?: string|undefined;
+            statuses: any[];
+        }},
+    },
+    bluesky: {
+        currentPage: 0,
+        statuses: {[key: number]: {
+            cursor?: string|undefined;
+            statuses: BskyPostSimple[];
+        }},
+    }
+}
+
+const createSelectors = (state:pageState,account:Accounts) => {
+
+    const findIndexByByCursor = (cursor:string|undefined): number =>{
+        if( undefined === cursor ){
+            return 0;
+        }
+        return Object.keys(state[account].statuses).findIndex((key) => {
+            return state[account].statuses[key].cursor === cursor;
+        });
+    }
+    function pageHasStatuses(index:number): boolean{
+        if( ! state[account].statuses[index] ){
+            return false;
+        }
+        return  state[account].statuses[index].statuses.length ? true : false;
+    }
+
+    function cursorHasStatuses(cursor:string|undefined): boolean{
+        const index = findIndexByByCursor(cursor);
+        return pageHasStatuses(index);
+    }
+
+    return {
+        pageHasStatuses,
+        cursorHasStatuses,
+        findIndexByByCursor,
+        hasNextPage(): boolean{
+            return !! state[account].statuses[state[account].currentPage + 1];
+        },
+        hasPage(page:number): boolean{
+            return !! state[account].statuses[page];
+        },
+        hasPageByCursor(cursor:string|undefined): boolean{
+            if( undefined === cursor ){
+                return pageHasStatuses(0);
+            }
+            const index = findIndexByByCursor(cursor);
+            if( -1 === index ){
+                return false;
+            }
+            return pageHasStatuses(index);
+        },
+        getCurrentCursor(): string|undefined{
+            return state[account].statuses[state[account].currentPage].cursor;
+        }
+    }
+};
+function pageReducer( state: pageState,action: {
+    account: Omit<Accounts,'bluesky'>,
+    newCursor?: string;
+    nextCursor?: string;
+    statuses: any[];
+}|{
+    account: 'bluesky'
+    newCursor?: string;
+    nextCursor?: string;
+    statuses: BskyPostSimple[];
+}| {
+    account: Omit<Accounts,'bluesky'>
+    setPage: number;
+}|{
+    account: 'bluesky'
+    setPage: number;
+}): pageState{
+    const actionAccount = action.account as string;
+    if( 'setPage' in action ){
+        //find cursor for that page and set it as current cursor
+
+        return {
+            ...state,
+            [actionAccount]: {
+                ...state[actionAccount],
+                currentPage: action.setPage,
+            }
+        }
+    }
+    if( undefined === action.newCursor ){
+        const statuses = {
+            ...state[actionAccount].statuses,
+            [0]: {
+                cursor: undefined,
+                statuses: action.statuses
+            }
+        }
+        if(action.nextCursor && ! state[actionAccount].statuses[1]){
+            statuses[1] =  {
+                cursor: action.nextCursor,
+                statuses: []
+            }
+        }
+        return {
+            ...state,
+            [actionAccount]: {
+                ...state[actionAccount],
+                statuses
+            }
+        }
+    }else{
+        let newState = {
+            ...state,
+        }
+
+        //find index of action.newCursor in cursors
+        Object.keys(state[actionAccount].statuses).forEach((key) => {
+            if( state[actionAccount].statuses[key].cursor === action.newCursor ){
+                const nextIndex = parseInt(key,10) + 1;
+                newState = {
+                    ...newState,
+                    [actionAccount]: {
+                        ...newState[actionAccount],
+                        statuses: {
+                            ...newState[actionAccount].statuses,
+                            [key]: {
+                                ...newState[actionAccount].statuses[key],
+                                statuses: action.statuses
+                            },
+                            [nextIndex]: newState[actionAccount].statuses[nextIndex] ? {
+                                cursor: action.nextCursor,
+                                statuses: newState[actionAccount].statuses[nextIndex].statuses,
+                            } : {
+                                cursor: action.nextCursor,
+                                statuses: []
+                            }
+                        }
+                    }
+                }
+
+            }
+        });
+        return newState;
+
+    }
+    return state;
+}
+
+function useTimelines({account}:{
+    account: Accounts
+}){
+    const [pageState,dispatchPageAction] = useReducer(pageReducer,{
+        mastodonSocial: {
+            currentPage: 0,
+            statuses: {0: {
+                cursor: undefined,
+                statuses: []
+            }}
+        },
+        fosstodon: {
+            currentPage: 0,
+            statuses: {0: {
+                cursor: undefined,
+                statuses: []
+            }}
+        },
+        bluesky: {
+            currentPage: 0,
+            statuses: {0: {
+                cursor: undefined,
+                statuses: []
+            }}
+        }
+    });
+
+    const selectors = useMemo(() => {
+        return createSelectors(pageState,account);
+    },[pageState,account]);
+
+    const currentCursor = useMemo(() => {
+        return selectors.getCurrentCursor();
+    },[selectors]);
+
+    return {
+        ...selectors,
+        pageState,
+        currentCursor,
+        dispatchPageAction
+    }
+}
 
 export default function Timeline({
     account,
@@ -156,123 +330,60 @@ export default function Timeline({
     onCopy,
     onQuote
 }:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps){
-    const [currentCursor,setCurrentCursor] = useState<string|undefined>(undefined);
-    const [cursors,setCursors] = useState<Map<number,string>>(new Map().set(0,undefined));
-    const setCursor = (newCursor:string|undefined,nextCursor:string|undefined) => {
-        setCursors((cursorsState) => {
-            if( ! newCursor ){
-                if( nextCursor ){
-                    return new Map(cursorsState).set(cursorsState.size,nextCursor);
-                }else{
-                    return new Map(cursorsState);
-                }
-            }
-            const cursorKey = Array.from(cursorsState.keys()).find((key) => cursorsState.get(key) === newCursor);
-            if( cursorKey ){
-                const newState = new Map(cursorsState);
-                if( nextCursor ){
-                    newState.set(cursorKey+ 1,nextCursor);
+    const {
+        pageState,
+        currentCursor,
+        dispatchPageAction,
+        hasPageByCursor,
+        hasNextPage,
+        cursorHasStatuses,
+    } = useTimelines({account});
 
-                }
-                return newState;
-            }else{
-                const newState = new Map(cursorsState).set(cursorsState.size + 1,newCursor);
-                if( nextCursor ){
-                    newState.set(cursorsState.size + 2,nextCursor);
-                }
-                return newState;
 
-            }
-        });
-    }
-    const prevCursor = useMemo<string|undefined>(() => {
-        if( ! cursors.size ){
-            return undefined;
-        }
-        if( ! currentCursor ){
-            return undefined;
-        }
-        const cursorKey = Array.from(cursors.keys()).find((key) => cursors.get(key) === currentCursor);
-        if( ! cursorKey ){
-            return undefined;
-        }
-        return cursors.get(cursorKey - 1);
-    },[currentCursor,cursors]);
-
-    const nextCursor = useMemo<string|undefined>(() => {
-        if( ! cursors.size ){
-            return undefined;
-        }
-        if( ! currentCursor  ){
-            //if has cursors[1]
-            if( cursors.has(1) ){
-                return cursors.get(1);
-            }
-            return undefined;
-        }
-        const cursorKey = Array.from(cursors.keys()).find((key) => cursors.get(key) === currentCursor);
-        if( ! cursorKey ){
-            return undefined;
-        }
-        return cursors.get(cursorKey + 1);
-    },[currentCursor,cursors]);
     const [isLoading, setIsLoading] = useState(false);
-
-    const [bskyPosts, setBskyPosts] = useState<BskyPostSimple[]>([]);
-    const [statuses, setStatuses] = useState<any[]>([]);
     const accountDetails = useMemo(() => {
         return accounts[account] as AccountDetailsMinimal;
     }, [account]);
 
-    //when account changes, reset the cursor
-    useEffect(() => {
-        if( accountDetails ){
-            setCurrentCursor(undefined);
-            setCursors(new Map().set(0,undefined));
-        }
-    },[accountDetails]);
+
 
 
     useEffect(() => {
         if( ! accountDetails ){
             return;
         }
+        if( cursorHasStatuses(currentCursor) ){
+            return;
+        }
         setIsLoading(true);
         fetchTimeline(accountDetails, see,currentCursor).then(r => {
+            //@ts-ignore
+            dispatchPageAction({
+                //@ts-ignore
+                account: account,
+                newCursor: r.cursor,
+                nextCursor: r.nextCursor,
+                statuses: r.statuses
+            });
 
-            setCursor(r.cursor,r.nextCursor);
-            if( 'mastodon' === accountDetails.type ){
-                setStatuses(r.statuses);
-            } else {
-                setBskyPosts(r.statuses);
-            }
         }).finally(() => {
             setIsLoading(false);
         });
     },[accountDetails, see,currentCursor])
 
-    const onClickNext = useCallback(() => {
-        if( ! nextCursor ){
-            return;
-        }
-        setCurrentCursor(nextCursor);
-    },[nextCursor]);
 
-    const onClickPrev = useCallback(() => {
-        if( ! prevCursor ){
-            return;
-        }
-        setCurrentCursor(prevCursor);
-    },[prevCursor]);
 
     const isMastodon = 'mastodon' === accountDetails?.type;
 
     const posts = useMemo<Timeline_Post[]>(() => {
+        const page = pageState[account].currentPage;
+        const state = pageState[account].statuses[page]?.statuses;
+        if( ! state ){
+            return [];
+        }
         if( isMastodon ){
-            if(  ! statuses || !statuses.length ){
-                return []
-            }
-            return statuses.map((post) => ({
+
+            return state.map((post) => ({
                 id: post.id,
                 postUrl: post.url,
                 content: post.content,
@@ -292,11 +403,8 @@ export default function Timeline({
                 }))
             }));
         }
-        if(  ! bskyPosts || !bskyPosts.length ){
-            return []
-        }
 
-        return bskyPosts.map((post:BskyPostSimple) => ({
+        return state.map((post:BskyPostSimple) => ({
             id: post.cid,
             content: post.text,
             postAuthor: post.author,
@@ -308,21 +416,54 @@ export default function Timeline({
         }));
 
 
-    }, [statuses, bskyPosts]);
+    }, [pageState,account]);
 
-    const Pagination = useCallback(() => (
-        <PaginationButtons
-            nextCursor={nextCursor}
-            prevCursor={prevCursor}
-            onClickNext={onClickNext }
-            onClickPrev={onClickPrev}
-        />
-    ), [nextCursor, prevCursor]);
+    const Pagination = useCallback(() => {
+        const state = pageState[account];
+        if( ! state ){
+            return null;
+        }
+        const {currentPage,statuses} = state;
+        const hasPrev = 0 !== currentPage;
+        const hasNext = hasNextPage();
+        return (
+
+                <div>
+                     <ButtonGroup>
+                        <Button
+                            variant={hasPrev ? 'outline':undefined}
+                            color={hasPrev ? 'secondary':undefined}
+                            disabled={!hasPrev}
+                            onClick={() => {
+                                dispatchPageAction({
+                                    account: account as Accounts,
+                                    setPage: currentPage - 1
+                                });
+                            }}
+                        >
+                            Previous
+                        </Button>
+                        <Button
+                            variant={hasNext ? 'outline':undefined}
+                            color={hasNext ? 'secondary':undefined}
+                            onClick={() => {
+                                dispatchPageAction({
+                                    account: account as Accounts,
+                                    setPage: currentPage + 1
+                                });
+                            }}
+                        >
+                            Next
+                        </Button>
+                    </ButtonGroup>
+                </div>
+
+        )
+    }, [pageState,account,dispatchPageAction]);
 
     if( ! accountDetails ){
         return <div>Account not found</div>
     }
-    console.log({cursors,currentCursor,nextCursor,prevCursor});
 
     return (
         <div>

@@ -219,9 +219,9 @@ api.get('/bluesky/:did/statuses', async (c) => {
 			const returnStatuses = statuses.statuses.map(statusToSimple).filter( s => s !== undefined) as BskyPostSimple[];
 			return c.json({
 				did,
-				cursor,
+				cursor: cursor ? `cursor=${cursor}`:undefined,
 				next: `${searchUrlApi}/bluesky/${did}/statuses?cursor=${statuses.statusesCursor}`,
-				nextCursor:`cursor=${statuses.statusesCursor}`,
+				nextCursor:statuses.statusesCursor ? `cursor=${statuses.statusesCursor}`:undefined,
 				statuses:	returnStatuses
 
 			});

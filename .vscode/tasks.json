@@ -1,0 +1,29 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Start WP Environment",
+        "type": "shell",
+        "command": "npx wp-env start",
+        "problemMatcher": [],
+        "group": "build",
+        "isBackground": true
+      },
+      {
+        "label": "Run Workers Site",
+        "type": "shell",
+        "command": "cd workers/site && bun run dev",
+        "problemMatcher": [],
+        "group": "build",
+        "isBackground": true
+      },
+      {
+        "label": "Run Garden Source Plugin",
+        "type": "shell",
+        "command": "cd plugins/garden-source && npm run start",
+        "problemMatcher": [],
+        "group": "build",
+        "isBackground": true
+      }
+    ]
+  }
