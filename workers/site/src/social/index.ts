@@ -31,13 +31,16 @@ export function isValidAccontId(accountId: string,network:SOCIAL_NETWORK): boole
 export function mastodonAccountIdToConfig(accountId: string):{
 	name: string,
 	instanceUrl: string,
-	accountId: string
+	accountId: string,
+	slug: string,
 } {
 	return config.social.mastodon.find( a => a.accountId === accountId) as {
 		name: string,
 		instanceUrl: string,
-		accountId: string
+		accountId: string,
+		slug: string,
 	};
+
 
 }
 
@@ -54,5 +57,5 @@ export function blueskyPostUriToUrl(uri:string,authorHandle:string){
 }
 
 export {
-    PosterService
+	PosterService
 };

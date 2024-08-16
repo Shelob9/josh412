@@ -13,6 +13,7 @@ import TimelinePost, { Timeline_Post } from './TimelinePost';
 
 type TimelineProps = {
     see: See;
+    search: string;
     account: Accounts,
     onChangeSee: (update: 'posts'|'likes'|'timeline') => void;
     onChangeAccount: (update: 'mastodonSocial'|'fosstodon'|'bluesky') => void;
@@ -23,7 +24,7 @@ export function TimelineViewToggles({
     onChangeSee,
     onChangeAccount,
 
-}:TimelineProps ){
+}:Omit<TimelineProps,'search'> ){
     const seeOptions = useMemo(() => {
         if( 'bluesky' === account ){
             return ['statuses', 'likes', 'timeline'];
@@ -78,17 +79,30 @@ const headers = {
     'Content-Type': 'application/json',
 }
 
-function fetchTimeline(account:AccountDetailsMinimal, see:See,cursor?:string): Promise<{
+function fetchTimeline({account,see,cursor,search}:{
+    account:AccountDetailsMinimal,
+    see:See,
+    cursor?:string,
+    search?:string
+}): Promise<{
     statuses: any[];
     nextCursor?: string;
     cursor?: string;
+    search?: string;
 }>{
     if( 'mastodon' === account.type ){
-        let url = `${apiUrl}/search/mastodon/${account.id}/statuses`;
-        if( cursor ){
-            url += `?${cursor}`;
+        let url = new URL(`${apiUrl}/search/mastodon/${account.id}`);
+        console.log({url:url.toString(),search})
+        if(! search ){
+            url = new URL(`${url.toString()}/statuses`);
+            if( cursor ){
+                url.searchParams.append('cursor',cursor);
+            }
+        }else{
+            url.searchParams.append('q',search);
         }
-        return fetch(url,{
+
+        return fetch(url.toString(),{
             headers,
         })
             .then(response => response.json())
@@ -328,7 +342,8 @@ export default function Timeline({
     account,
     see,
     onCopy,
-    onQuote
+    onQuote,
+    search
 }:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps){
     const {
         pageState,
@@ -353,10 +368,17 @@ export default function Timeline({
             return;
         }
         if( cursorHasStatuses(currentCursor) ){
-            return;
+           if( ! search ){
+                return;
+           }
         }
         setIsLoading(true);
-        fetchTimeline(accountDetails, see,currentCursor).then(r => {
+        fetchTimeline({
+            account:accountDetails,
+            see,
+            cursor:currentCursor,
+            search
+        }).then(r => {
             //@ts-ignore
             dispatchPageAction({
                 //@ts-ignore
@@ -369,7 +391,7 @@ export default function Timeline({
         }).finally(() => {
             setIsLoading(false);
         });
-    },[accountDetails, see,currentCursor])
+    },[accountDetails, see,currentCursor,search]);
 
 
 

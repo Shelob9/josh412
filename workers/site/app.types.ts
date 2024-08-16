@@ -10,6 +10,7 @@ import { Hono } from "hono";
     JOSH412_BSKY: string;
     KV: KVNamespace;
     TOKEN: string;
+    MASTODON_TOKENS: string;
   };
   export type Variables = {
     clippings: ClippingsApi;

@@ -25,19 +25,28 @@ api.use('*', logger());
 
 api.get('/mastodon/:accountId', async (c) => {
 	const accountId = c.req.param("accountId");
+
 	if(! accountId) {
 		return c.json({error: 'accountId is required'}, 400);
 	}
 	if( ! isValidAccontId(accountId,'mastodon') ){
 		return c.json({error: 'account not found'}, 404);
 	}
-	const {instanceUrl} = mastodonAccountIdToConfig(accountId);
+	const {instanceUrl,slug} = mastodonAccountIdToConfig(accountId);
+
+
 	const api = new MastodonApi(instanceUrl);
 	const account = await api.getAccountById(accountId,instanceUrl);
 	if( !  account ){
 		return c.json({error: 'account not found'}, 404);
 	}
 	if (c.req.query("q")) {
+		const tokens = JSON.parse(c.env.MASTODON_TOKENS);
+
+		const token = tokens[slug] ?? undefined;
+		if( ! token ){
+			return c.json({error: `Token required for search of ${slug}`}, 501);
+		}
 		const instanceUrl = c.req.query("instanceUrl") || undefined;
 		const following = c.req.query("following") || false;
 		const queryAccountId = c.req.query("accountId") || undefined;
@@ -45,9 +54,15 @@ api.get('/mastodon/:accountId', async (c) => {
 		const statuses = await api.search(q as string,{
 			instanceUrl,
 			following: following ? true : undefined,
-			account_id: queryAccountId ?? accountId
+			account_id: queryAccountId ?? accountId,
+			token,
 		});
-		return c.json({accountId,account,statuses,q});
+		return c.json({
+			accountId,
+			q,
+			statuses,
+			account,
+		});
 	}
 
 	return c.json({accountId,account,});

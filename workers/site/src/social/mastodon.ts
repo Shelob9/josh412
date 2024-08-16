@@ -31,15 +31,19 @@ export class MastodonApi {
         )
     }
 
-    async search(q:string, {instanceUrl, following, account_id } : {
+    //@see https://docs.joinmastodon.org/methods/search/
+    async search(q:string, {instanceUrl, following, account_id, token} : {
         instanceUrl?: string,
         following?: boolean,
-        account_id?: string|number
+        account_id?: string|number,
+        token?: string,
     } = {
     }) {
         const query = new URLSearchParams({
             q,
-
+            //accounts, hashtags, statuses
+            type:'statuses',
+            resolve:'true',
         })
         if( following ){
             query.set('following',following.toString())
@@ -47,8 +51,26 @@ export class MastodonApi {
         if( account_id ){
             query.set('account_id',account_id.toString())
         }
-        console.log({account_id,query:query.toString()})
-        return await fetch(`${instanceUrl ?? this.instanceUrl}/api/v2/search?${query.toString()}`).then((r) => r.json())
+
+        const data = await fetch(`${instanceUrl ?? this.instanceUrl}/api/v2/search?${query.toString()}`,{
+            headers: token ? {
+                Authorization: `Bearer ${token ?? this.token}`,
+            }:undefined
+        }).then((r) => r.json()) as {
+            statuses: Status[]
+            accounts: Account[]
+            hashtags: {
+                "name": string;
+                "url": string;
+                "history": {day:string,accounts:string,uses:string}[];
+                "following":boolean
+            }[]
+        }
+
+        if( data && data.statuses ){
+            return data.statuses
+        }
+        return []
     }
 
     async getStatuses({

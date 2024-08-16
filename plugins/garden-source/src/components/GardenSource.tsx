@@ -7,6 +7,7 @@ import { SearchGardern } from './SearchGarden';
 import Timeline, { TimelineViewToggles } from './Timeline';
 
 export default function GardenSource({search,setSearch}) {
+    console.log({search,setSearch})
 	const [see,setSee] = useState<See>('statuses');
 	const [account,setAccount] = useState<Accounts>('mastodonSocial');
 	const { insertBlocks } = useDispatch( 'core/block-editor' );
@@ -28,7 +29,9 @@ export default function GardenSource({search,setSearch}) {
             <section>
                 <SearchGardern
                     search={search}
-                    onChangeSearch={(update) => setSearch({ search })}
+                    onChangeSearch={(update) => {
+                        setSearch(update)
+                    }}
                 />
                 <TimelineViewToggles
                         see={see}
@@ -38,11 +41,13 @@ export default function GardenSource({search,setSearch}) {
                 />
             </section>
             <section>
-            <Timeline see={see} account={account}
-                        onCopy={(content) => addParagraph(content)}
-                        onQuote={(content,citation) => addBlockquote(content,citation)}
-
-                        onChangeAccount={setAccount} />
+            <Timeline
+                see={see}
+                search={search}
+                account={account}
+                onCopy={(content) => addParagraph(content)}
+                onQuote={(content,citation) => addBlockquote(content,citation)}
+                onChangeAccount={setAccount} />
 
             </section>
 
