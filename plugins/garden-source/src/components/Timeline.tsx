@@ -1,16 +1,16 @@
 import {
     ButtonGroup,
     __experimentalGrid as Grid,
-    SelectControl,
-    Spinner,
+    Spinner
 } from '@wordpress/components';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from 'react-daisyui';
-import { accountOptions, accounts } from '../accounts';
+import { accounts } from '../accounts';
 import { Accounts, See } from '../types';
 import fetchTimeline from './api/fetchTimeline';
 import { BskyPostSimple } from './bluesky';
-import useTimelines from './hooks/useTimelines';
+import { pageState } from './hooks/useTimelines';
+import useTimeLinesWithSearch from './hooks/useTimelinesWithSearch';
 import TimelinePost, { Timeline_Post } from './TimelinePost';
 
 export type TimelineProps = {
@@ -20,45 +20,7 @@ export type TimelineProps = {
     onChangeSee: (update: 'posts'|'likes'|'timeline') => void;
     onChangeAccount: (update: 'mastodonSocial'|'fosstodon'|'bluesky') => void;
 }
-export function TimelineViewToggles({
-    account,
-    see,
-    onChangeSee,
-    onChangeAccount,
 
-}:Omit<TimelineProps,'search'> ){
-    const seeOptions = useMemo(() => {
-        if( 'bluesky' === account ){
-            return ['statuses', 'likes', 'timeline'];
-        }
-        return ['statuses']
-    }, [account]);
-    return (
-        <div>
-            <div>
-                <SelectControl
-                    label="Account"
-                    value={account}
-                    options={accountOptions}
-                    // @ts-ignore
-                    onChange={(update) => onChangeAccount(update)}
-                />
-
-            </div>
-            <div>
-                <SelectControl
-                    label="See"
-                    value={see}
-                    options={seeOptions.map((value) => ({
-                        label: value,
-                        value,
-                    }))}
-                    onChange={(update) => onChangeSee(update as 'posts'|'likes'|'timeline')}
-                />
-            </div>
-        </div>
-    );
-}
 
 export type AccountDetailsMinimal = {
     type: 'mastodon'|'bluesky';
@@ -74,8 +36,6 @@ function postUriToUrl(uri:string,authorHandle:string){
 }
 
 
-
-
 export type UseProps = {
     onCopy: (content: string) => void;
     onQuote: (content: string, citation: string) => void;
@@ -88,37 +48,56 @@ export default function Timeline({
     onQuote,
     search
 }:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps){
-    const {
+    const showSearch = useMemo(() => {
+        return search && search.length > 0;
+    }, [search]);
+    const{
+        pageHasStatuses,
+        cursorHasStatuses,
+        findIndexByByCursor,
+        hasNextPage,
+        hasPage,
+        hasPageByCursor,
+        getCurrentCursor,
         pageState,
         currentCursor,
         dispatchPageAction,
-        hasPageByCursor,
-        hasNextPage,
-        cursorHasStatuses,
-    } = useTimelines({account});
+        dispatchSearchAction,
+        currentSearchCursor,
+        searchPageHasStatuses,
+        searchCursorHasStatuses,
+        searchFindIndexByByCursor,
+        searchHasNextPage,
+        searchHasPage,
+        searchHasPageByCursor,
+        searchGetCurrentCursor,
+        searchPageState,
 
+    } = useTimeLinesWithSearch({account});
 
     const [isLoading, setIsLoading] = useState(false);
     const accountDetails = useMemo(() => {
         return accounts[account] as AccountDetailsMinimal;
     }, [account]);
 
-
-
-
+    //fetch timeline
     useEffect(() => {
         if( ! accountDetails ){
             return;
         }
-        console.log({
-            currentCursor,
-            cursorHasStatuses:cursorHasStatuses(currentCursor)
-        });
-        if( cursorHasStatuses(currentCursor) ){
-           if( ! search ){
+        const isSearch = !! search;
+        if( isSearch ){
+            if( searchCursorHasStatuses(currentSearchCursor) ){
                 return;
-           }
+            }
+
+        }else{
+
+            if( cursorHasStatuses(currentCursor) ){
+                return;
+            }
         }
+
         setIsLoading(true);
         fetchTimeline({
             account:accountDetails,
@@ -126,27 +105,47 @@ export default function Timeline({
             cursor:currentCursor,
             search
         }).then(r => {
-            //@ts-ignore
-            dispatchPageAction({
-                //@ts-ignore
-                account: account,
-                newCursor: r.cursor,
-                nextCursor: r.nextCursor,
-                statuses: r.statuses
-            });
+            if( isSearch ){
+                dispatchSearchAction({
+                    account: account,
+                    newCursor: r.cursor,
+                    nextCursor: r.nextCursor,
+                    statuses: r.statuses
+                });
+            }else{
+                dispatchPageAction({
+                    account: account,
+                    newCursor: r.cursor,
+                    nextCursor: r.nextCursor,
+                    statuses: r.statuses
+                });
+            }
 
         }).finally(() => {
             setIsLoading(false);
         });
     },[accountDetails, see,currentCursor,search]);
 
+    //clear search state when search is empty
+    useEffect(() => {
+        if( ! search ){
+            dispatchSearchAction({
+                account: account,
+                clear: true
+            });
+        }
+    },[search]);
+
+
 
 
     const isMastodon = 'mastodon' === accountDetails?.type;
 
     const posts = useMemo<Timeline_Post[]>(() => {
-        const page = pageState[account].currentPage;
-        const state = pageState[account].statuses[page]?.statuses;
+        const getPage = (state:pageState) =>state[account].currentPage
+        const getState = (state:pageState) => state[account].statuses[page]?.statuses;
+        const page = getPage(showSearch ? searchPageState : pageState);
+        const state = getState(showSearch ? searchPageState : pageState);
         if( ! state ){
             return [];
         }
@@ -187,7 +186,7 @@ export default function Timeline({
         }));
 
 
-    }, [pageState,account]);
+    }, [pageState,searchPageState,showSearch,account]);
 
     const Pagination = useCallback(() => {
         const state = pageState[account];

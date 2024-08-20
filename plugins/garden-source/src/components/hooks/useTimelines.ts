@@ -27,7 +27,16 @@ export type pageState = {
     }
 }
 
-const createSelectors = (state:pageState,account:Accounts) => {
+type SelectorFns = {
+    pageHasStatuses: (index:number) => boolean;
+    cursorHasStatuses: (cursor:string|undefined) => boolean;
+    findIndexByByCursor: (cursor:string|undefined) => number;
+    hasNextPage: () => boolean;
+    hasPage: (page:number) => boolean;
+    hasPageByCursor: (cursor:string|undefined) => boolean;
+    getCurrentCursor: () => string|undefined;
+}
+const createSelectors = (state:pageState,account:Accounts):SelectorFns => {
 
     const findIndexByByCursor = (cursor:string|undefined): number =>{
         if( undefined === cursor ){
@@ -74,7 +83,7 @@ const createSelectors = (state:pageState,account:Accounts) => {
         }
     }
 };
-type Actions = {
+export type Page_State_Actions = {
     account: Omit<Accounts,'bluesky'>,
     newCursor?: string;
     nextCursor?: string;
@@ -90,17 +99,25 @@ type Actions = {
 }|{
     account: 'bluesky'
     setPage: number;
+}|{
+    account: Accounts
+    clear: true;
 };
 
-//0 is regular, 1 is search
-type pageStates = {
-    0: pageState;
-    1: pageState;
-}
-
-
-function pageReducer( state: pageState,action: Actions ): pageState{
+function pageReducer( state: pageState,action: Page_State_Actions ): pageState{
     const actionAccount = action.account as string;
+    if( 'clear' in action ){
+        return {
+            ...state,
+            [actionAccount]: {
+                currentPage: 0,
+                statuses: {0: {
+                    cursor: undefined,
+                    statuses: []
+                }}
+            }
+        }
+    }
     if( 'setPage' in action ){
         //find cursor for that page and set it as current cursor
 
@@ -171,16 +188,7 @@ function pageReducer( state: pageState,action: Actions ): pageState{
     return state;
 }
 
-function multiPageReducer(state: pageStates,action:{
-    mode: 0|1;
-    action: Actions;
-}): pageStates{
 
-   return {
-    ...state,
-    [action.mode]: pageReducer(state[action.mode],action.action)
-   }
-}
 
 const defaultPageState :pageState = {
 
@@ -206,47 +214,7 @@ const defaultPageState :pageState = {
             }}
         }
     };
-function useTimeLinesWithSearch({account}:{
-    account: Accounts,
-}){
-    const [pagesState,dispatchPagesAction] = useReducer(multiPageReducer,{
-        0: defaultPageState,
-        1: defaultPageState,
- } );
 
-    const selectors = useMemo(() => {
-        return createSelectors(pagesState[0],account);
-    },[pagesState[0],account]);
-    const searchSelectors = useMemo(() => {
-        return createSelectors(pagesState[1],account);
-    },[pagesState[1],account]);
-    const currentCursor = useMemo(() => {
-        return selectors.getCurrentCursor();
-    },[selectors]);
-
-    const currentSearchCursor = useMemo(() => {
-        return searchSelectors.getCurrentCursor();
-    },[searchSelectors]);
-
-    return {
-        ...selectors,
-        pageState: pagesState[0],
-        currentCursor,
-        dispatchPageAction: (action:Actions) => {
-            dispatchPagesAction({
-                mode: 0,
-                action
-            });
-        },
-        dispatchSearchAction: (action:Actions) => {
-            dispatchPagesAction({
-                mode: 1,
-                action
-            });
-        },
-        currentSearchCursor,
-    }
-}
 
 function useTimelines({account}:{
     account: Accounts,
@@ -260,11 +228,7 @@ function useTimelines({account}:{
     const currentCursor = useMemo(() => {
         return selectors.getCurrentCursor();
     },[selectors]);
-    console.log({
-        account,
-        pageState,
-        currentCursor
-    })
+
     return {
         ...selectors,
         pageState,

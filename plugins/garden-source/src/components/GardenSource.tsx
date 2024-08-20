@@ -4,13 +4,14 @@ import { useDispatch } from '@wordpress/data';
 import React, { useState } from 'react';
 import { Accounts, See } from '../types';
 import { SearchGardern } from './SearchGarden';
-import Timeline, { TimelineViewToggles } from './Timeline';
+import Timeline from './Timeline';
+import TimelineViewToggles from './TimelineViewToggles';
 
 export default function GardenSource({search,setSearch}) {
-    console.log({search,setSearch})
 	const [see,setSee] = useState<See>('statuses');
 	const [account,setAccount] = useState<Accounts>('mastodonSocial');
 	const { insertBlocks } = useDispatch( 'core/block-editor' );
+
 	function addBlockquote(content: string,citation: string) {
 		const block = createBlock( 'core/quote', {
 			value:content,
@@ -24,6 +25,10 @@ export default function GardenSource({search,setSearch}) {
 		} );
 		insertBlocks( block );
 	}
+    //when account changes, reset search
+    React.useEffect(() => {
+        setSearch('');
+    }, [account]);
 	return (
         <>
             <section>

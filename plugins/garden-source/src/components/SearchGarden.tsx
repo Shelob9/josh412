@@ -1,4 +1,8 @@
-import { TextControl } from '@wordpress/components';
+import {
+    Button,
+    __experimentalHStack as HStack,
+    TextControl,
+} from '@wordpress/components';
 import React from 'react';
 
 export function SearchGardern({
@@ -9,13 +13,18 @@ export function SearchGardern({
     onChangeSearch: (update: string) => void;
 }){
     return (
-        <div>
+        <HStack>
             <TextControl
                 type="text"
                 onChange={(update) => onChangeSearch(update)}
                 value={search}
                 label="Search"
             />
-        </div>
+            <Button
+                onClick={() => onChangeSearch('')}
+            >
+                Reset
+            </Button>
+        </HStack>
     );
 }
