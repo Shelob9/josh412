@@ -74,7 +74,18 @@ api.get('/mastodon/:accountId/statuses', async (c) => {
 	if(! accountId) {
 		return c.json({error: 'accountId is required'}, 400);
 	}
-	const maxId = c.req.query("maxId") || undefined;
+	let maxId = c.req.query("maxId") || undefined;
+	if( ! maxId ){
+	const cursor = c.req.query("cursor") || undefined;
+		//if is maxId=<cursor> get cursor
+		//UI pages by  maxId=<cursor>
+		if( cursor ){
+			const parts = cursor.split('=');
+			if( parts.length === 2 ){
+				maxId = parts[1];
+			}
+		}
+	}
 	const {instanceUrl} = mastodonAccountIdToConfig(accountId);
 	const api = new MastodonApi(instanceUrl);
 	try {

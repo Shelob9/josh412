@@ -4,14 +4,16 @@ import {
     SelectControl,
     Spinner,
 } from '@wordpress/components';
-import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from 'react-daisyui';
 import { accountOptions, accounts } from '../accounts';
 import { Accounts, See } from '../types';
+import fetchTimeline from './api/fetchTimeline';
 import { BskyPostSimple } from './bluesky';
+import useTimelines from './hooks/useTimelines';
 import TimelinePost, { Timeline_Post } from './TimelinePost';
 
-type TimelineProps = {
+export type TimelineProps = {
     see: See;
     search: string;
     account: Accounts,
@@ -58,69 +60,12 @@ export function TimelineViewToggles({
     );
 }
 
-type AccountDetailsMinimal = {
+export type AccountDetailsMinimal = {
     type: 'mastodon'|'bluesky';
     name: string;
     id: string;
 }
-const  { apiUrl,token } : {
-    apiUrl: string;
-    token: string;
-}
-//@ts-ignore
-= window.GARDEN || {
-    apiUrl: '',
-    token: '',
-};
 
-
-const headers = {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-}
-
-function fetchTimeline({account,see,cursor,search}:{
-    account:AccountDetailsMinimal,
-    see:See,
-    cursor?:string,
-    search?:string
-}): Promise<{
-    statuses: any[];
-    nextCursor?: string;
-    cursor?: string;
-    search?: string;
-}>{
-    if( 'mastodon' === account.type ){
-        let url = new URL(`${apiUrl}/search/mastodon/${account.id}`);
-        console.log({url:url.toString(),search})
-        if(! search ){
-            url = new URL(`${url.toString()}/statuses`);
-            if( cursor ){
-                url.searchParams.append('cursor',cursor);
-            }
-        }else{
-            url.searchParams.append('q',search);
-        }
-
-        return fetch(url.toString(),{
-            headers,
-        })
-            .then(response => response.json())
-            .then(json => {
-                console.log({json})
-                return json;
-            });
-    }
-    if( 'bluesky' === account.type ){
-        return fetch(`${apiUrl}/search/bluesky/${account.id}/${see}?${cursor ? cursor : ''}`,{headers})
-            .then(response => response.json())
-            .then(json => {
-                console.log({json})
-                return json;
-            });
-    }
-    return Promise.reject('Invalid account type');
-}
 function postUriToUrl(uri:string,authorHandle:string){
     //take only the part after app.bsky.feed.post/ in uri
     uri = uri.split('/').slice(-1)[0];
@@ -130,212 +75,10 @@ function postUriToUrl(uri:string,authorHandle:string){
 
 
 
+
 export type UseProps = {
     onCopy: (content: string) => void;
     onQuote: (content: string, citation: string) => void;
-}
-
-
-type pageState = {
-    mastodonSocial: {
-        currentPage: 0,
-        statuses: {[key: number]: {
-            cursor?: string|undefined;
-            statuses: any[];
-        }},
-    },
-    fosstodon: {
-        currentPage: 0,
-        statuses: {[key: number]: {
-            cursor?: string|undefined;
-            statuses: any[];
-        }},
-    },
-    bluesky: {
-        currentPage: 0,
-        statuses: {[key: number]: {
-            cursor?: string|undefined;
-            statuses: BskyPostSimple[];
-        }},
-    }
-}
-
-const createSelectors = (state:pageState,account:Accounts) => {
-
-    const findIndexByByCursor = (cursor:string|undefined): number =>{
-        if( undefined === cursor ){
-            return 0;
-        }
-        return Object.keys(state[account].statuses).findIndex((key) => {
-            return state[account].statuses[key].cursor === cursor;
-        });
-    }
-    function pageHasStatuses(index:number): boolean{
-        if( ! state[account].statuses[index] ){
-            return false;
-        }
-        return  state[account].statuses[index].statuses.length ? true : false;
-    }
-
-    function cursorHasStatuses(cursor:string|undefined): boolean{
-        const index = findIndexByByCursor(cursor);
-        return pageHasStatuses(index);
-    }
-
-    return {
-        pageHasStatuses,
-        cursorHasStatuses,
-        findIndexByByCursor,
-        hasNextPage(): boolean{
-            return !! state[account].statuses[state[account].currentPage + 1];
-        },
-        hasPage(page:number): boolean{
-            return !! state[account].statuses[page];
-        },
-        hasPageByCursor(cursor:string|undefined): boolean{
-            if( undefined === cursor ){
-                return pageHasStatuses(0);
-            }
-            const index = findIndexByByCursor(cursor);
-            if( -1 === index ){
-                return false;
-            }
-            return pageHasStatuses(index);
-        },
-        getCurrentCursor(): string|undefined{
-            return state[account].statuses[state[account].currentPage].cursor;
-        }
-    }
-};
-function pageReducer( state: pageState,action: {
-    account: Omit<Accounts,'bluesky'>,
-    newCursor?: string;
-    nextCursor?: string;
-    statuses: any[];
-}|{
-    account: 'bluesky'
-    newCursor?: string;
-    nextCursor?: string;
-    statuses: BskyPostSimple[];
-}| {
-    account: Omit<Accounts,'bluesky'>
-    setPage: number;
-}|{
-    account: 'bluesky'
-    setPage: number;
-}): pageState{
-    const actionAccount = action.account as string;
-    if( 'setPage' in action ){
-        //find cursor for that page and set it as current cursor
-
-        return {
-            ...state,
-            [actionAccount]: {
-                ...state[actionAccount],
-                currentPage: action.setPage,
-            }
-        }
-    }
-    if( undefined === action.newCursor ){
-        const statuses = {
-            ...state[actionAccount].statuses,
-            [0]: {
-                cursor: undefined,
-                statuses: action.statuses
-            }
-        }
-        if(action.nextCursor && ! state[actionAccount].statuses[1]){
-            statuses[1] =  {
-                cursor: action.nextCursor,
-                statuses: []
-            }
-        }
-        return {
-            ...state,
-            [actionAccount]: {
-                ...state[actionAccount],
-                statuses
-            }
-        }
-    }else{
-        let newState = {
-            ...state,
-        }
-
-        //find index of action.newCursor in cursors
-        Object.keys(state[actionAccount].statuses).forEach((key) => {
-            if( state[actionAccount].statuses[key].cursor === action.newCursor ){
-                const nextIndex = parseInt(key,10) + 1;
-                newState = {
-                    ...newState,
-                    [actionAccount]: {
-                        ...newState[actionAccount],
-                        statuses: {
-                            ...newState[actionAccount].statuses,
-                            [key]: {
-                                ...newState[actionAccount].statuses[key],
-                                statuses: action.statuses
-                            },
-                            [nextIndex]: newState[actionAccount].statuses[nextIndex] ? {
-                                cursor: action.nextCursor,
-                                statuses: newState[actionAccount].statuses[nextIndex].statuses,
-                            } : {
-                                cursor: action.nextCursor,
-                                statuses: []
-                            }
-                        }
-                    }
-                }
-
-            }
-        });
-        return newState;
-
-    }
-    return state;
-}
-
-function useTimelines({account}:{
-    account: Accounts
-}){
-    const [pageState,dispatchPageAction] = useReducer(pageReducer,{
-        mastodonSocial: {
-            currentPage: 0,
-            statuses: {0: {
-                cursor: undefined,
-                statuses: []
-            }}
-        },
-        fosstodon: {
-            currentPage: 0,
-            statuses: {0: {
-                cursor: undefined,
-                statuses: []
-            }}
-        },
-        bluesky: {
-            currentPage: 0,
-            statuses: {0: {
-                cursor: undefined,
-                statuses: []
-            }}
-        }
-    });
-
-    const selectors = useMemo(() => {
-        return createSelectors(pageState,account);
-    },[pageState,account]);
-
-    const currentCursor = useMemo(() => {
-        return selectors.getCurrentCursor();
-    },[selectors]);
-
-    return {
-        ...selectors,
-        pageState,
-        currentCursor,
-        dispatchPageAction
-    }
 }
 
 export default function Timeline({
@@ -367,6 +110,10 @@ export default function Timeline({
         if( ! accountDetails ){
             return;
         }
+        console.log({
+            currentCursor,
+            cursorHasStatuses:cursorHasStatuses(currentCursor)
+        });
         if( cursorHasStatuses(currentCursor) ){
            if( ! search ){
                 return;
