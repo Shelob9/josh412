@@ -43,16 +43,18 @@ export default function GardenSource({search,setSearch}) {
                         onChangeSee={(see) => setSee(see as See)}
                         account={account}
                         onChangeAccount={(update) => setAccount(update)}
-                />
+                    />
+
             </section>
             <section>
-            <Timeline
-                see={see}
-                search={search}
-                account={account}
-                onCopy={(content) => addParagraph(content)}
-                onQuote={(content,citation) => addBlockquote(content,citation)}
-                onChangeAccount={setAccount} />
+                <Timeline
+                    see={see}
+                    search={search}
+                    account={account}
+                    onCopy={(content) => addParagraph(content)}
+                    onQuote={(content,citation) => addBlockquote(content,citation)}
+                    onChangeAccount={setAccount}
+                />
 
             </section>
 

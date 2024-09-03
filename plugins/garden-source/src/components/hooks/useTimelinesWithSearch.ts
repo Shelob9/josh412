@@ -30,6 +30,8 @@ export default function useTimeLinesWithSearch({account}:{
         dispatchPageAction: dispatchSearchAction
     } = useTimelines({account});
 
+    const mineOnlySearch = useTimelines({account});
+
     return {
         pageHasStatuses,
         cursorHasStatuses,
@@ -51,6 +53,6 @@ export default function useTimeLinesWithSearch({account}:{
         searchHasPageByCursor,
         searchGetCurrentCursor,
         searchPageState,
-
+        mineOnlySearch,
     }
 }

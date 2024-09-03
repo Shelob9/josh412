@@ -17,9 +17,10 @@ const headers = {
     'Content-Type': 'application/json',
 }
 
-function fetchTimeline({account,see,cursor,search}:{
+function fetchTimeline({account,see,cursor,search,searchMyPostsOnly}:{
     account:AccountDetailsMinimal,
     see:See,
+    searchMyPostsOnly?:boolean,
     cursor?:string,
     search?:string
 }): Promise<{
@@ -38,6 +39,9 @@ function fetchTimeline({account,see,cursor,search}:{
             }
         }else{
             url.searchParams.append('q',search);
+            if(searchMyPostsOnly){
+                url.searchParams.append('accountId','true');
+            }
         }
 
         return fetch(url.toString(),{
@@ -50,12 +54,25 @@ function fetchTimeline({account,see,cursor,search}:{
             });
     }
     if( 'bluesky' === account.type ){
-        return fetch(`${apiUrl}/search/bluesky/${account.id}/${see}?${cursor ? cursor : ''}`,{headers})
-            .then(response => response.json())
-            .then(json => {
-                console.log({json})
-                return json;
-            });
+        const isSearch = search && search.length > 3;
+        const url = isSearch ? new URL(`${apiUrl}/search/bluesky/${account.id}`) : new URL(`${apiUrl}/search/bluesky/${account.id}/${see}`);
+        if( isSearch ){
+            url.searchParams.append('q',search);
+            if(searchMyPostsOnly){
+                url.searchParams.append('accountId','mine');
+            }
+        }
+        if( cursor ){
+            url.searchParams.append('cursor',cursor);
+        }
+
+        return fetch(url.toString(),{headers})
+                .then(response => response.json())
+                .then(json => {
+                    console.log({json})
+                    return json;
+                });
+
     }
     return Promise.reject('Invalid account type');
 }

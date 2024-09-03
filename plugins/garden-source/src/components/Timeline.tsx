@@ -48,29 +48,22 @@ export default function Timeline({
     onQuote,
     search
 }:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps){
+    const [lastSearch, setLastSearch] = useState('');
+
     const showSearch = useMemo(() => {
         return search && search.length > 0;
     }, [search]);
     const{
-        pageHasStatuses,
         cursorHasStatuses,
-        findIndexByByCursor,
         hasNextPage,
-        hasPage,
-        hasPageByCursor,
-        getCurrentCursor,
+
         pageState,
         currentCursor,
         dispatchPageAction,
         dispatchSearchAction,
         currentSearchCursor,
-        searchPageHasStatuses,
         searchCursorHasStatuses,
-        searchFindIndexByByCursor,
-        searchHasNextPage,
-        searchHasPage,
-        searchHasPageByCursor,
-        searchGetCurrentCursor,
+
         searchPageState,
 
     } = useTimeLinesWithSearch({account});
@@ -86,6 +79,7 @@ export default function Timeline({
             return;
         }
         const isSearch = !! search;
+        console.log({isSearch});
         if( isSearch ){
             if( searchCursorHasStatuses(currentSearchCursor) ){
                 return;
@@ -134,6 +128,13 @@ export default function Timeline({
                 clear: true
             });
         }
+        if( lastSearch !== search ){
+            setLastSearch(search);
+            dispatchSearchAction({
+                account: account,
+                clear: true
+            });
+        }
     },[search]);
 
 
@@ -173,6 +174,7 @@ export default function Timeline({
             }));
         }
 
+        console.log({state,showSearch})
         return state.map((post:BskyPostSimple) => ({
             id: post.cid,
             content: post.text,

@@ -2,6 +2,7 @@ import {
     AppBskyActorDefs,
     AppBskyFeedDefs,
     AppBskyFeedPost,
+    AppBskyFeedSearchPosts,
     AtpSessionData,
     AtpSessionEvent,
     BskyAgent,
@@ -183,6 +184,37 @@ export async function postBsykyStatus({
         throw new Error(`Could not post`)
     }
 
+}
+
+export async function searchBlueskyStatuses({
+    agent,
+    actor,
+    limit,
+    cursor,
+    args,
+}: {
+    // Best to use a did
+    actor?: string;
+    agent: BskyAgent;
+    limit?: number;
+    cursor?: string;
+    args :{
+        q: string;
+    }
+}): Promise<{
+    statusesCursor: string | undefined;
+    statuses: AppBskyFeedDefs.PostView[];
+}> {
+    const params :  AppBskyFeedSearchPosts.QueryParams = {q: args.q,cursor,limit,author: actor}
+    const {data} = await agent.api.app.bsky.feed.searchPosts(params)
+    if (!data) {
+        throw new Error("no data")
+    }
+
+    return {
+        statusesCursor: data.cursor,
+        statuses: data.posts,
+    }
 }
 
 export async function getBlueskyStatuses({
