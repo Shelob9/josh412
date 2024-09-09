@@ -1,3 +1,4 @@
+import { blueskyPostUriToUrl, BskyAuthorSimple, BskyPostSimple } from "@app/social";
 import {
     Account as MastodonAccount,
     Status as MastodonStatus
@@ -56,6 +57,84 @@ export default class ItemsApi {
         sourceId: string
     }) {
         return `items-${accountId}-${sourceId}`;
+    }
+    async injestBluesky({statuses}:{
+        statuses: BskyPostSimple[]
+    }){
+        const remoteAuthorArg = (account:BskyAuthorSimple) :RemoteAuthorArg => {
+            return {
+                remoteId: account.did,
+                remoteHandle: account.handle,
+                remoteDisplayName: account.displayName,
+                source: {
+                    type: 'bluesky',
+                    url: `https://bsky.app/profile/${account.handle}`
+                }
+            }
+        }
+        const remoteSourceArg = (status:BskyPostSimple) :SourceArg => {
+            return {
+                type: 'bluesky',
+                url: blueskyPostUriToUrl(status.uri,status.author.handle)
+            };
+        }
+
+        const processed: {
+            remoteAuthor: RemoteAuthorArg,
+            source: SourceArg,
+            content: string,
+            remoteId: string,
+            remoteReplyToId?: string,
+            uuid: string |false,
+            created:boolean
+        }[] = [];
+        for(const status of statuses){
+            const remoteAuthor = remoteAuthorArg(status.author);
+            const source = remoteSourceArg(status);
+
+            const sourceId = await this.sourceArgToSourceUuid(source);
+
+            const exists = await this.hasItem({
+                sourceId: sourceId,
+                remoteId: status.cid
+            });
+            if( exists ){
+                processed.push({
+                    created: false,
+                    remoteAuthor,
+                    source,
+                    content: status.text,
+                    remoteId: status.cid,
+                    remoteReplyToId: status.uri ?? undefined,
+                    uuid: sourceId
+                });
+                continue;
+            }
+            try {
+                const created = await this.create({
+                    remoteAuthor,
+                    source,
+                    content: status.text,
+                    remoteId: status.cid,
+                    remoteReplyToId: status.uri ?? undefined
+                });
+                processed.push({
+                    created: true,
+                    remoteAuthor,
+                    source,
+                    content: status.text,
+                    remoteId: status.cid,
+                    remoteReplyToId: status.uri ?? undefined,
+                    uuid: created ? created.uuid : false
+                });
+
+            } catch (error) {
+                console.log({error});
+                throw new Error('Could not create item');
+            }
+        }
+        return processed
+
     }
     async injestMastodon({statuses}:{
         statuses: MastodonStatus[]
@@ -177,46 +256,53 @@ export default class ItemsApi {
             if( ! sourceModel ){
                 throw new Error('Could not create source');
             }
-            const item = await this.prisma.item.create({
-                data: {
-                    content,
-                    remoteId,
-                    remoteReplyToId,
-                    source: {
-                        connect: {
-                            uuid: sourceModel.uuid,
-                            type: sourceModel.type
-                        }
-                    },
-                    remoteAuthor: {
-                        connectOrCreate: {
-                            where: {
-                                remoteId: remoteAuthor.remoteId,
-                                sourceId:sourceModel.uuid,
-                                uuid: remoteAuthor.uuid ?? undefined,
-                                sourceId_remoteId: {
+            try {
+                const item = await this.prisma.item.create({
+                    data: {
+                        content,
+                        remoteId,
+                        remoteReplyToId,
+                        source: {
+                            connect: {
+                                uuid: sourceModel.uuid,
+                                type: sourceModel.type
+                            }
+                        },
+                        remoteAuthor: {
+                            connectOrCreate: {
+                                where: {
                                     remoteId: remoteAuthor.remoteId,
-                                    sourceId: sourceModel.uuid
-                                }
-                            },
-                            create: {
-                                remoteId: remoteAuthor.remoteId,
-                                remoteHandle: remoteAuthor.remoteHandle,
-                                remoteDisplayName: remoteAuthor.remoteDisplayName,
-                                source: {
-                                    connect: {
-                                        uuid: sourceModel.uuid
+                                    sourceId:sourceModel.uuid,
+                                    uuid: remoteAuthor.uuid ?? undefined,
+                                    sourceId_remoteId: {
+                                        remoteId: remoteAuthor.remoteId,
+                                        sourceId: sourceModel.uuid
+                                    }
+                                },
+                                create: {
+                                    remoteId: remoteAuthor.remoteId,
+                                    remoteHandle: remoteAuthor.remoteHandle,
+                                    remoteDisplayName: remoteAuthor.remoteDisplayName,
+                                    source: {
+                                        connect: {
+                                            uuid: sourceModel.uuid
+                                        }
                                     }
                                 }
                             }
-                        }
-                    },
+                        },
 
 
-                }
-            });
-            return item;
+                    }
+                });
+                return item;
+            } catch (error) {
+                console.log({303:error});
+                throw new Error('Could not create source');
+
+            }
         } catch (error) {
+            console.log({308:error});
             throw new Error('Could not create source');
         }
 

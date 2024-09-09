@@ -46,12 +46,14 @@ export default function Timeline({
     see,
     onCopy,
     onQuote,
-    search
-}:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps){
+    search,
+    searchMyPostsOnly
+}:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps&{
+    searchMyPostsOnly:boolean
+}){
     const [lastSearch, setLastSearch] = useState('');
-
     const showSearch = useMemo(() => {
-        return search && search.length > 0;
+        return search && search.length > 2;
     }, [search]);
     const{
         cursorHasStatuses,
@@ -66,7 +68,7 @@ export default function Timeline({
 
         searchPageState,
 
-    } = useTimeLinesWithSearch({account});
+    } = useTimeLinesWithSearch({account,searchMyPostsOnly});
 
     const [isLoading, setIsLoading] = useState(false);
     const accountDetails = useMemo(() => {
@@ -79,7 +81,6 @@ export default function Timeline({
             return;
         }
         const isSearch = !! search;
-        console.log({isSearch});
         if( isSearch ){
             if( searchCursorHasStatuses(currentSearchCursor) ){
                 return;
@@ -96,8 +97,9 @@ export default function Timeline({
         fetchTimeline({
             account:accountDetails,
             see,
-            cursor:currentCursor,
-            search
+            cursor:isSearch ? currentSearchCursor : currentCursor,
+            search,
+            searchMyPostsOnly
         }).then(r => {
             if( isSearch ){
                 dispatchSearchAction({
@@ -118,7 +120,7 @@ export default function Timeline({
         }).finally(() => {
             setIsLoading(false);
         });
-    },[accountDetails, see,currentCursor,search]);
+    },[accountDetails, see,currentCursor,search,searchMyPostsOnly]);
 
     //clear search state when search is empty
     useEffect(() => {
@@ -137,8 +139,32 @@ export default function Timeline({
         }
     },[search]);
 
+    const onResetAccount = useCallback(() => {
+        dispatchPageAction({
+            account: account as Accounts,
+            clear: true
+        });
+        dispatchSearchAction({
+            account: account as Accounts,
+            clear: true
+        });
+    }, [account,dispatchPageAction]);
 
 
+    //clear search state when searchMyPostsOnly is toggled
+    useEffect(() => {
+        if( searchMyPostsOnly ){
+            dispatchSearchAction({
+                account: account,
+                clear: true
+            });
+        }else{
+            dispatchSearchAction({
+                account: account,
+                clear: true
+            });
+        }
+    },[searchMyPostsOnly]);
 
     const isMastodon = 'mastodon' === accountDetails?.type;
 
@@ -189,6 +215,7 @@ export default function Timeline({
 
 
     }, [pageState,searchPageState,showSearch,account]);
+
 
     const Pagination = useCallback(() => {
         const state = pageState[account];
@@ -242,6 +269,7 @@ export default function Timeline({
             <Grid>
                 <Pagination />
                 {isLoading && <Spinner />}
+                <Button onClick={onResetAccount}>Reset</Button>
             </Grid>
             {! posts || !posts.length ? (<Spinner />) : (
                 <div>
@@ -255,7 +283,7 @@ export default function Timeline({
                     ))}
                 </div>
             )}
-                        <Pagination />
+                <Pagination />
 
         </div>
     );

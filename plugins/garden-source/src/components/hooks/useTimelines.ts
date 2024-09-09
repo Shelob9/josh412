@@ -50,6 +50,9 @@ const createSelectors = (state:pageState,account:Accounts):SelectorFns => {
         if( ! state[account].statuses[index] ){
             return false;
         }
+        if( ! state[account].statuses[index].statuses ){
+            return false;
+        }
         return  state[account].statuses[index].statuses.length ? true : false;
     }
 

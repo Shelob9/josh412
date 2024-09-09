@@ -1,7 +1,8 @@
-import { mastodonAccountIdToConfig, MastodonApi } from "@app/social";
+import { blueskyDidToCongig, isValidAccontId, mastodonAccountIdToConfig, MastodonApi, tryBskyLogin } from "@app/social";
 import config from "@lib/config";
 import { Hono } from "hono";
 import { Bindings, Variables } from "../../app.types";
+import { fetchBlueskyStatusesSimple } from "./util/BlueskyStatusToSimple";
 
 const api = new Hono<{Variables: Variables,Bindings:Bindings}>();
 
@@ -22,7 +23,73 @@ api.get('/', async (c) => {
 
 });
 
-api.get('/injest/mastodon/:accountId', async (c) => {
+api.post('injest/bluesky/:did', async (c) => {
+    const did = c.req.param("did");
+    console.log({did,1:2})
+
+	if(! did) {
+		return c.json({error: 'did is required',did}, 400);
+	}
+	if( ! isValidAccontId(did,'bluesky') ){
+		return c.json({error: 'account not found'}, 404);
+	}
+	const account = blueskyDidToCongig(did);
+	if( ! account ){
+		return c.json({error: 'account not found'}, 404);
+	}
+	const cursor = c.req.query("cursor") || undefined;
+    const itemsDb = c.get('ItemsApi');
+
+	try {
+		const agent = await tryBskyLogin({
+			identifier: account?.name,
+			password: c.env.JOSH412_BSKY,
+		});
+		try {
+			const returnValue = await fetchBlueskyStatusesSimple({
+				agent: agent.agent,
+				actor: account.did,
+				cursor,
+                makeNextUri: (did,cursor) => `/api/items/injest/bluesky/${did}/?cursor=${cursor}`
+			})
+            try{
+                const items = await itemsDb.injestBluesky({statuses:returnValue.statuses});
+                if( ! items || items.length === 0) {
+                    return c.json({ err: "No items created",did,cursor });
+                }
+                return c.json({
+                    cursor: returnValue.cursor,
+                    next: returnValue.next,
+
+                    nextCursor: returnValue.nextCursor,
+                    items: items.map( i => {
+                        return {
+                            uuid: i.uuid,
+                            remoteId: i.remoteId,
+                            created: i.created,
+                        }
+                    } ),
+                    did,
+
+                });
+            }catch(e){
+                console.log(e);
+                return c.json({ err: e.message,did,cursor,1:1}, 500);
+            }
+
+		} catch (error) {
+			//console.log({error});
+			return c.json({error: 'Error1'}, 501);
+
+		}
+	} catch (error) {
+		console.log(error);
+		return c.json({error: 'Error',login:'Bsky error',2:3}, 500);
+	}
+
+});
+
+api.post('/injest/mastodon/:accountId', async (c) => {
     const accountId = c.req.param("accountId");
 	if(! accountId) {
 		return c.json({error: 'accountId is required'}, 400);

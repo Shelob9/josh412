@@ -32,11 +32,12 @@ export class MastodonApi {
     }
 
     //@see https://docs.joinmastodon.org/methods/search/
-    async search(q:string, {instanceUrl, following, account_id, token} : {
+    async search(q:string, {instanceUrl, following, account_id, token,maxId} : {
         instanceUrl?: string,
         following?: boolean,
         account_id?: string|number,
         token?: string,
+        maxId?: string,
     } = {
     }) {
         const query = new URLSearchParams({
@@ -50,6 +51,9 @@ export class MastodonApi {
         }
         if( account_id ){
             query.set('account_id',account_id.toString())
+        }
+        if( maxId ){
+            query.set('max_id',maxId)
         }
 
         const data = await fetch(`${instanceUrl ?? this.instanceUrl}/api/v2/search?${query.toString()}`,{

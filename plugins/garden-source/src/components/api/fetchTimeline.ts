@@ -31,7 +31,6 @@ function fetchTimeline({account,see,cursor,search,searchMyPostsOnly}:{
 }>{
     if( 'mastodon' === account.type ){
         let url = new URL(`${apiUrl}/search/mastodon/${account.id}`);
-        console.log({url:url.toString(),search})
         if(! search ){
             url = new URL(`${url.toString()}/statuses`);
             if( cursor ){
@@ -40,7 +39,7 @@ function fetchTimeline({account,see,cursor,search,searchMyPostsOnly}:{
         }else{
             url.searchParams.append('q',search);
             if(searchMyPostsOnly){
-                url.searchParams.append('accountId','true');
+                url.searchParams.append('accountId',account.id);
             }
         }
 
@@ -55,18 +54,23 @@ function fetchTimeline({account,see,cursor,search,searchMyPostsOnly}:{
     }
     if( 'bluesky' === account.type ){
         const isSearch = search && search.length > 3;
-        const url = isSearch ? new URL(`${apiUrl}/search/bluesky/${account.id}`) : new URL(`${apiUrl}/search/bluesky/${account.id}/${see}`);
+        let url = isSearch ? `${apiUrl}/search/bluesky/${account.id}` : `${apiUrl}/search/bluesky/${account.id}/${see}`;
+
         if( isSearch ){
-            url.searchParams.append('q',search);
+            url = `${url}?q=${search}`;
+            if(cursor){
+                url = `${url}&${cursor}`;
+            }
             if(searchMyPostsOnly){
-                url.searchParams.append('accountId','mine');
+                url = `${url}&accountId=${account.id}`;
+            }
+        }else{
+            if(cursor){
+                url = `${url}?${cursor}`;
             }
         }
-        if( cursor ){
-            url.searchParams.append('cursor',cursor);
-        }
-
-        return fetch(url.toString(),{headers})
+        console.log({url})
+        return fetch(url,{headers})
                 .then(response => response.json())
                 .then(json => {
                     console.log({json})

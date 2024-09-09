@@ -217,18 +217,20 @@ export async function searchBlueskyStatuses({
     }
 }
 
+export type Get_Bsky_Statuses_Args = {
+     //Best to use a did
+    actor: string
+    agent: BskyAgent
+    limit?: number
+    cursor?: string,
+    makeNextUri?: (did:string,cursor?:string) => string
+}
 export async function getBlueskyStatuses({
     agent,
     actor,
     limit,
     cursor,
-}: {
-    //Best to use a did
-    actor: string
-    agent: BskyAgent
-    limit?: number
-    cursor?: string
-}): Promise<{
+}: Get_Bsky_Statuses_Args): Promise<{
     statusesCursor: string | undefined;
     statuses: AppBskyFeedDefs.FeedViewPost[];
 }> {

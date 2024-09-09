@@ -1,5 +1,6 @@
 
 import { createBlock } from '@wordpress/blocks';
+import { ToggleControl } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import React, { useState } from 'react';
 import { Accounts, See } from '../types';
@@ -11,6 +12,7 @@ export default function GardenSource({search,setSearch}) {
 	const [see,setSee] = useState<See>('statuses');
 	const [account,setAccount] = useState<Accounts>('mastodonSocial');
 	const { insertBlocks } = useDispatch( 'core/block-editor' );
+    const [searchMyPostsOnly, setSearchMyPostsOnly] = useState(true);
 
 	function addBlockquote(content: string,citation: string) {
 		const block = createBlock( 'core/quote', {
@@ -38,12 +40,18 @@ export default function GardenSource({search,setSearch}) {
                         setSearch(update)
                     }}
                 />
+                {search ?
+                <ToggleControl
+                    checked={searchMyPostsOnly}
+                    onChange={() =>  setSearchMyPostsOnly(!searchMyPostsOnly)}
+                    label="Search my posts only"
+                />: null}
                 <TimelineViewToggles
                         see={see}
                         onChangeSee={(see) => setSee(see as See)}
                         account={account}
                         onChangeAccount={(update) => setAccount(update)}
-                    />
+                />
 
             </section>
             <section>
@@ -54,6 +62,7 @@ export default function GardenSource({search,setSearch}) {
                     onCopy={(content) => addParagraph(content)}
                     onQuote={(content,citation) => addBlockquote(content,citation)}
                     onChangeAccount={setAccount}
+                    searchMyPostsOnly={searchMyPostsOnly}
                 />
 
             </section>
