@@ -82,6 +82,9 @@ const createSelectors = (state:pageState,account:Accounts):SelectorFns => {
             return pageHasStatuses(index);
         },
         getCurrentCursor(): string|undefined{
+            if( ! state[account] || ! state[account].statuses[state[account].currentPage] ){
+                return undefined;
+            }
             return state[account].statuses[state[account].currentPage].cursor;
         }
     }
@@ -112,12 +115,13 @@ function pageReducer( state: pageState,action: Page_State_Actions ): pageState{
     if( 'clear' in action ){
         return {
             ...state,
-            [actionAccount]: {
+            [actionAccount]:  {
                 currentPage: 0,
                 statuses: {0: {
                     cursor: undefined,
                     statuses: []
-                }}
+                }},
+
             }
         }
     }
