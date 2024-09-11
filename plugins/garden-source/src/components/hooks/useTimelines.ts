@@ -82,6 +82,9 @@ const createSelectors = (state:pageState,account:Accounts):SelectorFns => {
             return pageHasStatuses(index);
         },
         getCurrentCursor(): string|undefined{
+            if(! state[account].statuses[state[account].currentPage] ){
+                return undefined;
+            }
             return state[account].statuses[state[account].currentPage].cursor;
         }
     }

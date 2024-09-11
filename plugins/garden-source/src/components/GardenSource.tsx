@@ -1,6 +1,6 @@
 
 import { createBlock } from '@wordpress/blocks';
-import { ToggleControl } from '@wordpress/components';
+import { TabPanel, ToggleControl } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import React, { useState } from 'react';
 import { Accounts, See } from '../types';
@@ -34,18 +34,7 @@ export default function GardenSource({search,setSearch}) {
 	return (
         <>
             <section>
-                <SearchGardern
-                    search={search}
-                    onChangeSearch={(update) => {
-                        setSearch(update)
-                    }}
-                />
-                {search ?
-                <ToggleControl
-                    checked={searchMyPostsOnly}
-                    onChange={() =>  setSearchMyPostsOnly(!searchMyPostsOnly)}
-                    label="Search my posts only"
-                />: null}
+
                 <TimelineViewToggles
                         see={see}
                         onChangeSee={(see) => setSee(see as See)}
@@ -54,18 +43,64 @@ export default function GardenSource({search,setSearch}) {
                 />
 
             </section>
-            <section>
-                <Timeline
-                    see={see}
-                    search={search}
-                    account={account}
-                    onCopy={(content) => addParagraph(content)}
-                    onQuote={(content,citation) => addBlockquote(content,citation)}
-                    onChangeAccount={setAccount}
-                    searchMyPostsOnly={searchMyPostsOnly}
-                />
+            <TabPanel
+                className="my-tab-panel"
+                activeClass="active-tab"
+                tabs={ [
+                    {
+                        name: 'timeline',
+                        title: 'Timeline',
+                        className: 'timeline-tab',
+                    },
+                    {
+                        name: 'search',
+                        title: 'Search',
+                        className: 'search-tab',
+                    },
+                ] }
+            >
+                { ( tab ) => {
+                    switch (tab.name) {
+                        case 'timeline':
+                               return <Timeline
+                                    see={see}
+                                    search={''}
+                                    account={account}
+                                    onCopy={(content) => addParagraph(content)}
+                                    onQuote={(content,citation) => addBlockquote(content,citation)}
+                                    onChangeAccount={setAccount}
+                                    searchMyPostsOnly={searchMyPostsOnly}
+                                />
+                            break;
 
-            </section>
+                        default:
+                            return <>
+                                <SearchGardern
+                                    search={search}
+                                    onChangeSearch={(update) => {
+                                        setSearch(update)
+                                    }}
+                                />
+                                {search ?
+                                <ToggleControl
+                                    checked={searchMyPostsOnly}
+                                    onChange={() =>  setSearchMyPostsOnly(!searchMyPostsOnly)}
+                                    label="Search my posts only"
+                                />: null}
+                                <Timeline
+                                    see={see}
+                                    search={search}
+                                    account={account}
+                                    onCopy={(content) => addParagraph(content)}
+                                    onQuote={(content,citation) => addBlockquote(content,citation)}
+                                    onChangeAccount={setAccount}
+                                    searchMyPostsOnly={searchMyPostsOnly}
+                                />
+                            </>
+                    }
+                } }
+            </TabPanel>
+
 
         </>
 

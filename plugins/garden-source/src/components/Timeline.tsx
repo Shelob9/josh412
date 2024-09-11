@@ -200,7 +200,6 @@ export default function Timeline({
             }));
         }
 
-        console.log({state,showSearch})
         return state.map((post:BskyPostSimple) => ({
             id: post.cid,
             content: post.text,
@@ -225,6 +224,7 @@ export default function Timeline({
         const {currentPage,statuses} = state;
         const hasPrev = 0 !== currentPage;
         const hasNext = hasNextPage();
+
         return (
 
                 <div>
@@ -234,25 +234,32 @@ export default function Timeline({
                             color={hasPrev ? 'secondary':undefined}
                             disabled={!hasPrev}
                             onClick={() => {
+                                if(! hasPrev){
+                                    return;
+                                }
                                 dispatchPageAction({
                                     account: account as Accounts,
                                     setPage: currentPage - 1
                                 });
                             }}
                         >
-                            Previous
+                            {search ? 'Previous Results ' : 'Previous'}
                         </Button>
                         <Button
+                            disabled={!hasNext}
                             variant={hasNext ? 'outline':undefined}
                             color={hasNext ? 'secondary':undefined}
                             onClick={() => {
+                                if(! hasNext){
+                                    return;
+                                }
                                 dispatchPageAction({
                                     account: account as Accounts,
                                     setPage: currentPage + 1
                                 });
                             }}
                         >
-                            Next
+                            {search ? 'More' : 'Next'}
                         </Button>
                     </ButtonGroup>
                 </div>
@@ -283,7 +290,7 @@ export default function Timeline({
                     ))}
                 </div>
             )}
-                <Pagination />
+            <Pagination />
 
         </div>
     );

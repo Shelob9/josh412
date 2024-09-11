@@ -48,7 +48,7 @@ function fetchTimeline({account,see,cursor,search,searchMyPostsOnly}:{
         })
             .then(response => response.json())
             .then(json => {
-                console.log({json})
+                console.log({mastodon:json})
                 return json;
             });
     }
@@ -73,7 +73,7 @@ function fetchTimeline({account,see,cursor,search,searchMyPostsOnly}:{
         return fetch(url,{headers})
                 .then(response => response.json())
                 .then(json => {
-                    console.log({json})
+                    console.log({bluesky:json})
                     return json;
                 });
 
