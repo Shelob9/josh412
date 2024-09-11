@@ -138,6 +138,105 @@ api.get('/mastodon/:accountId/statuses', async (c) => {
 })
 
 
+api.get('/mastodon/:accountId/likes', async (c) => {
+	const accountId = c.req.param("accountId");
+	if(! accountId) {
+		return c.json({error: 'accountId is required'}, 400);
+	}
+
+
+	let maxId = c.req.query("maxId") || undefined;
+
+	if( ! maxId ){
+		const cursor = c.req.query("cursor") || undefined;
+		//if is maxId=<cursor> get cursor
+		//UI pages by  maxId=<cursor>
+		console.log({cursor});
+		if( cursor ){
+			const parts = cursor.split('=');
+			if( parts.length === 2 ){
+				maxId = parts[1];
+			}
+		}
+	}
+	const cr = mastodonAccountIdToConfig(accountId);
+	const {instanceUrl,slug} = cr;
+	const tokens = JSON.parse(c.env.MASTODON_TOKENS);
+
+	const token = tokens[slug] ?? undefined;
+	if( ! token ){
+		return c.json({error: `Token required for search of ${slug}`}, 501);
+	}
+	const api = new MastodonApi(instanceUrl,token);
+	try {
+		const statuses = await api.getLikes({maxId});
+
+		const lastId = statuses.length ? statuses[statuses.length - 1].id : undefined;
+		return c.json({
+			maxId,
+			cursor: maxId ? `maxId=${maxId}` :undefined,
+			nextCursor:lastId ? `maxId=${lastId}` : undefined,
+			next: `${searchUrlApi}/mastodon/${accountId}/statuses?maxId=${lastId}`,
+			statuses,
+			accountId,
+		});
+	} catch (error) {
+		console.log({1:error});
+		return c.json({error: 'Could not get statuses'}, 400);
+
+	}
+})
+
+api.get('/mastodon/:accountId/timeline', async (c) => {
+	const accountId = c.req.param("accountId");
+	if(! accountId) {
+		return c.json({error: 'accountId is required'}, 400);
+	}
+
+
+	let maxId = c.req.query("maxId") || undefined;
+
+	if( ! maxId ){
+		const cursor = c.req.query("cursor") || undefined;
+		//if is maxId=<cursor> get cursor
+		//UI pages by  maxId=<cursor>
+		console.log({cursor});
+		if( cursor ){
+			const parts = cursor.split('=');
+			if( parts.length === 2 ){
+				maxId = parts[1];
+			}
+		}
+	}
+	const cr = mastodonAccountIdToConfig(accountId);
+	const {instanceUrl,slug} = cr;
+	const tokens = JSON.parse(c.env.MASTODON_TOKENS);
+
+	const token = tokens[slug] ?? undefined;
+	if( ! token ){
+		return c.json({error: `Token required for search of ${slug}`}, 501);
+	}
+
+	const api = new MastodonApi(instanceUrl, token);
+	try {
+		const statuses = await api.getTimeLine({maxId});
+
+		const lastId = statuses.length ? statuses[statuses.length - 1].id : undefined;
+		return c.json({
+			maxId,
+			cursor: maxId ? `maxId=${maxId}` :undefined,
+			nextCursor:lastId ? `maxId=${lastId}` : undefined,
+			next: `${searchUrlApi}/mastodon/${accountId}/statuses?maxId=${lastId}`,
+			statuses,
+			accountId,
+		});
+	} catch (error) {
+		console.log({1:error});
+		return c.json({error: 'Could not get statuses'}, 400);
+
+	}
+});
+
 api.get('/bluesky/:did', async (c) => {
 	const did = c.req.param("did");
 	if(! did) {

@@ -77,6 +77,20 @@ export class MastodonApi {
         return []
     }
 
+    async getLikes({
+        maxId,
+        sinceId,
+        minId,
+        limit,
+    }:{
+        maxId?: string,
+        sinceId?: string,
+        minId?: string,
+        limit?: number,
+    }) {
+        return await getLikes(this.instanceUrl,maxId,sinceId,minId,limit)
+    }
+
     async getStatuses({
         accountId,
         maxId,
@@ -99,6 +113,8 @@ export class MastodonApi {
         );
 
     }
+
+
 
     async getTimeLine({
         sinceId,
@@ -306,6 +322,50 @@ async function uploadMediaToMastdon({ attatchment, instanceUrl, token }: {
         (await mediaResponse.json()) as ImageAttachment
     return mediaData.id
 }
+
+/**
+ * Get likes
+ *
+ * @see  https://docs.joinmastodon.org/methods/favourites/#get
+ * @todo Include reblogs exclude_reblogs = false
+ */
+export async function getLikes(
+    instanceUrl: string,
+    //MAX ID: String. All results returned will be lesser than this ID. In effect, sets an upper bound on results.
+    maxId?: string,
+    //SINCE ID: String. All results returned will be greater than this ID. In effect, sets a lower bound on results.
+    sinceId?: string,
+    //MIN ID: String. Returns results immediately newer than this ID. In effect, sets a cursor at this ID and paginates forward.
+    minId?: string,
+    limit: number = 40,
+
+): Promise<Status[]> {
+    let url = `${instanceUrl}/api/v1/favourites?limit=${limit}`;
+    if (maxId) {
+        url += `&max_id=${maxId}`
+    } else if (sinceId) {
+        url += `&since_id=${sinceId}`
+    }
+    if (minId) {
+        url += `&min_id=${minId}`
+    }
+
+    const statuses = await fetch(url)
+        .then((res) => res.json())
+        .catch((err) => {
+            console.error(err)
+            return []
+        })
+    // @ts-ignore
+    if (statuses.error) {
+        // @ts-ignore
+        throw new Error(statuses.error)
+    }
+    //@ts-ignore
+    return statuses
+}
+
+
 /**
  * Get statuses
  *
@@ -532,7 +592,7 @@ export async function getMastdonTimeline({
     minId?: string
     limit?: number
 
-}) {
+}):Promise<Status[]> {
     const url = new URL(`/api/v1/timelines/home`, instanceUrl);
     const params = new URLSearchParams();
     if (sinceId) {

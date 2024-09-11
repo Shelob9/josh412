@@ -21,6 +21,8 @@ api.use("*", async (c, next) => {
     await next()
 });
 api.get("/status", (c) => c.json({ status: "ok" }));
+
+
 api.get('/status/accounts', (c) => {
     return c.json({
         accounts: config.social

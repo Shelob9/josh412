@@ -32,7 +32,7 @@ function fetchTimeline({account,see,cursor,search,searchMyPostsOnly}:{
     if( 'mastodon' === account.type ){
         let url = new URL(`${apiUrl}/search/mastodon/${account.id}`);
         if(! search ){
-            url = new URL(`${url.toString()}/statuses`);
+            url = new URL(`${url.toString()}/${see}`);
             if( cursor ){
                 url.searchParams.append('cursor',cursor);
             }
