@@ -14,9 +14,9 @@ export default function TimelineViewToggles({
 }:Omit<TimelineProps,'search'> ){
     const seeOptions = useMemo(() => {
         if( 'bluesky' === account ){
-            return ['statuses', 'likes', 'timeline'];
+            return ['statuses', 'likes'];
         }
-        return ['statuses']
+        return ['statuses', 'likes', 'timeline']
     }, [account]);
     return (
         <div>
