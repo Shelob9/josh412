@@ -139,6 +139,21 @@ export default function Timeline({
         }
     },[search]);
 
+    useEffect(() => {
+        if(! see ){
+            return;
+        }
+        console.log({see})
+        dispatchPageAction({
+            account: account as Accounts,
+            clear: true
+        });
+        dispatchSearchAction({
+            account: account as Accounts,
+            clear: true
+        });
+    },[see])
+
     const onResetAccount = useCallback(() => {
         dispatchPageAction({
             account: account as Accounts,

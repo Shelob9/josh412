@@ -27,7 +27,7 @@ export type pageState = {
     }
 }
 
-type SelectorFns = {
+export type SelectorFns = {
     pageHasStatuses: (index:number) => boolean;
     cursorHasStatuses: (cursor:string|undefined) => boolean;
     findIndexByByCursor: (cursor:string|undefined) => number;
@@ -221,10 +221,15 @@ const defaultPageState :pageState = {
         }
     };
 
-
+export type TimelineStateApi =
+    SelectorFns & {
+        pageState: pageState;
+        currentCursor: string|undefined;
+        dispatchPageAction: (action:Page_State_Actions) => void;
+    }
 function useTimelines({account}:{
     account: Accounts,
-}){
+}): TimelineStateApi {
     const [pageState,dispatchPageAction] = useReducer(pageReducer,defaultPageState);
 
     const selectors = useMemo(() => {
