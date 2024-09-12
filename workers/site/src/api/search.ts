@@ -181,7 +181,7 @@ api.get('/mastodon/:accountId/likes', async (c) => {
 			accountId,
 		});
 	} catch (error) {
-		console.log({1:error});
+		console.log({mastodonLikes:error});
 		return c.json({error: 'Could not get statuses'}, 400);
 
 	}

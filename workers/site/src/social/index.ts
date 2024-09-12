@@ -1,5 +1,4 @@
 import config from "@lib/config";
-import PosterService from "./PosterService";
 
 export interface Attatchment {
     file: R2ObjectBody
@@ -9,7 +8,6 @@ export interface Attatchment {
 export type Attatchments = Attatchment[]
 export * from "./bluesky";
 export * from "./mastodon";
-export * from "./PosterService";
 export * from "./types/bsky";
 export * from "./types/generic";
 export * from "./types/mastodon";
@@ -55,7 +53,3 @@ export function blueskyPostUriToUrl(uri:string,authorHandle:string){
     return `https://bsky.app/profile/${authorHandle}/post/${uri}`;
 
 }
-
-export {
-	PosterService
-};

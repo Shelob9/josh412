@@ -8,7 +8,7 @@
     "start": "bunx --bun vite",
     "build": "vite build",
     "server": "tsx server.ts",
-    "deploy": "wrangler deploy",
+    "deploy": "wrangler deploy --minify",
     "migrate:local": "wrangler d1 migrations apply josh412-02 --local",
     "migrate:prod": " wrangler d1 migrations apply josh412-02 --remote",
     "prisma": "prisma generate"

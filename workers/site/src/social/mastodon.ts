@@ -77,19 +77,48 @@ export class MastodonApi {
         return []
     }
 
+        /**
+     * Get likes
+     *
+     * @see  https://docs.joinmastodon.org/methods/favourites/#get
+     * @todo Include reblogs exclude_reblogs = false
+     */
     async getLikes({
+        limit,
         maxId,
         sinceId,
         minId,
-        limit,
-    }:{
-        maxId?: string,
-        sinceId?: string,
-        minId?: string,
-        limit?: number,
-    }) {
-        return await getLikes(this.instanceUrl,maxId,sinceId,minId,limit)
+    }:Mastodon_Api_Pagination): Promise<Status[]>  {
+        limit = limit ?? 40
+        let url = `${this.instanceUrl}/api/v1/favourites?limit=${limit}`;
+        if (maxId) {
+            url += `&max_id=${maxId}`
+        } else if (sinceId) {
+            url += `&since_id=${sinceId}`
+        }
+        if (minId) {
+            url += `&min_id=${minId}`
+        }
+
+        const statuses = await fetch(url,{
+            headers: this.headers()
+        })
+            .then((res) => res.json())
+            .catch((err) => {
+                console.error(err)
+                return []
+            })
+        // @ts-ignore
+        if (statuses.error) {
+            // @ts-ignore
+            throw new Error(statuses.error)
+        }
+        //@ts-ignore
+        return statuses
     }
+
+
+
 
     async getStatuses({
         accountId,
@@ -138,6 +167,19 @@ export class MastodonApi {
         }
     }
 
+    private headers(): Headers {
+        const headers = new Headers({
+
+                "Content-Type": "application/json",
+
+
+        })
+        if(this.token ){
+            headers.set('Authorization', `Bearer ${this.token}`)
+        }
+        return headers;
+    }
+
 
     async uploadMedia({
         attatchment,
@@ -149,6 +191,12 @@ export class MastodonApi {
         }));
     }
 
+    /**
+ * Create status
+ *
+ * @see https://docs.joinmastodon.org/methods/statuses/#create
+ * @see https://docs.joinmastodon.org/methods/media/
+ */
     async createStatus({
         text,
         visibility,
@@ -160,12 +208,62 @@ export class MastodonApi {
         attachments?: Attatchment[],
         postAt?: Date
     }) {
-        return await createMastodonStatus(this.args({
-            text,
-            visibility,
-            attachments,
-            postAt,
-        }));
+        if(! this.token ){
+            throw new Error('No token! createStatus requires token')
+        }
+
+        const data: {
+            status: string
+            visibility: string
+            media_ids?: string[]
+            scheduled_at?: string
+        } = {
+            status: text,
+            visibility: visibility,
+        }
+        if (attachments) {
+            const mediaIds = await Promise.all(
+                attachments.map(async (attatchment) => {
+                    try {
+                        const id = uploadMediaToMastdon(this.args({
+                            attatchment,
+                        }))
+                        return id;
+                    } catch (error) {
+                        console.log({ error })
+                        return false
+
+                    }
+                })
+            )
+            if (mediaIds.length) {
+                // @ts-ignore
+                data.media_ids = mediaIds.filter((id) => id)
+            }
+        }
+        if (postAt) {
+            data.scheduled_at = postAt.toISOString()
+        }
+        console.log({ data });
+        const statusResponse = await fetch(
+            `${this.instanceUrl}/api/v1/statuses`,
+            {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: this.headers(),
+            }
+        )
+        const statusData = await statusResponse.json() as Status;
+        if (![200, 201].includes(statusResponse.status)) {
+            //@ts-ignore
+            throw new Error(statusData.error || `Could not post`)
+        }
+        return {
+            id: statusData.id,
+            uri: statusData.uri,
+            url: statusData.url as string,
+        }
+
     }
 
     async getScheduled({
@@ -213,88 +311,6 @@ export class MastodonApi {
 
 
 }
-/**
- * Create status
- *
- * @see https://docs.joinmastodon.org/methods/statuses/#create
- * @see https://docs.joinmastodon.org/methods/media/
- */
-export async function createMastodonStatus({
-    token,
-    text,
-    instanceUrl,
-    visibility,
-    attachments,
-    postAt,
-}: {
-    token: string
-    text: string
-    instanceUrl: string
-    visibility: "public" | "unlisted" | "private" | "direct"
-    attachments?: Attatchment[],
-    postAt?: Date
-}): Promise<{
-    id: string
-    uri: string
-    url?: string
-}> {
-    const data: {
-        status: string
-        visibility: string
-        media_ids?: string[]
-        scheduled_at?: string
-    } = {
-        status: text,
-        visibility: visibility,
-    }
-    if (attachments) {
-        const mediaIds = await Promise.all(
-            attachments.map(async (attatchment) => {
-                try {
-                    const id = uploadMediaToMastdon({
-                        attatchment,
-                        instanceUrl,
-                        token,
-                    })
-                    return id;
-                } catch (error) {
-                    console.log({ error })
-                    return false
-
-                }
-            })
-        )
-        if (mediaIds.length) {
-            // @ts-ignore
-            data.media_ids = mediaIds.filter((id) => id)
-        }
-    }
-    if (postAt) {
-        data.scheduled_at = postAt.toISOString()
-    }
-    console.log({ data });
-    const statusResponse = await fetch(
-        `${instanceUrl}/api/v1/statuses`,
-        {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-        }
-    )
-    const statusData = await statusResponse.json() as Status;
-    if (![200, 201].includes(statusResponse.status)) {
-        //@ts-ignore
-        throw new Error(statusData.error || `Could not post`)
-    }
-    return {
-        id: statusData.id,
-        uri: statusData.uri,
-        url: statusData.url as string,
-    }
-}
 
 async function uploadMediaToMastdon({ attatchment, instanceUrl, token }: {
     attatchment: Attatchment,
@@ -321,48 +337,6 @@ async function uploadMediaToMastdon({ attatchment, instanceUrl, token }: {
     const mediaData =
         (await mediaResponse.json()) as ImageAttachment
     return mediaData.id
-}
-
-/**
- * Get likes
- *
- * @see  https://docs.joinmastodon.org/methods/favourites/#get
- * @todo Include reblogs exclude_reblogs = false
- */
-export async function getLikes(
-    instanceUrl: string,
-    //MAX ID: String. All results returned will be lesser than this ID. In effect, sets an upper bound on results.
-    maxId?: string,
-    //SINCE ID: String. All results returned will be greater than this ID. In effect, sets a lower bound on results.
-    sinceId?: string,
-    //MIN ID: String. Returns results immediately newer than this ID. In effect, sets a cursor at this ID and paginates forward.
-    minId?: string,
-    limit: number = 40,
-
-): Promise<Status[]> {
-    let url = `${instanceUrl}/api/v1/favourites?limit=${limit}`;
-    if (maxId) {
-        url += `&max_id=${maxId}`
-    } else if (sinceId) {
-        url += `&since_id=${sinceId}`
-    }
-    if (minId) {
-        url += `&min_id=${minId}`
-    }
-
-    const statuses = await fetch(url)
-        .then((res) => res.json())
-        .catch((err) => {
-            console.error(err)
-            return []
-        })
-    // @ts-ignore
-    if (statuses.error) {
-        // @ts-ignore
-        throw new Error(statuses.error)
-    }
-    //@ts-ignore
-    return statuses
 }
 
 
