@@ -53,3 +53,52 @@ function josh412_garden_source_block_init() {
 
 }
 add_action( 'init', 'josh412_garden_source_block_init' );
+
+add_action('wp_dashboard_setup', function ()
+{
+	// Enqueue a file built with @wordpress/scripts
+	$assets = include plugin_dir_path( __FILE__ ) . 'build/dashboard.asset.php';
+    wp_enqueue_script(
+        'custom-admin-script',
+        plugin_dir_url(__FILE__) . 'build/dashboard.js',
+        $assets['dependencies'],
+        $assets['version'],
+        true
+    );
+    global $wp_meta_boxes;
+    $wp_meta_boxes['dashboard']['normal']['core'] = array();
+    $wp_meta_boxes['dashboard']['side']['core'] = array();
+}, 9999 );
+
+
+
+
+class GardenSource{
+
+	public static function create_media_item_from_existing_file(string $filename, string $filetype, int $parent_post_id = 0) {
+			require_once( ABSPATH . 'wp-admin/includes/image.php' );
+
+
+			$wp_upload_dir = wp_upload_dir();
+			$file = $wp_upload_dir['path'] . '/' . basename( $filename );
+
+			$attachment = [
+				'file' => $file,
+				'guid'           => $wp_upload_dir['url'] . '/' . basename( $filename ),
+				'post_mime_type' => $filetype,
+				'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
+				'post_content'   => '',
+				'post_status'    => 'inherit'
+			];
+
+			$attach_id = wp_insert_attachment( $attachment, $file, $parent_post_id );
+			if($parent_post_id ){
+				$attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
+				wp_update_attachment_metadata( $attach_id, $attach_data );
+
+				set_post_thumbnail( $parent_post_id, $attach_id );
+			}
+
+			return $attachment_id;
+	}
+}
