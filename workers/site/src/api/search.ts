@@ -421,7 +421,7 @@ api.get('/search', async (c) => {
 	for(const m of config.social.mastodon){
 		routes.push({
 			name: `${m.name} ${m.instanceUrl} account details`,
-			url: c.get('makeUrl')(`/mastodon/${m.accountId}`
+			url: c.get('makeUrl')(`/mastodon/${m.accountId}`),
 		});
 		routes.push({
 			name: `${m.name} ${m.instanceUrl} statuses`,
