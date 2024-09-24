@@ -14,13 +14,24 @@ const api = new Hono<{Variables:Variables,Bindings:Bindings}>({ strict: false })
 
 api.use("*", async (c, next) => {
     const prisma = createClient(c.env.DB);
+    c.set('makeUrl', (path:string,args?:{[key:string]:string|number|undefined}) => {
+        const requestUrl = new URL(c.req.url);
+        const newUrl = new URL(`${requestUrl.protocol}//${requestUrl.host}${path}`);
+        if(args){
+            for (const key in args) {
+                newUrl.searchParams.set(key, args[key]);
+            }
+
+        }
+        return newUrl.toString();
+    });
     c.set('prisma', prisma );
     c.set('clippings', new ClippingsApi(prisma));
     c.set('classifications', new ClassificationsApi(prisma));
     c.set('ItemsApi', new ItemsApi(prisma,c.env.KV));
     await next()
 });
-api.get("/status", (c) => c.json({ status: "ok" }));
+api.get("/status", (c) => c.json({ status: "ok",url:c.get('makeUrl')('/api/status') }));
 
 
 api.get('/status/accounts', (c) => {

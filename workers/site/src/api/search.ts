@@ -82,7 +82,7 @@ api.get('/mastodon/:accountId', async (c) => {
 			maxId,
 			cursor: maxId ? `maxId=${maxId}` :undefined,
 			nextCursor:lastId ? `maxId=${lastId}` : undefined,
-			next: `${searchUrlApi}/mastodon/${accountId}/?q=${q}&maxId=${lastId}`,
+			next: c.get('makeUrl')(`/mastodon/${accountId}/`,{q,maxId:lastId}),
 			statuses,
 			accountId,
 		});
@@ -126,7 +126,7 @@ api.get('/mastodon/:accountId/statuses', async (c) => {
 			maxId,
 			cursor: maxId ? `maxId=${maxId}` :undefined,
 			nextCursor:lastId ? `maxId=${lastId}` : undefined,
-			next: `${searchUrlApi}/mastodon/${accountId}/statuses?maxId=${lastId}`,
+			next: c.get('makeUrl')(`/mastodon/${accountId}/statuses`,{maxId:lastId}),
 			statuses,
 			accountId,
 		});
@@ -176,7 +176,7 @@ api.get('/mastodon/:accountId/likes', async (c) => {
 			maxId,
 			cursor: maxId ? `maxId=${maxId}` :undefined,
 			nextCursor:lastId ? `maxId=${lastId}` : undefined,
-			next: `${searchUrlApi}/mastodon/${accountId}/statuses?maxId=${lastId}`,
+			next: c.get('makeUrl')(`/mastodon/${accountId}/statuses`,{maxId:lastId}),
 			statuses,
 			accountId,
 		});
@@ -226,7 +226,7 @@ api.get('/mastodon/:accountId/timeline', async (c) => {
 			maxId,
 			cursor: maxId ? `maxId=${maxId}` :undefined,
 			nextCursor:lastId ? `maxId=${lastId}` : undefined,
-			next: `${searchUrlApi}/mastodon/${accountId}/statuses?maxId=${lastId}`,
+			next: c.get('makeUrl')(`/mastodon/${accountId}/statuses`,{maxId:lastId}),
 			statuses,
 			accountId,
 		});
@@ -286,7 +286,7 @@ api.get('/bluesky/:did', async (c) => {
 			return c.json({
 				did,
 				cursor: cursor ? `cursor=${cursor}`:undefined,
-				next: `${searchUrlApi}/bluesky/${did}/statuses?cursor=${statuses.statusesCursor}`,
+				next: c.get('makeUrl')(`/bluesky/${did}/statuses`,{cursor:statuses.statusesCursor}),
 				nextCursor:statuses.statusesCursor ? `cursor=${statuses.statusesCursor}`:undefined,
 				statuses:	simpled
 
@@ -369,7 +369,7 @@ api.get('/bluesky/:did/likes', async (c) => {
 			return c.json({
 				did,
 				cursor: cursor ? `cursor=${cursor}`:undefined,
-				next: `${searchUrlApi}/bluesky/${did}/likes?cursor=${statuses.likesCursor}`,
+				next: c.get('makeUrl')(`/bluesky/${did}/likes`,{cursor:statuses.likesCursor}),
 				nextCursor:statuses.likesCursor ? `cursor=${statuses.likesCursor}`:undefined,
 				statuses: returnStatuses
 
@@ -421,25 +421,25 @@ api.get('/search', async (c) => {
 	for(const m of config.social.mastodon){
 		routes.push({
 			name: `${m.name} ${m.instanceUrl} account details`,
-			url: `${searchUrlApi}/mastodon/${m.accountId}`
+			url: c.get('makeUrl')(`/mastodon/${m.accountId}`
 		});
 		routes.push({
 			name: `${m.name} ${m.instanceUrl} statuses`,
-			url: `${searchUrlApi}/mastodon/${m.accountId}/statuses`
+			url: c.get('makeUrl')(`/mastodon/${m.accountId}/statuses`),
 		});
 	}
 	for(const b of config.social.bluesky){
 		routes.push({
 			name: `${b.name} ${b.did} account details`,
-			url: `${searchUrlApi}/bluesky/${b.did}`
+			url: c.get('makeUrl')(`/bluesky/${b.did}`),
 		});
 		routes.push({
 			name: `${b.name} ${b.did} statuses`,
-			url: `${searchUrlApi}/bluesky/${b.did}/statuses`
+			url: c.get('makeUrl')(`/bluesky/${b.did}/statuses`),
 		});
 		routes.push({
 			name: `${b.name} ${b.did} likes`,
-			url: `${searchUrlApi}/bluesky/${b.did}/likes`
+			url: c.get('makeUrl')(`/bluesky/${b.did}/likes`),
 		});
 	}
 	return c.json({routes});

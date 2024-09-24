@@ -1,5 +1,4 @@
 import { blueskyDidToCongig, isValidAccontId, mastodonAccountIdToConfig, MastodonApi, tryBskyLogin } from "@app/social";
-import config from "@lib/config";
 import { Hono } from "hono";
 import { Bindings, Variables } from "../../app.types";
 import { fetchBlueskyStatusesSimple } from "./util/BlueskyStatusToSimple";
@@ -25,7 +24,6 @@ api.get('/', async (c) => {
 
 api.post('injest/bluesky/:did', async (c) => {
     const did = c.req.param("did");
-    console.log({did,1:2})
 
 	if(! did) {
 		return c.json({error: 'did is required',did}, 400);
@@ -50,7 +48,7 @@ api.post('injest/bluesky/:did', async (c) => {
 				agent: agent.agent,
 				actor: account.did,
 				cursor,
-                makeNextUri: (did,cursor) => `/api/items/injest/bluesky/${did}/?cursor=${cursor}`
+                makeNextUri: (did,cursor) => c.get('makeUrl')(`/api/items/injest/bluesky/${did}`,{cursor}),
 			})
             try{
                 const items = await itemsDb.injestBluesky({statuses:returnValue.statuses});
@@ -109,7 +107,7 @@ api.post('/injest/mastodon/:accountId', async (c) => {
                 const items = await itemsDb.injestMastodon({statuses});
                 return c.json({
                     maxId,
-                    next: `${config.uri}/api/items/injest/mastodon/${accountId}?maxId=${lastId}`,
+                    next: c.get('makeUrl')(`/api/items/injest/mastodon/${accountId}`,{maxId:lastId}),
                     cursor:`maxId=${lastId}`,
                     items: items.map( i => {
                         return {
@@ -229,7 +227,7 @@ api.post('/', async (c) => {
         };
         //@todo: validate body
         const uuid = await itemsDb.create(body);
-        return c.json({ route,uuid,get: `/api/items/${uuid}` });
+        return c.json({ route,uuid,get: c.get('makeUrl')(`/api/items/${uuid}`) });
     } catch (e) {
         return c.json({ err: e.message,route }, 500);
     }

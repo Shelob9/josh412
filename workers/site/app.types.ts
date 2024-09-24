@@ -17,6 +17,8 @@ import { Hono } from "hono";
     classifications: ClassificationsApi
     ItemsApi: ItemsApi
     prisma: PrismaClient
+    makeUrl:(path:string,args?:{[key:string]:string|number|undefined}) => string
+
   }
 
   export type honoType =  Hono<{ Bindings: Bindings,Variables:Variables }>;
