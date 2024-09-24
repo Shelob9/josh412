@@ -1,6 +1,6 @@
-import { useMemo, useReducer } from 'react';
+import { useMemo } from 'react';
 import { Accounts, See } from "../../types";
-import { createSelectors, defaultPageState, Page_State_Actions, pageReducer, TimelineStateApi } from "./useTimelines";
+import useTimelines, { Page_State_Actions, SelectorFns, TimelineStateApi } from "./useTimelines";
 type AccountReducers = {
     search: TimelineStateApi;
     statuses:TimelineStateApi;
@@ -8,33 +8,72 @@ type AccountReducers = {
     timeline: TimelineStateApi;
 }
 
-
+type Reducers = {
+    mastodonSocial: AccountReducers;
+    fosstodon: AccountReducers;
+    bluesky: AccountReducers;
+}
 export default function useSearchApis(){
-    const reducers = useMemo(() => {
+
+
+    const reducers  = useMemo<Reducers>(() => {
         return {
-            timelines: useReducer(pageReducer,defaultPageState),
-            likes : useReducer(pageReducer,defaultPageState),
-            statuses : useReducer(pageReducer,defaultPageState),
-            search : useReducer(pageReducer,defaultPageState),
+            mastodonSocial: {
+                search: useTimelines({account:'mastodonSocial'}),
+                statuses: useTimelines({account:'mastodonSocial'}),
+                likes: useTimelines({account:'mastodonSocial'}),
+                timeline: useTimelines({account:'mastodonSocial'}),
+            },
+            fosstodon: {
+                search: useTimelines({account:'fosstodon'}),
+                statuses: useTimelines({account:'fosstodon'}),
+                likes: useTimelines({account:'fosstodon'}),
+                timeline: useTimelines({account:'fosstodon'}),
+
+            },
+            bluesky: {
+               search: useTimelines({account:'bluesky'}),
+                statuses: useTimelines({account:'bluesky'}),
+                likes: useTimelines({account:'bluesky'}),
+                timeline: useTimelines({account:'bluesky'}),
+            }
         }
     },[]);
 
-
-    function dispatchAction({action,type}:{
+    function dispatchAction({action,account,type}:{
         action:Page_State_Actions;
+        account:Accounts
         type: See|'search',
     }){
-        return reducers[type][1](action);
+        return reducers[account][type].dispatchPageAction(action);
     }
 
+    function getState({account,type}:{
+        account:Accounts
+        type: See|'search',
+    }){
+        return reducers[account][type].pageState;
+    }
 
+    function selectors({account,type}): SelectorFns{
+        const { pageHasStatuses, cursorHasStatuses, findIndexByByCursor, hasNextPage, hasPage, hasPageByCursor, getCurrentCursor } = reducers[account][type];
+        return {
+            pageHasStatuses,
+            cursorHasStatuses,
+            findIndexByByCursor,
+            hasNextPage,
+            hasPage,
+            hasPageByCursor,
+            getCurrentCursor
+        }
+    }
 
+    function getPage({account,type}:{account:Accounts,type:See|'search',}):number{
+        return this.getState({account,type}).currentPage;
+    }
 
-
-    function select({ account, type }: { account: Accounts; type: See|'search', }) {
-        const state=  reducers[type][0];
-        console.log({state,account, type})
-        const selectorFns = createSelectors(state, account);
+    function select({ account, type }: { account: string; type: string }) {
+        const selectorFns = selectors({ account, type });
 
         return {
             hasPage: (page: number) => selectorFns.hasPage(page),
@@ -44,16 +83,15 @@ export default function useSearchApis(){
             pageHasStatuses: (index: number) => selectorFns.pageHasStatuses(index),
             cursorHasStatuses: (cursor: string) => selectorFns.cursorHasStatuses(cursor),
             findIndexByByCursor: (cursor: string) => selectorFns.findIndexByByCursor(cursor),
-            getStatuses: () => {
-                const page = state[account].currentPage;
-                return state[account].statuses[page]?.statuses;
-            }
+
 
         };
     }
 
     return {
         dispatchAction,
+        getState,
         select,
+        getPage
     }
 }

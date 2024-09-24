@@ -8,9 +8,11 @@ import { Button } from 'react-daisyui';
 import { accounts } from '../accounts';
 import { Accounts, See } from '../types';
 import fetchTimeline from './api/fetchTimeline';
-import useSearchApis from './hooks/useSearchApis';
+import { BskyPostSimple } from './bluesky';
+import { pageState } from './hooks/useTimelines';
 import useTimeLinesWithSearch from './hooks/useTimelinesWithSearch';
 import TimelinePost, { Timeline_Post } from './TimelinePost';
+
 export type TimelineProps = {
     see: See;
     search: string;
@@ -49,37 +51,20 @@ export default function Timeline({
 }:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps&{
     searchMyPostsOnly:boolean
 }){
-    const {
-        dispatchAction,
-        select,
-
-    } = useSearchApis();
-    const isSearch = useMemo(() => search && search.length >2, [search]);
-    const type = isSearch ? 'search' : see;
     const [lastSearch, setLastSearch] = useState('');
     const showSearch = useMemo(() => {
         return search && search.length > 2;
     }, [search]);
-
-    const cursorHasStatuses = useCallback((cursor:string|undefined) => {
-        return select({account,type}).cursorHasStatuses(cursor);
-    }, [select,account,type]);
-
-    const hasNextPage = useCallback(() => {
-        return select({account,type}).hasNextPage();
-    }, [select,account,type]);
-
-    const currentCursor = useMemo(() => {
-        return select({account,type}).getCurrentCursor();
-    }, [select,account,type]);
-
     const{
+        cursorHasStatuses,
+        hasNextPage,
 
         pageState,
+        currentCursor,
         dispatchPageAction,
         dispatchSearchAction,
         currentSearchCursor,
-
+        searchCursorHasStatuses,
 
         searchPageState,
 
@@ -95,8 +80,17 @@ export default function Timeline({
         if( ! accountDetails ){
             return;
         }
-        if( cursorHasStatuses(currentCursor) ){
-            return;
+        const isSearch = !! search;
+        if( isSearch ){
+            if( searchCursorHasStatuses(currentSearchCursor) ){
+                return;
+            }
+
+        }else{
+
+            if( cursorHasStatuses(currentCursor) ){
+                return;
+            }
         }
 
         setIsLoading(true);
@@ -115,14 +109,11 @@ export default function Timeline({
                     statuses: r.statuses
                 });
             }else{
-                dispatchAction({
-                    action:{
-                        account: account,
-                        newCursor: r.cursor,
-                        nextCursor: r.nextCursor,
-                        statuses: r.statuses
-                    },
-                    type
+                dispatchPageAction({
+                    account: account,
+                    newCursor: r.cursor,
+                    nextCursor: r.nextCursor,
+                    statuses: r.statuses
                 });
             }
 
@@ -141,47 +132,38 @@ export default function Timeline({
         }
         if( lastSearch !== search ){
             setLastSearch(search);
-            dispatchAction({
-                action: {
-                    account: account,
-                    clear: true
-                },
-                type,
+            dispatchSearchAction({
+                account: account,
+                clear: true
             });
         }
-    },[search,dispatchSearchAction,dispatchAction,account,type,lastSearch]);
+    },[search]);
 
     useEffect(() => {
         if(! see ){
             return;
         }
         console.log({see})
-        dispatchAction({
-            action: {
-                account: account,
-                clear: true
-            },
-            type,
+        dispatchPageAction({
+            account: account as Accounts,
+            clear: true
         });
         dispatchSearchAction({
             account: account as Accounts,
             clear: true
         });
-    },[see,dispatchAction,dispatchSearchAction,account,type]);
+    },[see])
 
     const onResetAccount = useCallback(() => {
-        dispatchAction({
-            action: {
-                account: account,
-                clear: true
-            },
-            type,
+        dispatchPageAction({
+            account: account as Accounts,
+            clear: true
         });
         dispatchSearchAction({
             account: account as Accounts,
             clear: true
         });
-    }, [account,dispatchAction,dispatchSearchAction,type]);
+    }, [account,dispatchPageAction]);
 
 
     //clear search state when searchMyPostsOnly is toggled
@@ -202,11 +184,51 @@ export default function Timeline({
     const isMastodon = 'mastodon' === accountDetails?.type;
 
     const posts = useMemo<Timeline_Post[]>(() => {
-        return select({account,type}).getStatuses();
+        const getPage = (state:pageState) =>state[account].currentPage
+        const getState = (state:pageState) => state[account].statuses[page]?.statuses;
+        const page = getPage(showSearch ? searchPageState : pageState);
+        const state = getState(showSearch ? searchPageState : pageState);
+        if( ! state ){
+            return [];
+        }
+        if( isMastodon ){
+
+            return state.map((post) => ({
+                id: post.id,
+                postUrl: post.url,
+                content: post.content,
+                createdAt: post.created_at,
+                postAuthor: {
+                    url: post.account.url,
+                    displayName: post.account.display_name,
+                    avatar: post.account.avatar
+                },
+                reply: post.reblog ? {
+                    url: post.reblog.url
+                } : undefined,
+                medias: post.media_attachments?.map((media) => ({
+                    id: media.id,
+                    preview_url: media.preview_url,
+                    url: media.url,
+                    description: media.description
+                }))
+            }));
+        }
+
+        return state.map((post:BskyPostSimple) => ({
+            id: post.cid,
+            content: post.text,
+            postAuthor: post.author,
+            createdAt: post.createdAt,
+            postUrl: postUriToUrl(post.uri,post.author.handle),
+            reply: post.reply ? {
+                url: postUriToUrl(post.reply.uri,post.reply.author.handle)
+            } : undefined,
+            medias: post.images ? post.images : undefined
+        }));
 
 
-
-    }, [select,account,type]);
+    }, [pageState,searchPageState,showSearch,account]);
 
 
     const Pagination = useCallback(() => {

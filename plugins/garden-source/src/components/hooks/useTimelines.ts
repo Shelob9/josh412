@@ -2,17 +2,29 @@ import { useMemo, useReducer } from 'react';
 import { Accounts } from '../../types';
 import { BskyPostSimple } from '../bluesky';
 
-export type AccountPageState<T> = {
-    currentPage: 0,
-    statuses: {[key: number]: {
-        cursor?: string|undefined;
-        statuses: T[]
-    }},
-}
+
 export type pageState = {
-    mastodonSocial:AccountPageState<any>;
-    fosstodon: AccountPageState<any>;
-    bluesky: AccountPageState<BskyPostSimple>;
+    mastodonSocial: {
+        currentPage: 0,
+        statuses: {[key: number]: {
+            cursor?: string|undefined;
+            statuses: any[];
+        }},
+    },
+    fosstodon: {
+        currentPage: 0,
+        statuses: {[key: number]: {
+            cursor?: string|undefined;
+            statuses: any[];
+        }},
+    },
+    bluesky: {
+        currentPage: 0,
+        statuses: {[key: number]: {
+            cursor?: string|undefined;
+            statuses: BskyPostSimple[];
+        }},
+    }
 }
 
 export type SelectorFns = {
@@ -24,7 +36,7 @@ export type SelectorFns = {
     hasPageByCursor: (cursor:string|undefined) => boolean;
     getCurrentCursor: () => string|undefined;
 }
-export const createSelectors = (state:pageState,account:Accounts):SelectorFns => {
+const createSelectors = (state:pageState,account:Accounts):SelectorFns => {
 
     const findIndexByByCursor = (cursor:string|undefined): number =>{
         if( undefined === cursor ){
@@ -98,7 +110,7 @@ export type Page_State_Actions = {
     clear: true;
 };
 
-export function pageReducer( state: pageState,action: Page_State_Actions ): pageState{
+function pageReducer( state: pageState,action: Page_State_Actions ): pageState{
     const actionAccount = action.account as string;
     if( 'clear' in action ){
         return {
@@ -184,7 +196,7 @@ export function pageReducer( state: pageState,action: Page_State_Actions ): page
 
 
 
-export const defaultPageState :pageState = {
+const defaultPageState :pageState = {
 
         mastodonSocial: {
             currentPage: 0,
