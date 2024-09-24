@@ -1,11 +1,13 @@
 
-import { TabPanel, ToggleControl } from '@wordpress/components';
+import { SelectControl, TabPanel, ToggleControl } from '@wordpress/components';
 import React, { useState } from 'react';
+import { accountOptions } from '../accounts';
 import { Accounts, See } from '../types';
+import useDebouncedValue from './hooks/useDebouncedValue';
+import Injest from './Injest';
 import { SearchGardern } from './SearchGarden';
 import Timeline from './Timeline';
 import TimelineViewToggles from './TimelineViewToggles';
-import useDebouncedValue from './hooks/useDebouncedValue';
 
 export default function Dashboard() {
     const [search,setSearch] = useDebouncedValue<string>('',300);
@@ -28,15 +30,7 @@ export default function Dashboard() {
     }, [account]);
 	return (
         <>
-            <section>
-                <TimelineViewToggles
-                        see={see}
-                        onChangeSee={(see) => setSee(see as See)}
-                        account={account}
-                        onChangeAccount={(update) => setAccount(update)}
-                />
 
-            </section>
             <TabPanel
                 className="my-tab-panel"
                 activeClass="active-tab"
@@ -47,49 +41,80 @@ export default function Dashboard() {
                         className: 'timeline-tab',
                     },
                     {
-                        name: 'search',
-                        title: 'Search',
-                        className: 'search-tab',
+                        name:'items',
+                        title: 'Items',
+                        className: 'items-tab',
+                    },
+                    {
+                        name: 'injest',
+                        title: 'Injest',
+                        className: 'injest-tab',
                     },
                 ] }
             >
                 { ( tab ) => {
                     switch (tab.name) {
                         case 'timeline':
-                               return <Timeline
-                                    see={see}
-                                    search={''}
-                                    account={account}
-                                    onCopy={(content) => addParagraph(content)}
-                                    onQuote={(content,citation) => addBlockquote(content,citation)}
-                                    onChangeAccount={setAccount}
-                                    searchMyPostsOnly={searchMyPostsOnly}
-                                />
+                               return (
+                                    <>
+                                        <SearchGardern
+                                            search={search}
+                                            onChangeSearch={(update) => {
+                                                setSearch(update)
+                                            }}
+                                        />
+                                        {search ?
+                                        <ToggleControl
+                                            checked={searchMyPostsOnly}
+                                            onChange={() =>  setSearchMyPostsOnly(!searchMyPostsOnly)}
+                                            label="Search my posts only"
+                                        />: <TimelineViewToggles
+                                            see={see}
+                                            onChangeSee={(see) => setSee(see as See)}
+                                            account={account}
+                                            onChangeAccount={(update) => setAccount(update)}
+                                        />}
+                                        <Timeline
+                                                see={see}
+                                                search={search}
+                                                account={account}
+                                                onCopy={(content) => addParagraph(content)}
+                                                onQuote={(content,citation) => addBlockquote(content,citation)}
+                                                onChangeAccount={setAccount}
+                                                searchMyPostsOnly={searchMyPostsOnly}
+                                        />
+                                    </>
+                               )
                             break;
+                            case"items":
+                                return (
+                                    <div>
+                                    <SelectControl
+                                        label="Account"
+                                        value={account}
+                                        options={accountOptions}
+                                        onChange={(update) => setAccount(update as Accounts)}
+                                    />
+                                    Items
 
+                                </div>
+                                )
+                        case 'injest':
                         default:
                             return <>
-                                <SearchGardern
-                                    search={search}
-                                    onChangeSearch={(update) => {
-                                        setSearch(update)
-                                    }}
-                                />
-                                {search ?
-                                <ToggleControl
-                                    checked={searchMyPostsOnly}
-                                    onChange={() =>  setSearchMyPostsOnly(!searchMyPostsOnly)}
-                                    label="Search my posts only"
-                                />: null}
-                                <Timeline
-                                    see={see}
-                                    search={search}
-                                    account={account}
-                                    onCopy={(content) => addParagraph(content)}
-                                    onQuote={(content,citation) => addBlockquote(content,citation)}
-                                    onChangeAccount={setAccount}
-                                    searchMyPostsOnly={searchMyPostsOnly}
-                                />
+                                <div>
+                                    <SelectControl
+                                        label="Account"
+                                        value={account}
+                                        options={accountOptions}
+                                        // @ts-ignore
+                                        onChange={(update) => setAccount(update)}
+                                    />
+                                    <Injest
+                                        account={account}
+                                    />
+
+                                </div>
                             </>
                     }
                 } }

@@ -22,6 +22,25 @@ api.get('/', async (c) => {
 
 });
 
+api.get('/search', async (c) => {
+    const query = c.req.query("q");
+    const itemsDb = c.get('ItemsApi');
+    const route = 'GET /items/search';
+    if( ! query) {
+        return c.json({ err: "q is required",route });
+    }
+    try {
+        const items = await itemsDb.search({
+            query,
+            page: 1,
+            perPage:25
+        });
+        return c.json({ items,route });
+    } catch (e) {
+        return c.json({ err: e.message,route }, 500);
+    }
+});
+
 api.post('injest/bluesky/:did', async (c) => {
     const did = c.req.param("did");
 

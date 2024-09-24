@@ -312,7 +312,22 @@ export default class ItemsApi {
     }
 
 
+    async search({query,page,perPage}:{
 
+        query: string,
+        page: number,
+        perPage: number
+    }) {
+        const items = await this.prisma.item.findMany({
+            where: {
+                content: {
+                    contains: query
+                }
+            },
+            ...this.argsToSkipTake({page,perPage})
+        });
+        return items;
+    }
 
     async all(args: Pagignation): Promise<Item[]> {
 
