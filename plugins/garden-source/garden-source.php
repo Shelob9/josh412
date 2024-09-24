@@ -56,15 +56,24 @@ add_action( 'init', 'josh412_garden_source_block_init' );
 
 add_action('wp_dashboard_setup', function ()
 {
-	// Enqueue a file built with @wordpress/scripts
+	$handle = 'gardensource-dashboard';
+
 	$assets = include plugin_dir_path( __FILE__ ) . 'build/dashboard.asset.php';
     wp_enqueue_script(
-        'custom-admin-script',
+        $handle,
         plugin_dir_url(__FILE__) . 'build/dashboard.js',
         $assets['dependencies'],
         $assets['version'],
         true
     );
+	wp_localize_script(
+		$handle,
+		'GARDEN',
+		[
+			'token' => defined('JOSH412_SECRET_TOKEN') ? JOSH412_SECRET_TOKEN : '12345',
+			'apiUrl' => defined('JOSH412_API_URL') ? JOSH412_API_URL : 'https://josh412.com/api'
+		]
+	);
     global $wp_meta_boxes;
     $wp_meta_boxes['dashboard']['normal']['core'] = array();
     $wp_meta_boxes['dashboard']['side']['core'] = array();
