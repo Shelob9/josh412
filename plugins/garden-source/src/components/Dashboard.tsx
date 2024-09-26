@@ -5,6 +5,7 @@ import { accountOptions } from '../accounts';
 import { Accounts, See } from '../types';
 import useDebouncedValue from './hooks/useDebouncedValue';
 import Injest from './Injest';
+import Items from './Items';
 import { SearchGardern } from './SearchGarden';
 import Timeline from './Timeline';
 import TimelineViewToggles from './TimelineViewToggles';
@@ -28,11 +29,26 @@ export default function Dashboard() {
     React.useEffect(() => {
         setSearch('');
     }, [account]);
+
+    //add style sheet to document
+    React.useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = `
+            .gs-tab-panel .active-tab {
+                border-bottom:1px solid black;
+        }
+        `;
+        document.head.appendChild(style);
+        return () => {
+            document.head.removeChild(style);
+        }
+    }, []);
 	return (
         <>
 
+
             <TabPanel
-                className="my-tab-panel"
+                className="gs-tab-panel"
                 activeClass="active-tab"
                 tabs={ [
                     {
@@ -95,7 +111,7 @@ export default function Dashboard() {
                                         options={accountOptions}
                                         onChange={(update) => setAccount(update as Accounts)}
                                     />
-                                    Items
+                                    <Items account={account} />
 
                                 </div>
                                 )

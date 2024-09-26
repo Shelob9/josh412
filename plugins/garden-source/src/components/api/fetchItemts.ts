@@ -1,3 +1,4 @@
+import { Accounts } from "../../types";
 import { AccountDetailsMinimal } from "../Timeline";
 
 const  { apiUrl,token } : {
@@ -32,6 +33,12 @@ export function fetchInjestItems({account,cursor,}:{
 
     let url = new URL(`${apiUrl}/items/injest/${account.type}/${account.id}`);
     if( cursor ){
+        if( cursor.includes('?')){
+            url = new URL(`${apiUrl}/items/injest/${account.type}/${account.id}${cursor}`);
+        }else if (cursor.includes('cursor=')){
+            url = new URL(`${apiUrl}/items/injest/${account.type}/${account.id}?${cursor}`);
+
+        }
         url.searchParams.append('cursor',cursor);
     }
 
@@ -41,25 +48,39 @@ export function fetchInjestItems({account,cursor,}:{
     })
         .then(response => response.json())
         .then(json => {
+            if( 'mastodon' === account.type ){
+                return {
+                    nextCursor: json.cursor,
+                    items:json.items
+                }
+            }
             console.log({json})
             return json;
         });
 }
-export default function fetchItems({page,perPage,search}:{
+export default function fetchItems({page,perPage,search,sourceType}:{
 
     page?:number,
     perPage?:number,
-    search?:string
+    search?:string,
+    sourceType?:Accounts
 }): Promise<{
     statuses: any[];
     nextCursor?: string;
     cursor?: string;
     search?: string;
 }>{
-    let url = new URL(`${apiUrl}/items${search ? '/search' : ''}`);
+    let url = new URL(`${apiUrl}/items`);
+
+    if( sourceType ){
+        url = new URL(`${apiUrl}/items/sourcetype/${sourceType}`);
+    }else if (search){
+        url = new URL(`${apiUrl}/items/search`);
+    }
     if( search ){
         url.searchParams.append('q',search);
     }
+
     if( page ){
         url.searchParams.append('page',page.toString());
     }
@@ -71,7 +92,13 @@ export default function fetchItems({page,perPage,search}:{
     })
         .then(response => response.json())
         .then(json => {
-            console.log({json})
+            if('items' in json){
+                return {
+                    ...json,
+                    statuses: json.items,
+
+                }
+            }
             return json;
         });
 

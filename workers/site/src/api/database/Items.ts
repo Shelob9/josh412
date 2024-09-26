@@ -310,30 +310,28 @@ export default class ItemsApi {
         return items;
     }
 
-    async all(args: Pagignation): Promise<Item[]> {
-
-        const items = await this.prisma.item.findMany(
-            {
-                    ...this.argsToSkipTake(args)
-
-            }
-        );
-        return items as Item[];
-    }
-
-    async allBySource (args: Pagignation&{
-        source: string
+    async all(args: Pagignation&{
+        source?: string,
+        sourceType?: string
     }): Promise<Item[]> {
+        let where = undefined;
+        if(args.source || args.sourceType){
+            where = {
+                source: args.source,
+                sourceType: args.sourceType
+            }
+        }
+
         const items = await this.prisma.item.findMany(
             {
                     ...this.argsToSkipTake(args),
-                    where: {
-                        source: args.source
-                    }
+                    where
+
             }
         );
         return items as Item[];
     }
+
     async allByType(args: Pagignation&{
         sourceType: string
     }): Promise<Item[]> {

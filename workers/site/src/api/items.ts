@@ -6,14 +6,25 @@ import { fetchBlueskyStatusesSimple } from "./util/BlueskyStatusToSimple";
 const api = new Hono<{Variables: Variables,Bindings:Bindings}>();
 
 
+const numberArg = (req:HonoRequest,key:string) => {
+    if( ! req.query(key)){
+        return undefined;
+    }
+    return parseInt(req.query(key) as string);
+}
 api.get('/', async (c) => {
     const route = 'GET /items';
     const itemsDb = c.get('ItemsApi');
 
+    const source = c.req.query('source') || undefined;
+    const sourceType = c.req.query('sourceType') || undefined;
+
     try {
         const items = await itemsDb.all({
-            page: 1,
-            perPage:25
+            page: numberArg(c.req,'page'),
+            perPage:numberArg(c.req,'perPage'),
+            source,
+            sourceType,
         });
         return c.json({ items,route });
    } catch (e) {
@@ -23,14 +34,14 @@ api.get('/', async (c) => {
 });
 
 api.get('/sourcetype/:sourceType', async (c) => {
-    const sourceType = c.req.param('sourceType');
-    const route = 'GET /items';
     const itemsDb = c.get('ItemsApi');
+    const sourceType = c.req.param('sourceType');
+    const route = 'GET /items/sourcetype/:sourceType';
 
     try {
-        const items = await itemsDb.allByType({
-            page: 1,
-            perPage:25,
+        const items = await itemsDb.all({
+            page: numberArg(c.req,'page'),
+            perPage:numberArg(c.req,'perPage'),
             sourceType,
         });
         return c.json({ items,route });
@@ -42,13 +53,14 @@ api.get('/sourcetype/:sourceType', async (c) => {
 
 api.get('/source/:source', async (c) => {
     const source = c.req.param('source');
-    const route = 'GET /items';
+
+    const route = 'GET /items/source/:source';
     const itemsDb = c.get('ItemsApi');
 
     try {
-        const items = await itemsDb.allBySource({
-            page: 1,
-            perPage:25,
+        const items = await itemsDb.all({
+            page: numberArg(c.req,'page'),
+            perPage:numberArg(c.req,'perPage'),
             source,
         });
         return c.json({ items,route });
@@ -68,8 +80,8 @@ api.get('/search', async (c) => {
     try {
         const items = await itemsDb.search({
             query,
-            page: 1,
-            perPage:25
+            page: numberArg(c.req,'page'),
+            perPage:numberArg(c.req,'perPage'),
         });
         return c.json({ items,route });
     } catch (e) {
