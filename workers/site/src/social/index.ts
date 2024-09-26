@@ -30,13 +30,13 @@ export function mastodonAccountIdToConfig(accountId: string):{
 	name: string,
 	instanceUrl: string,
 	accountId: string,
-	slug: string,
+	slug: 'mastodonSocial'|'fosstodon',
 } {
 	return config.social.mastodon.find( a => a.accountId === accountId) as {
 		name: string,
 		instanceUrl: string,
 		accountId: string,
-		slug: string,
+		slug: 'mastodonSocial'|'fosstodon',
 	};
 
 

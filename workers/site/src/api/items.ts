@@ -22,6 +22,42 @@ api.get('/', async (c) => {
 
 });
 
+api.get('/sourcetype/:sourceType', async (c) => {
+    const sourceType = c.req.param('sourceType');
+    const route = 'GET /items';
+    const itemsDb = c.get('ItemsApi');
+
+    try {
+        const items = await itemsDb.allByType({
+            page: 1,
+            perPage:25,
+            sourceType,
+        });
+        return c.json({ items,route });
+   } catch (e) {
+     return c.json({ err: e.message,route }, 500);
+   }
+
+});
+
+api.get('/source/:source', async (c) => {
+    const source = c.req.param('source');
+    const route = 'GET /items';
+    const itemsDb = c.get('ItemsApi');
+
+    try {
+        const items = await itemsDb.allBySource({
+            page: 1,
+            perPage:25,
+            source,
+        });
+        return c.json({ items,route });
+   } catch (e) {
+     return c.json({ err: e.message,route }, 500);
+   }
+
+});
+
 api.get('/search', async (c) => {
     const query = c.req.query("q");
     const itemsDb = c.get('ItemsApi');
@@ -113,7 +149,7 @@ api.post('/injest/mastodon/:accountId', async (c) => {
 	}
 	const maxId = c.req.query("maxId") || undefined;
 	try {
-        const {instanceUrl} = mastodonAccountIdToConfig(accountId);
+        const {instanceUrl,slug} = mastodonAccountIdToConfig(accountId);
         const itemsDb = c.get('ItemsApi');
         const api = new MastodonApi(instanceUrl);
         try {
@@ -123,7 +159,7 @@ api.post('/injest/mastodon/:accountId', async (c) => {
             }
             const lastId = statuses[statuses.length - 1].id;
             try {
-                const items = await itemsDb.injestMastodon({statuses});
+                const items = await itemsDb.injestMastodon({statuses,source:slug});
                 return c.json({
                     maxId,
                     next: c.get('makeUrl')(`/api/items/injest/mastodon/${accountId}`,{maxId:lastId}),
@@ -180,27 +216,6 @@ api.get('/sources', async (c) => {
         return c.json({ err: e.message,route }, 500);
     }
 });
-api.get('/sources/:sourceId', async (c) => {
-    const sourceId = c.req.param('sourceId');
-    const itemsDb = c.get('ItemsApi');
-    const route = 'GET /items/:sourceUuid';
-    if( ! sourceId) {
-        return c.json({ err: "sourceUuid is required",route,sourceUuid });
-    }
-    try {
-        const items = await itemsDb.getBySourceUuid({
-            page: 1,
-            perPage:25,
-            sourceId
-        });
-        if( ! items) {
-            return c.json({ err: "No items found",route,sourceId });
-        }
-        return c.json({ items,route,sourceId });
-    } catch (e) {
-        return c.json({ err: e.message,route,sourceId }, 500);
-    }
-})
 
 api.get('/:uuid', async (c) => {
     const uuid = c.req.param('uuid');

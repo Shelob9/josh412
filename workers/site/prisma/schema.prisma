@@ -31,35 +31,30 @@ model Classification {
   @@index([item_type])
 }
 
-model Source {
-  uuid          String         @id @default(uuid())
-  //enum of mastodon|bluesky|wordpress
-  type          String
-  url           String
-  RemoteAuthors RemoteAuthor[]
-  Items         Item[]
-}
-
-model RemoteAuthor {
-  uuid              String  @id @default(uuid())
-  source            Source  @relation(fields: [sourceId], references: [uuid])
-  sourceId          String
-  remoteId          String
-  remoteHandle      String
-  remoteDisplayName String?
-  Items             Item[]
-  @@unique([sourceId, remoteId])
-}
 
 model Item {
   uuid            String       @id @default(uuid())
   content         String
-  source          Source       @relation(fields: [sourceId], references: [uuid])
-  sourceId        String
+  source          String
+  sourceType      String
   remoteId        String
   remoteReplyToId String?
-  remoteAuthor    RemoteAuthor @relation(fields: [remoteAuthorId], references: [uuid])
+  remoteReplyToAuthorId String?
   remoteAuthorId  String
-  @@unique([sourceId, remoteId])
+  @@unique([source, remoteId])
   @@index([remoteAuthorId])
+  @@index([remoteReplyToAuthorId])
+  @@index([remoteAuthorId,remoteReplyToAuthorId])
+}
+
+
+model RemoteAuthor {
+  uuid            String       @id @default(uuid())
+  source          String
+  sourceType      String
+  remoteId        String
+  url String
+  avatar String
+  displayName String
+  handle String
 }

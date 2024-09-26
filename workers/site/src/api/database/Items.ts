@@ -1,45 +1,39 @@
-import { blueskyPostUriToUrl, BskyAuthorSimple, BskyPostSimple } from "@app/social";
+import { BskyPostSimple } from "@app/social";
 import {
-    Account as MastodonAccount,
     Status as MastodonStatus
 } from "@app/types/mastodon";
-import { PrismaClient, Source } from "@prisma/client";
+import { Item, PrismaClient } from "@prisma/client";
 import { Pagignation } from "./types";
 
-export type Item = {
-    uuid: string;
-    remote_id: string;
-    item_type: string;
-    remote_reply_to_id?: string;
-    content?: string;
-};
+
 const validateSourceType = (type: string): boolean => {
     return ['bluesky', 'twitter', 'mastodon', 'wordpress'].includes(type);
 }
 
-export type SourceArgs = {
+export type SourceArg = {
     url: string,
     type: string
-    uuid?: string
 }
-export type SourceArg = SourceArgs
 
-export type CreateRemoteAuthorArgs = {
+
+export type CreateItemArgs ={
+    content: string
+    //url, without https
+    source: string
+    //mastodon, twitter, bluesky, wordpress
+    sourceType: string
     remoteId: string
-    remoteHandle: string
-    remoteDisplayName?: string | null
-    source: SourceArg
-    uuid?: string
+    remoteReplyToId: string | null
+    remoteReplyToAuthorId: string | null
+    remoteAuthorId: string,
+    author: {
+        handle: string
+        avatar: string
+        displayName: string
+        url: string
+    }
 }
-export type RemoteAuthorArg =  CreateRemoteAuthorArgs
-export type CreateItemArgs = {
-    content: string;
-    source: SourceArg;
-    remoteId: string;
-    remoteAuthor: RemoteAuthorArg;
-    remoteReplyAuthor?: RemoteAuthorArg;
-    remoteReplyToId?: string
-}
+// Omit<Item, 'uuid'>
 export default class ItemsApi {
 
     perPage: number = 25;
@@ -49,250 +43,39 @@ export default class ItemsApi {
         this.kv = kv;
     }
 
-    private cacheKey({
-        accountId,
-        sourceId,
-    }:{
-        accountId: string,
-        sourceId: string
-    }) {
-        return `items-${accountId}-${sourceId}`;
-    }
-    async injestBluesky({statuses}:{
-        statuses: BskyPostSimple[]
-    }){
-        const remoteAuthorArg = (account:BskyAuthorSimple) :RemoteAuthorArg => {
-            return {
-                remoteId: account.did,
-                remoteHandle: account.handle,
-                remoteDisplayName: account.displayName,
-                source: {
-                    type: 'bluesky',
-                    url: `https://bsky.app/profile/${account.handle}`
-                }
-            }
-        }
-        const remoteSourceArg = (status:BskyPostSimple) :SourceArg => {
-            return {
-                type: 'bluesky',
-                url: blueskyPostUriToUrl(status.uri,status.author.handle)
-            };
-        }
-
-        const processed: {
-            remoteAuthor: RemoteAuthorArg,
-            source: SourceArg,
-            content: string,
-            remoteId: string,
-            remoteReplyToId?: string,
-            uuid: string |false,
-            created:boolean
-        }[] = [];
-        for(const status of statuses){
-            const remoteAuthor = remoteAuthorArg(status.author);
-            const source = remoteSourceArg(status);
-
-            const sourceId = await this.sourceArgToSourceUuid(source);
-
-            const exists = await this.hasItem({
-                sourceId: sourceId,
-                remoteId: status.cid
-            });
-            if( exists ){
-                processed.push({
-                    created: false,
-                    remoteAuthor,
-                    source,
-                    content: status.text,
-                    remoteId: status.cid,
-                    remoteReplyToId: status.uri ?? undefined,
-                    uuid: sourceId
-                });
-                continue;
-            }
-            try {
-                const created = await this.create({
-                    remoteAuthor,
-                    source,
-                    content: status.text,
-                    remoteId: status.cid,
-                    remoteReplyToId: status.uri ?? undefined
-                });
-                processed.push({
-                    created: true,
-                    remoteAuthor,
-                    source,
-                    content: status.text,
-                    remoteId: status.cid,
-                    remoteReplyToId: status.uri ?? undefined,
-                    uuid: created ? created.uuid : false
-                });
-
-            } catch (error) {
-                console.log({error});
-                throw new Error('Could not create item');
-            }
-        }
-        return processed
-
-    }
-    async injestMastodon({statuses}:{
-        statuses: MastodonStatus[]
-    }){
-        const remoteAuthorArg = (account:MastodonAccount) :RemoteAuthorArg => {
-            return {
-                remoteId: account.id,
-                remoteHandle: account.username,
-                remoteDisplayName: account.display_name,
-                source: {
-                    type: 'mastodon',
-                    url: account.url.replace(account.username,'')
-                }
-            }
-        }
-        const remoteSourceArg = (status:MastodonStatus) :SourceArg => {
-              // Split the URL at '/@' and take the first part
-                const baseUrl = status.account.url.split('/@')[0];
-                return {
-                    type: 'mastodon',
-                    url: baseUrl
-                };
-        }
-
-
-        const processed: {
-            remoteAuthor: RemoteAuthorArg,
-            source: SourceArg,
-            content: string,
-            remoteId: string,
-            remoteReplyToId?: string,
-            uuid: string |false,
-            created:boolean
-        }[] = [];
-        for(const status of statuses){
-            const remoteAuthor = remoteAuthorArg(status.account);
-            const source = remoteSourceArg(status);
-            console.log({source});
-
-            const sourceId = await this.sourceArgToSourceUuid(source);
-            console.log({sourceId,source});
-
-            const exists = await this.hasItem({
-                sourceId: sourceId,
-                remoteId: status.id
-            });
-            if( exists ){
-                processed.push({
-                    created: false,
-                    remoteAuthor,
-                    source,
-                    content: status.content,
-                    remoteId: status.id,
-                    remoteReplyToId: status.in_reply_to_id ?? undefined,
-                    uuid: sourceId
-                });
-                continue;
-            }
-            try {
-                const created = await this.create({
-                    remoteAuthor,
-                    source,
-                    content: status.content,
-                    remoteId: status.id,
-                    remoteReplyToId: status.in_reply_to_id ?? undefined
-                });
-                processed.push({
-                    created: true,
-                    remoteAuthor,
-                    source,
-                    content: status.content,
-                    remoteId: status.id,
-                    remoteReplyToId: status.in_reply_to_id ?? undefined,
-                    uuid: created ? created.uuid : false
-                });
-            } catch (error) {
-                console.log({error});
-
-            }
-
-
-
-        }
-        return processed
-
+    private prepareSource = (source:string):string => {
+        //remove https:// and trailing slash
+        return source.replace(/^https?:\/\//,'').replace(/\/$/,'');
     }
 
-    public async hasItem({
-        sourceId,
-        remoteId,
-
-    }:{
-        sourceId: string,
-        remoteId: string,
-    }){
-        const item = await this.prisma.item.findFirst({
-            where: {
-                remoteId,
-                sourceId,
-
-            }
-        });
-        return !!item;
-    }
-    public async create({
-        content,
-        remoteId,
-        source,
-        remoteAuthor,
-        remoteReplyToId
-    }: CreateItemArgs) {
+    public async create(data: CreateItemArgs) {
         try {
-            if( ! await this.hasSource(source) ){
-                 await this.createSource(source);
-            }
-            const sourceModel = await this.prisma.source.findFirst({
-                where: source
+            const remoteAuthorExists = await this.hasRemoteAuthor({
+                source: data.source,
+                sourceType: data.sourceType,
+                remoteAuthorId: data.remoteAuthorId
             });
-            if( ! sourceModel ){
-                throw new Error('Could not create source');
+            if( ! remoteAuthorExists ){
+                await this.createRemoteAuthor({
+                    source: data.source,
+                    sourceType: data.sourceType,
+                    remoteId: data.remoteAuthorId,
+                    handle: data.author.handle,
+                    avatar: data.author.avatar,
+                    displayName: data.author.displayName,
+                    url: data.author.url
+                });
             }
             try {
                 const item = await this.prisma.item.create({
-                    data: {
-                        content,
-                        remoteId,
-                        remoteReplyToId,
-                        source: {
-                            connect: {
-                                uuid: sourceModel.uuid,
-                                type: sourceModel.type
-                            }
-                        },
-                        remoteAuthor: {
-                            connectOrCreate: {
-                                where: {
-                                    remoteId: remoteAuthor.remoteId,
-                                    sourceId:sourceModel.uuid,
-                                    uuid: remoteAuthor.uuid ?? undefined,
-                                    sourceId_remoteId: {
-                                        remoteId: remoteAuthor.remoteId,
-                                        sourceId: sourceModel.uuid
-                                    }
-                                },
-                                create: {
-                                    remoteId: remoteAuthor.remoteId,
-                                    remoteHandle: remoteAuthor.remoteHandle,
-                                    remoteDisplayName: remoteAuthor.remoteDisplayName,
-                                    source: {
-                                        connect: {
-                                            uuid: sourceModel.uuid
-                                        }
-                                    }
-                                }
-                            }
-                        },
-
-
+                    data:{
+                        content: data.content,
+                        remoteId: data.remoteId,
+                        source: data.source,
+                        sourceType: data.sourceType,
+                        remoteAuthorId: data.remoteAuthorId,
+                        remoteReplyToId: data.remoteReplyToId,
+                        remoteReplyToAuthorId: data.remoteReplyToAuthorId
                     }
                 });
                 return item;
@@ -311,6 +94,204 @@ export default class ItemsApi {
 
     }
 
+    async injestBluesky({statuses}:{
+        statuses: BskyPostSimple[]
+    }){
+
+        const sourceArg = {
+            source: 'bsky.social',
+            sourceType: 'bluesky',
+        }
+        const processed: {
+
+            remoteId: string,
+            uuid: string |false,
+            created:boolean
+        }[] = [];
+        for(const status of statuses){
+
+
+            const exists = await this.hasItem({
+                source:sourceArg.source,
+                remoteId: status.cid
+            });
+            if( exists ){
+                processed.push({
+                    created: false,
+                    remoteId: status.cid,
+                    uuid: exists
+                });
+                continue;
+            }
+            try {
+                const reply = status.reply ? status.reply : null;
+                const created = await this.create({
+                    ...sourceArg,
+                    content: status.text,
+                    remoteId: status.cid,
+                    remoteAuthorId: status.author.did,
+                    remoteReplyToId: status.reply ? status.reply.cid : null,
+                    remoteReplyToAuthorId: reply ? reply.author.did : null,
+                    author: {
+                        handle: status.author.handle,
+                        avatar: status.author.avatar,
+                        displayName: status.author.displayName,
+                        url: `https://bsky.app/profile/${status.author.handle}`
+                    }
+
+                });
+                processed.push({
+                    created: true,
+                    remoteId: status.cid,
+                    uuid: created ? created.uuid : false
+                });
+
+            } catch (error) {
+                console.log({error});
+                throw new Error('Could not create item');
+            }
+        }
+        return processed
+
+    }
+    async injestMastodon({statuses,source}:{
+        statuses: MastodonStatus[],
+        source: 'mastodonSocial'|'fosstodon'
+    }){
+
+        const sourceArg = {
+            source,
+            sourceType: 'mastodon',
+        }
+        const processed: {
+
+            remoteId: string,
+            uuid: string |false,
+            created:boolean
+        }[] = [];
+        for(const status of statuses){
+
+
+
+            const exists = await this.hasItem({
+                source: sourceArg.source,
+                remoteId: status.id
+            });
+            if( exists ){
+                processed.push({
+                    created: false,
+                    uuid: exists,
+                    remoteId:status.id
+                });
+                continue;
+            }
+            try {
+                const created = await this.create({
+                   ...sourceArg,
+                    content: status.content,
+                    remoteId: status.id,
+                    remoteAuthorId: status.account.id,
+                    remoteReplyToId: status.in_reply_to_id ?? null,
+                    remoteReplyToAuthorId: status.in_reply_to_account_id ?? null,
+                    author: {
+                        handle: status.account.acct,
+                        avatar: status.account.avatar,
+                        displayName: status.account.display_name,
+                        url: status.account.url
+                    }
+
+                });
+                processed.push({
+                    created: true,
+                    remoteId: status.id,
+                    uuid: created ? created.uuid : false
+                });
+            } catch (error) {
+                console.log({error});
+
+            }
+
+
+
+        }
+        return processed
+
+    }
+
+    public async hasItem({
+        source,
+        remoteId,
+
+    }:{
+        source: string,
+        remoteId: string,
+    }): Promise<string|false> {
+        const item = await this.prisma.item.findFirst({
+            where: {
+                remoteId,
+                source,
+
+            }
+        });
+        if(item){
+            return item.uuid;
+        }
+        return false;
+    }
+
+
+    public async hasRemoteAuthor({
+        source,
+        sourceType,
+        remoteAuthorId,
+    }: {
+        source: string,
+        sourceType: string,
+        remoteAuthorId: string
+    }): Promise<string|false> {
+        const author = await this.prisma.remoteAuthor.findFirst({
+            where: {
+                remoteId: remoteAuthorId,
+                source,
+                sourceType
+            }
+        });
+        if(author){
+            return author.uuid;
+        }
+        return false;
+    }
+
+    async createRemoteAuthor({
+        source,
+        sourceType,
+        remoteId,
+        handle,
+        avatar,
+        displayName,
+        url
+    }: {
+        source: string,
+        sourceType: string,
+        remoteId: string,
+        url: string;
+        avatar: string;
+        displayName: string;
+        handle: string;
+    }) {
+        const author = await this.prisma.remoteAuthor.create({
+            data: {
+                source,
+                sourceType,
+                remoteId,
+                handle,
+                avatar,
+                displayName,
+                url
+            }
+        });
+        return author;
+    }
 
     async search({query,page,perPage}:{
 
@@ -331,24 +312,44 @@ export default class ItemsApi {
 
     async all(args: Pagignation): Promise<Item[]> {
 
-        const items = await this.prisma.item.findMany( this.argsToSkipTake(args));
+        const items = await this.prisma.item.findMany(
+            {
+                    ...this.argsToSkipTake(args)
+
+            }
+        );
         return items as Item[];
     }
 
-    async getBySourceUuid({sourceId,page,perPage}: {
-        sourceId: string;
-
-    }&Pagignation) {
-        page = page || 1;
-        perPage = perPage || this.perPage;
-        const items = await this.prisma.item.findMany({
-            ...this.argsToSkipTake({page,perPage}),
-            where: {
-                sourceId,
+    async allBySource (args: Pagignation&{
+        source: string
+    }): Promise<Item[]> {
+        const items = await this.prisma.item.findMany(
+            {
+                    ...this.argsToSkipTake(args),
+                    where: {
+                        source: args.source
+                    }
             }
-        });
-        return items;
+        );
+        return items as Item[];
     }
+    async allByType(args: Pagignation&{
+        sourceType: string
+    }): Promise<Item[]> {
+
+        const items = await this.prisma.item.findMany(
+            {
+                    ...this.argsToSkipTake(args),
+                    where: {
+                        sourceType: args.sourceType
+                    }
+            }
+        );
+        return items as Item[];
+    }
+
+
 
     async get(uuid: string): Promise<Item> {
 
@@ -363,93 +364,28 @@ export default class ItemsApi {
         return item as Item;
     }
 
-    private async remoteAuthorExists({ remoteId, sourceId }: {
-        remoteId: string;
-        sourceId: string;
-    }) {
-        const author = await this.prisma.remoteAuthor.findFirst({
-            where: {
-                remoteId,
-                sourceId
-            }
-        });
-        return author ?? false;
-    }
-
-    private async createOrFindRemoteAuthor({ remoteId, remoteHandle, remoteDisplayName, source }: CreateRemoteAuthorArgs) {
-        const sourceId = await this.sourceArgToSourceUuid(source);
-        const exists = await this.remoteAuthorExists({ remoteId, sourceId });
-        if (exists) {
-            return await this.getRemoteAuthor({ remoteId, sourceId });
-        }
-        return await this.createRemoteAuthor({ remoteId, remoteHandle, remoteDisplayName, source });
-    }
-
-    async createRemoteAuthor({
-        remoteId, remoteHandle, remoteDisplayName, source
-    }: CreateRemoteAuthorArgs) {
-
-        const sourceId = 'object' === typeof source ? await this.createOrFindSourceUuid(source.type, source.url) : source;
-        const author = await this.prisma.remoteAuthor.create({
-            data: {
-                remoteId, remoteHandle, remoteDisplayName, sourceId
-            }
-        });
-        return author;
-    }
 
     async allRemoteAuthors(args: Pagignation) {
-        const authors = await this.prisma.remoteAuthor.findMany(this.argsToSkipTake(args));
+        const uniqueAuthors = await this.prisma.item.findMany({
+            distinct: ['remoteAuthorId','source'],
+            select: {
+                source: true,
+                sourceType: true,
+                remoteAuthorId: true,
+            },
+            ...this.argsToSkipTake(args)
+        });
+        const authors = await this.prisma.remoteAuthor.findMany({
+            where: {
+                remoteId: {
+                    in: uniqueAuthors.map((a) => a.remoteAuthorId)
+                },
+            }
+        });
         return authors;
     }
 
-    async getRemoteAuthor({ remoteId, sourceId }: {
-        remoteId: string;
-        sourceId: string;
-    }) {
-        const author = await this.prisma.remoteAuthor.findFirst({
-            where: {
-                remoteId,
-                sourceId
-            }
-        });
-        return author ?? false
-    }
 
-    async updateRemoteAuthor({ remoteId, remoteHandle, remoteDisplayName, sourceId } = c.body as unknown as {
-        remoteId: string
-        remoteHandle: string
-        remoteDisplayName?: string | null
-        sourceId: string
-    }) {
-
-        const author = await this.prisma.remoteAuthor.update({
-            where: {
-                sourceId_remoteId: {
-                    remoteId,
-                    sourceId
-                }
-            }, data: {
-                remoteHandle,
-                remoteDisplayName
-            }
-        });
-        return author;
-
-    }
-
-    async deleteRemoteAuthor(uuid: string) {
-        try {
-            await this.prisma.remoteAuthor.delete({
-                where: {
-                    uuid
-                }
-            });
-            return true;
-        } catch (error) {
-            return false;
-        }
-    }
 
     async delete(uuid: string): Promise<boolean> {
         try {
@@ -482,111 +418,22 @@ export default class ItemsApi {
         return this.get(uuid);
     }
 
-    private async sourceArgToSource(source: SourceArg) {
-        if ('string' === typeof source) {
-            return await this.getSource(source);
-        }
-        return await this.createOrFindSource(source)
-    }
-    private async sourceArgToSourceUuid(source: SourceArg): Promise<string> {
-        const sourceId = 'object' === typeof source ? await this.createOrFindSourceUuid(source.type, source.url) : source;
-        return sourceId;
-    }
+    async allSources(args: Pagignation & {
+        type?: string
+    }):Promise<{source: string, sourceType: string}[]> {
+        //select unique values for source from items table
+        const sources = await this.prisma.item.findMany({
+            distinct: ['source'],
+            select: {
+                source: true,
+                sourceType: true
+            },
 
-    private async hasSource(source: SourceArg) {
-        const sourceRecord = await this.prisma.source.findFirst({ where: source });
-        return !!sourceRecord;
-    }
-
-    private async createOrFindSource(where:SourceArgs): Promise<Source> {
-        const sourceRecord = await this.prisma.source.findFirst({ where});
-        if (sourceRecord) {
-            return sourceRecord;
-        }
-        const newSource = await this.prisma.source.create({
-            data: where
+            ...this.argsToSkipTake(args)
         });
-        return newSource;
+        return sources;
     }
 
-    private async createOrFindSourceUuid(type: string, url: string): Promise<string> {
-        const sourceRecord = await this.createOrFindSource({
-                type,
-                url
-        });
-        return sourceRecord.uuid;
-    }
-
-
-    async getSource(uuid: string) {
-        try {
-            const source = await this.prisma.source.findFirst({
-                where: {
-                    uuid
-                }
-            });
-            return source;
-        } catch (error) {
-            return false;
-        }
-    }
-
-    async updateSource({ uuid, type, url }: {
-        uuid: string;
-        type: string;
-        url: string;
-    }) {
-        if (!validateSourceType(type)) {
-            throw new Error('Invalid source type');
-        }
-        try {
-            await this.prisma.source.update({
-                where: {
-                    uuid
-                }, data: {
-                    type,
-                    url
-                }
-            });
-            return true;
-        } catch (error) {
-            return false;
-        }
-    }
-
-    async createSource({ type, url }: {
-        type: string;
-        url: string;
-    }) {
-        if (!validateSourceType(type)) {
-            throw new Error('Invalid source type');
-        }
-
-        try {
-            const newSource = await this.prisma.source.create({
-                data: {
-                    type,
-                    url
-                }
-            });
-            return newSource.uuid;
-        } catch (error) {
-            return false;
-        }
-    }
-
-    async deleteSource(uuid: string) {
-        try {
-            await this.prisma.source.delete({
-                where: {
-                    uuid
-                }
-            });
-            return true;
-        } catch (error) {
-            return false;
-        }
-    }
 
     private argsToSkipTake(args: Pagignation) {
         return {
@@ -594,27 +441,5 @@ export default class ItemsApi {
             take: args?.perPage ?? 25
         }
     }
-    async allSources(args: Pagignation & {
-        type?: string
-    }) {
-        let query: {
-            skip: number,
-            take: number,
-            where?: {
-                type: string
-            }
 
-        } = this.argsToSkipTake(args);
-        if (args.type) {
-            query = {
-                ...query,
-                where: {
-                    type: args.type
-                }
-            }
-        }
-        console.log({args,query});
-        const sources = await this.prisma.source.findMany(query);
-        return sources
-    }
 }
