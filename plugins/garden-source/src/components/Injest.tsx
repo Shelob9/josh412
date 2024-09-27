@@ -1,8 +1,10 @@
+import { Spinner } from "@wordpress/components";
 import React from "react";
 import { accounts } from "../accounts";
 import { Accounts } from "../types";
-import { AccountDetailsMinimal } from "./Timeline";
 import { CreatedItem, fetchInjestItems } from "./api/fetchItemts";
+import Table from "./Table";
+import { AccountDetailsMinimal } from "./Timeline";
 export default function Injest({account}:{
     account: Accounts
 }) {
@@ -34,13 +36,13 @@ export default function Injest({account}:{
             console.log(nextCursor);
             if(items){
                 setCreatedItems((prev) => {
-                    return {
-                        ...prev,
-                        [account]: [
-                            ...prev[account],
-                            ...items
-                        ]
-                    }
+                    const update = {...prev};
+                    //put new first
+                    update[account] = [
+                        ...items,
+                        ...update[account]
+                    ];
+                    return update;
                 });
             }
 
@@ -56,6 +58,24 @@ export default function Injest({account}:{
         });
     }, [clicked,isLoading,accountDetails,nextCursor]);
 
+
+    React.useEffect(() => {
+        //when nextCursor changes, put in local storage
+        if( nextCursor ){
+            localStorage.setItem(`nextCursorInjest${account}`,nextCursor);
+        }
+    },[nextCursor,account]);
+
+    //when account changes, if we have a nextCursor in local storage, set it
+    React.useEffect(() => {
+        const savedNextCursor = localStorage.getItem(`nextCursorInjest${account}`);
+        if( savedNextCursor ){
+            setNextCursor(savedNextCursor);
+        }
+    },[account]);
+
+
+
     if( ! accountDetails || ! accountDetails.name ){
         return null;
     }
@@ -67,27 +87,41 @@ export default function Injest({account}:{
             }}>
                 Injest {accountDetails.name} {nextCursor ? `nextCursor: ${nextCursor}` : ''}
             </button>
-            {createdItems[account].length ?(<table>
-                <thead>
-                    <tr>
-                        <th>uuid</th>
-                        <th>created</th>
-                        <th>remoteId</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {createdItems[account].map((item) => {
-                        return (
-                            <tr key={item.uuid}>
-                                <td>{item.uuid}</td>
-                                <td>{item.created ?'YES':'No'}</td>
-                                <td>{item.remoteId}</td>
-                            </tr>
-                        )
-                    })}
-
-                </tbody>
-            </table>): null}
+            {isLoading ? <Spinner />: null}
+            {createdItems[account].length ?(<Table
+                headers={[{
+                    id: 'uuid',
+                    children: 'uuid'
+                },{
+                    id: 'created',
+                    children: 'created'
+                },{
+                    id: 'remoteId',
+                    children: 'remoteId'
+                }]}
+                caption="Created Items"
+                rows={[
+                    ...createdItems[account].map((item) => {
+                        return {
+                            key: item.uuid,
+                            cells: [
+                                {
+                                    key: 'uuid',
+                                    children: item.uuid
+                                },
+                                {
+                                    key: 'created',
+                                    children: item.created ? 'YES' : 'No'
+                                },
+                                {
+                                    key: 'remoteId',
+                                    children: item.remoteId
+                                }
+                            ]
+                        }
+                    })
+                ]}
+            />): null}
         </div>
     )
 

@@ -1,12 +1,32 @@
 import React from "react";
 import { Accounts } from "../types";
 import fetchItems from "./api/fetchItemts";
+import Table, { TablePagination } from "./Table";
 type UIItem = {
     uuid: string;
     content: string;
     source: string;
     sourceType: string;
 }
+
+const headers = [
+    {
+        id: 'uuid',
+        children: 'UUID'
+    },
+    {
+        id: 'content',
+        children: 'Content'
+    },
+    {
+        id: 'source',
+        children: 'Source'
+    },
+    {
+        id: 'sourceType',
+        children: 'Source Type'
+    }
+]
 export default function Items({account}:{
     account: Accounts
 }) {
@@ -52,14 +72,55 @@ export default function Items({account}:{
         }
         return items[account];
     },[showAll,items,account]);
+
+    const rows = React.useMemo< {
+		key:string,
+		cells: {
+			key:string,
+			children:React.ReactNode,
+			className?:string
+		}[]
+	}[]>(() => {
+
+        return posts.map((post) => {
+            return {
+                key: post.uuid,
+                cells: [
+                    {
+                        key: 'uuid',
+                        children: post.uuid
+                    },
+                    {
+                        key: 'content',
+                        children: post.content
+                    },
+                    {
+                        key: 'source',
+                        children: post.source
+                    },
+                    {
+                        key: 'sourceType',
+                        children: post.sourceType
+                    }
+                ]
+            }
+        })
+
+
+    },[posts]);
     if( ! posts || posts.length === 0 ){
         return <p>No items</p>
     }
     return (
-        <ul>
-            {posts.map((item) => {
-                return <li key={item.uuid}>{item.content}</li>
-            })}
-        </ul>
+        <>
+            {! posts || posts.length === 0 ? <p>No items</p> : <div>
+                <Table
+                headers={headers}
+                rows={rows}
+                caption={`Items from ${account}`}
+            />
+                <TablePagination currentPage={page} totalPages={1} displayingNum={posts.length}  />
+            </div>}
+        </>
     )
 }
