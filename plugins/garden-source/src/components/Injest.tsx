@@ -8,6 +8,7 @@ import { AccountDetailsMinimal } from "./Timeline";
 export default function Injest({account}:{
     account: Accounts
 }) {
+    const ranOnce = React.useRef(false);
     const [createdItems,setCreatedItems] = React.useState<{
         fosstodon: CreatedItem[];
         mastodonSocial: CreatedItem[];
@@ -23,9 +24,13 @@ export default function Injest({account}:{
     }, [account]);
     const [isLoading, setIsLoading] = React.useState(false);
     const [clicked,setClicked] = React.useState(false);
+    const [clickedInjestAll,setClickedInjestAll] = React.useState(false);
+    const isDone = React.useMemo(() => {
+        return ranOnce.current && ! nextCursor;
+    },[nextCursor]);
 
     React.useEffect(() => {
-        if( ! clicked || isLoading ){
+        if( ! clicked || isLoading || isDone ){
             return;
         }
         setIsLoading(true);
@@ -55,14 +60,29 @@ export default function Injest({account}:{
         }).finally(() => {
             setClicked(false);
             setIsLoading(false);
+            ranOnce.current = true;
         });
-    }, [clicked,isLoading,accountDetails,nextCursor]);
+    }, [clicked,isLoading,accountDetails,nextCursor,isDone]);
 
+    React.useEffect(() => {
+        if(clickedInjestAll){
+            if(isDone){
+                setClickedInjestAll(false);
+            }else{
+                if( ! clicked && ! isLoading ){
+                    setClicked(true);
+                }
+            }
+
+        }
+    },[clickedInjestAll,isDone,clicked,isLoading]);
 
     React.useEffect(() => {
         //when nextCursor changes, put in local storage
         if( nextCursor ){
             localStorage.setItem(`nextCursorInjest${account}`,nextCursor);
+        }else{
+            localStorage.removeItem(`nextCursorInjest${account}`);
         }
     },[nextCursor,account]);
 
@@ -82,11 +102,22 @@ export default function Injest({account}:{
 
     return (
         <div>
-            <button onClick={() => {
-                setClicked(true);
-            }}>
-                Injest {accountDetails.name} {nextCursor ? `nextCursor: ${nextCursor}` : ''}
-            </button>
+            {isDone ?<strong>Done With Injest</strong>:(<div>
+                <button onClick={() => {
+                    setClicked(true);
+                }}>
+                    Injest {accountDetails.name} {nextCursor ? `nextCursor: ${nextCursor}` : ''}
+                </button>
+                <button
+                    onClick={() => {
+                        setClickedInjestAll(true);
+                    }}
+
+                >
+                    Injest All
+                </button>
+
+            </div>)}
             {isLoading ? <Spinner />: null}
             {createdItems[account].length ?(<Table
                 headers={[{
@@ -107,15 +138,15 @@ export default function Injest({account}:{
                             cells: [
                                 {
                                     key: 'uuid',
-                                    children: item.uuid
+                                    Render:  () =>    item.uuid
                                 },
                                 {
                                     key: 'created',
-                                    children: item.created ? 'YES' : 'No'
+                                    Render: () => item.created ? 'YES' : 'No'
                                 },
                                 {
                                     key: 'remoteId',
-                                    children: item.remoteId
+                                    Render: () => item.remoteId
                                 }
                             ]
                         }

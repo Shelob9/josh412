@@ -2,29 +2,43 @@ import React from "react";
 import { Accounts } from "../types";
 import fetchItems from "./api/fetchItemts";
 import Table, { TablePagination } from "./Table";
+import { TimelineRender } from "./Timeline";
+import { Timeline_Post } from "./TimelinePost";
 type UIItem = {
     uuid: string;
     content: string;
     source: string;
     sourceType: string;
+    remoteId: string
+    remoteAuthorId: string;
+    remoteReplyToAuthorId?: string
+    remoteReplyToId?: string
+    author: {
+        url: string,
+        displayName: string,
+        avatar: string,
+        handle: string
+        uuid: string
+    },
+    url: string
 }
 
 const headers = [
     {
-        id: 'uuid',
-        children: 'UUID'
+        id: 'id',
+        children: 'id'
     },
     {
         id: 'content',
         children: 'Content'
     },
     {
-        id: 'source',
-        children: 'Source'
+        id: 'author',
+        children: 'Author'
     },
     {
-        id: 'sourceType',
-        children: 'Source Type'
+        id: 'url',
+        children: 'URL'
     }
 ]
 export default function Items({account}:{
@@ -48,7 +62,7 @@ export default function Items({account}:{
     });
     const [nextCursor, setNextCursor] = React.useState<string | undefined>(undefined);
     React.useEffect(() => {
-            fetchItems({page,perPage,search:undefined,sourceType:showAll ? undefined : account})
+            fetchItems({page,perPage,search:undefined,source:showAll ? undefined : account})
                 .then(({statuses,nextCursor}) => {
                     setItems((prevItems) => {
                         if( showAll ){
@@ -66,41 +80,65 @@ export default function Items({account}:{
                 });
 
     },[account])
-    const posts = React.useMemo(() => {
-        if( showAll ){
-            return items.items;
+    const posts = React.useMemo<Timeline_Post[]>(() => {
+        const itemToPost = (item:UIItem) => {
+            const post : Timeline_Post = {
+                id: item.uuid,
+                createdAt:'',//not saved
+                content:item.content,
+                postAuthor: {
+                    url: item.author.url,
+                    displayName: item.author.displayName,
+                    avatar: item.author.avatar,
+                },
+                postUrl: item.url,
+                reply: {
+                    url: item.remoteReplyToId ?? '',
+                },
+                        };
+            return post;
         }
-        return items[account];
+        if( showAll ){
+            return items.items.map(itemToPost)
+        }
+        return items[account].map(itemToPost)
     },[showAll,items,account]);
 
     const rows = React.useMemo< {
 		key:string,
 		cells: {
 			key:string,
-			children:React.ReactNode,
+			Render:() => React.ReactNode,
 			className?:string
 		}[]
 	}[]>(() => {
 
         return posts.map((post) => {
             return {
-                key: post.uuid,
+                key: post.id,
                 cells: [
                     {
-                        key: 'uuid',
-                        children: post.uuid
+                        key: 'id',
+                        Render:() =>  post.id
                     },
                     {
                         key: 'content',
-                        children: post.content
+                        Render:() =>  post.content
+                    },
+
+                    {
+                        key: 'author',
+                        Render: () => <a href={post.postAuthor.url}
+                            target="_blank"
+                            rel="noreferrer"
+                        >{post.postAuthor.displayName}</a>
                     },
                     {
-                        key: 'source',
-                        children: post.source
-                    },
-                    {
-                        key: 'sourceType',
-                        children: post.sourceType
+                        key: 'url',
+                        Render: () => <a href={post.postUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                        >{post.postUrl}</a>
                     }
                 ]
             }
@@ -114,11 +152,21 @@ export default function Items({account}:{
     return (
         <>
             {! posts || posts.length === 0 ? <p>No items</p> : <div>
-                <Table
-                headers={headers}
-                rows={rows}
-                caption={`Items from ${account}`}
-            />
+                <TimelineRender
+                    account={account}
+                    see="statuses"
+                    onChangeAccount={() => {}}
+                    searchMyPostsOnly={false}
+                    search={''}
+                    Render={() => (
+                        <Table
+                            headers={headers}
+                            rows={rows}
+                            caption={`Items from ${account}`}
+                        />
+                    )}
+                />
+
                 <TablePagination currentPage={page} totalPages={1} displayingNum={posts.length}  />
             </div>}
         </>

@@ -25,7 +25,8 @@ CREATE TABLE "Item" (
     "remoteId" TEXT NOT NULL,
     "remoteReplyToId" TEXT,
     "remoteReplyToAuthorId" TEXT,
-    "remoteAuthorId" TEXT NOT NULL
+    "remoteAuthorId" TEXT NOT NULL,
+    "url" TEXT NOT NULL
 );
 
 -- CreateTable

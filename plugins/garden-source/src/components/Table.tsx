@@ -71,7 +71,7 @@ export default function Table({caption,headers,rows,footer}:{
 		key:string,
 		cells: {
 			key:string,
-			children:React.ReactNode,
+			Render: () =>React.ReactNode,
 			className?:string
 		}[]
 	}[]
@@ -108,9 +108,9 @@ export default function Table({caption,headers,rows,footer}:{
 						</label>
 
 					</Th>
-					{row.cells.map(({key,children,className})=>(
+					{row.cells.map(({key,Render,className})=>(
 						<Td key={key} id={key} className={className}>
-							{children}
+							<Render />
 						</Td>
 					))}
 				</tr>)

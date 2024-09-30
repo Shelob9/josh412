@@ -1,4 +1,4 @@
-import { BskyPostSimple } from "@app/social";
+import { blueskyPostUriToUrl, BskyPostSimple } from "@app/social";
 import {
     Status as MastodonStatus
 } from "@app/types/mastodon";
@@ -10,6 +10,16 @@ const validateSourceType = (type: string): boolean => {
     return ['bluesky', 'twitter', 'mastodon', 'wordpress'].includes(type);
 }
 
+export type ItemAuthor = {
+    url: string,
+    displayName: string,
+    avatar: string,
+    handle: string
+    uuid: string
+}
+export type ItemWithAuthor =  Item & {
+    author: ItemAuthor
+};
 export type SourceArg = {
     url: string,
     type: string
@@ -26,6 +36,7 @@ export type CreateItemArgs ={
     remoteReplyToId: string | null
     remoteReplyToAuthorId: string | null
     remoteAuthorId: string,
+    url: string
     author: {
         handle: string
         avatar: string
@@ -48,7 +59,7 @@ export default class ItemsApi {
         return source.replace(/^https?:\/\//,'').replace(/\/$/,'');
     }
 
-    public async create(data: CreateItemArgs) {
+    public async create(data: CreateItemArgs):Promise<Item> {
         try {
             const remoteAuthorExists = await this.hasRemoteAuthor({
                 source: data.source,
@@ -75,7 +86,8 @@ export default class ItemsApi {
                         sourceType: data.sourceType,
                         remoteAuthorId: data.remoteAuthorId,
                         remoteReplyToId: data.remoteReplyToId,
-                        remoteReplyToAuthorId: data.remoteReplyToAuthorId
+                        remoteReplyToAuthorId: data.remoteReplyToAuthorId,
+                        url: data.url
                     }
                 });
                 return item;
@@ -119,7 +131,7 @@ export default class ItemsApi {
                 processed.push({
                     created: false,
                     remoteId: status.cid,
-                    uuid: exists
+                    uuid: exists.uuid,
                 });
                 continue;
             }
@@ -137,7 +149,8 @@ export default class ItemsApi {
                         avatar: status.author.avatar,
                         displayName: status.author.displayName,
                         url: `https://bsky.app/profile/${status.author.handle}`
-                    }
+                    },
+                    url: blueskyPostUriToUrl(status.uri,status.author.handle)
 
                 });
                 processed.push({
@@ -167,7 +180,7 @@ export default class ItemsApi {
 
             remoteId: string,
             uuid: string |false,
-            created:boolean
+            created:false | Item
         }[] = [];
         for(const status of statuses){
 
@@ -180,7 +193,7 @@ export default class ItemsApi {
             if( exists ){
                 processed.push({
                     created: false,
-                    uuid: exists,
+                    uuid: exists.uuid,
                     remoteId:status.id
                 });
                 continue;
@@ -198,11 +211,12 @@ export default class ItemsApi {
                         avatar: status.account.avatar,
                         displayName: status.account.display_name,
                         url: status.account.url
-                    }
+                    },
+                    url: status.url as string
 
                 });
                 processed.push({
-                    created: true,
+                    created: created,
                     remoteId: status.id,
                     uuid: created ? created.uuid : false
                 });
@@ -225,7 +239,7 @@ export default class ItemsApi {
     }:{
         source: string,
         remoteId: string,
-    }): Promise<string|false> {
+    }): Promise<Item|false> {
         const item = await this.prisma.item.findFirst({
             where: {
                 remoteId,
@@ -234,7 +248,7 @@ export default class ItemsApi {
             }
         });
         if(item){
-            return item.uuid;
+            return item;
         }
         return false;
     }
@@ -313,7 +327,7 @@ export default class ItemsApi {
     async all(args: Pagignation&{
         source?: string,
         sourceType?: string
-    }): Promise<Item[]> {
+    }): Promise<ItemWithAuthor[]> {
         let where = undefined;
         if(args.source || args.sourceType){
             where = {
@@ -325,11 +339,37 @@ export default class ItemsApi {
         const items = await this.prisma.item.findMany(
             {
                     ...this.argsToSkipTake(args),
-                    where
+                    where,
+
 
             }
         );
-        return items as Item[];
+        const authors = await this.prisma.remoteAuthor.findMany({
+            where: {
+                remoteId: {
+                    in: Array.from(new Set(items.map((a) => a.remoteAuthorId)))
+                },
+            }
+        });
+        return items.map((item:Item) => {
+            const author = authors.find((a) => a.remoteId === item.remoteAuthorId);
+            return {
+                ...item,
+                author: author ?{
+                    url: author.url,
+                    displayName: author.displayName,
+                    avatar: author.avatar,
+                    handle: author.handle,
+                    uuid: author.uuid
+                }: {
+                    url: '',
+                    displayName: '',
+                    avatar: '',
+                    handle: '',
+                    uuid: ''
+                } as ItemAuthor
+            } as ItemWithAuthor;
+        });
     }
 
     async allByType(args: Pagignation&{

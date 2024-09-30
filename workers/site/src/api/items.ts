@@ -126,7 +126,7 @@ api.post('injest/bluesky/:did', async (c) => {
                     cursor: returnValue.cursor,
                     next: returnValue.next,
 
-                    nextCursor: returnValue.nextCursor,
+                    nextCursor: returnValue.nextCursor?.replace('cursor=',''),
                     items: items.map( i => {
                         return {
                             uuid: i.uuid,
@@ -175,7 +175,8 @@ api.post('/injest/mastodon/:accountId', async (c) => {
                 return c.json({
                     maxId,
                     next: c.get('makeUrl')(`/api/items/injest/mastodon/${accountId}`,{maxId:lastId}),
-                    cursor:`maxId=${lastId}`,
+                    nextCursor:lastId,
+                    cursor: maxId,
                     items: items.map( i => {
                         return {
                             uuid: i.uuid,

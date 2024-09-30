@@ -41,6 +41,7 @@ model Item {
   remoteReplyToId String?
   remoteReplyToAuthorId String?
   remoteAuthorId  String
+  url String
   @@unique([source, remoteId])
   @@index([remoteAuthorId])
   @@index([remoteReplyToAuthorId])

@@ -33,13 +33,11 @@ export function fetchInjestItems({account,cursor,}:{
 
     let url = new URL(`${apiUrl}/items/injest/${account.type}/${account.id}`);
     if( cursor ){
-        if( cursor.includes('?')){
-            url = new URL(`${apiUrl}/items/injest/${account.type}/${account.id}${cursor}`);
-        }else if (cursor.includes('cursor=')){
-            url = new URL(`${apiUrl}/items/injest/${account.type}/${account.id}?${cursor}`);
-
+        if( 'bluesky' === account.type ){
+            url.searchParams.append('cursor',cursor);
+        }else{
+            url.searchParams.append('maxId',cursor);
         }
-        url.searchParams.append('cursor',cursor);
     }
 
     return fetch(url.toString(),{
@@ -48,32 +46,32 @@ export function fetchInjestItems({account,cursor,}:{
     })
         .then(response => response.json())
         .then(json => {
-            if( 'mastodon' === account.type ){
-                return {
-                    nextCursor: json.cursor,
-                    items:json.items
-                }
-            }
+
             console.log({json})
             return json;
         });
 }
-export default function fetchItems({page,perPage,search,sourceType}:{
+export default function fetchItems({page,perPage,search,source}:{
 
     page?:number,
     perPage?:number,
     search?:string,
-    sourceType?:Accounts
+    source?:Accounts
 }): Promise<{
     statuses: any[];
     nextCursor?: string;
     cursor?: string;
-    search?: string;
+    source?: string;
 }>{
     let url = new URL(`${apiUrl}/items`);
 
-    if( sourceType ){
-        url = new URL(`${apiUrl}/items/sourcetype/${sourceType}`);
+    if( source ){
+        if( 'bluesky' === source ){
+            url = new URL(`${apiUrl}/items/sourcetype/bluesky`);
+
+        }else{
+            url = new URL(`${apiUrl}/items/source/${source}`);
+        }
     }else if (search){
         url = new URL(`${apiUrl}/items/search`);
     }

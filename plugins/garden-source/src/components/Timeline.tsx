@@ -41,16 +41,49 @@ export type UseProps = {
     onQuote: (content: string, citation: string) => void;
 }
 
-export default function Timeline({
-    account,
-    see,
-    onCopy,
-    onQuote,
-    search,
-    searchMyPostsOnly
-}:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps&{
+export default function Timeline(props:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps&{
     searchMyPostsOnly:boolean
 }){
+    return <TimelineRender
+        see={props.see}
+        search={props.search}
+        account={props.account}
+        searchMyPostsOnly={props.searchMyPostsOnly}
+        onChangeAccount={props.onChangeAccount}
+        Render={({posts}) => (
+                    <div>
+                    {posts.map((post:Timeline_Post) => (
+                        <TimelinePost
+                            key={post.postUrl}
+                            {...post}
+                            onCopy={props.onCopy}
+                            onQuote={props.onQuote}
+                        />
+                    ))}
+                </div>
+
+        )}
+    />
+
+
+}
+
+
+export function TimelineRender({
+    Render,
+    account,
+    search,
+    see,
+    searchMyPostsOnly,
+}:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&{
+    searchMyPostsOnly:boolean
+}&{
+    Render: ({posts,}:{
+        posts: Timeline_Post[]
+    }) => React.ReactElement;
+
+}) {
+
     const [lastSearch, setLastSearch] = useState('');
     const showSearch = useMemo(() => {
         return search && search.length > 2;
@@ -294,19 +327,13 @@ export default function Timeline({
                 <Button onClick={onResetAccount}>Reset</Button>
             </Grid>
             {! posts || !posts.length ? (<Spinner />) : (
-                <div>
-                    {posts.map((post:Timeline_Post) => (
-                        <TimelinePost
-                            key={post.postUrl}
-                            {...post}
-                            onCopy={onCopy}
-                            onQuote={onQuote}
-                        />
-                    ))}
-                </div>
+                <Render
+                    posts={posts}
+                />
             )}
             <Pagination />
-
         </div>
     );
+
+
 }
