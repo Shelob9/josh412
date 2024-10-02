@@ -45,7 +45,7 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
-= 0.4.1 =
+= 0.4.2 =
 * Release
 
 == Arbitrary section ==
