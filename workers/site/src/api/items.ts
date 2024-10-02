@@ -1,5 +1,5 @@
 import { blueskyDidToCongig, isValidAccontId, mastodonAccountIdToConfig, MastodonApi, tryBskyLogin } from "@app/social";
-import { Hono } from "hono";
+import { Hono, HonoRequest } from "hono";
 import { Bindings, Variables } from "../../app.types";
 import { fetchBlueskyStatusesSimple } from "./util/BlueskyStatusToSimple";
 
@@ -18,15 +18,15 @@ api.get('/', async (c) => {
 
     const source = c.req.query('source') || undefined;
     const sourceType = c.req.query('sourceType') || undefined;
-
+    const page = numberArg(c.req,'page');
     try {
         const items = await itemsDb.all({
-            page: numberArg(c.req,'page'),
+            page: page,
             perPage:numberArg(c.req,'perPage'),
             source,
             sourceType,
         });
-        return c.json({ items,route });
+        return c.json({ items,route,nextCursor: page ?page + 1 : 2 });
    } catch (e) {
      return c.json({ err: e.message,route }, 500);
    }
@@ -37,14 +37,14 @@ api.get('/sourcetype/:sourceType', async (c) => {
     const itemsDb = c.get('ItemsApi');
     const sourceType = c.req.param('sourceType');
     const route = 'GET /items/sourcetype/:sourceType';
-
+    const page = numberArg(c.req,'page');
     try {
         const items = await itemsDb.all({
-            page: numberArg(c.req,'page'),
+            page,
             perPage:numberArg(c.req,'perPage'),
             sourceType,
         });
-        return c.json({ items,route });
+        return c.json({ items,route,nextCursor: page ?page + 1 : 2 });
    } catch (e) {
      return c.json({ err: e.message,route }, 500);
    }
@@ -56,14 +56,15 @@ api.get('/source/:source', async (c) => {
 
     const route = 'GET /items/source/:source';
     const itemsDb = c.get('ItemsApi');
+    const page = numberArg(c.req,'page');
 
     try {
         const items = await itemsDb.all({
-            page: numberArg(c.req,'page'),
+            page,
             perPage:numberArg(c.req,'perPage'),
             source,
         });
-        return c.json({ items,route });
+        return c.json({ items,route,nextCursor: page ?page + 1 : 2 });
    } catch (e) {
      return c.json({ err: e.message,route }, 500);
    }

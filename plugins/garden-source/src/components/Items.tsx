@@ -1,6 +1,8 @@
-import React from "react";
+import { Spinner } from "@wordpress/components";
+import React, { useMemo } from "react";
 import { Accounts } from "../types";
 import fetchItems from "./api/fetchItemts";
+import usePagedState from "./hooks/usePagedState";
 import Table, { TablePagination } from "./Table";
 import { Timeline_Post } from "./TimelinePost";
 type UIItem = {
@@ -43,42 +45,65 @@ const headers = [
 export default function Items({account}:{
     account: Accounts
 }) {
-    const [showAll,setShowAll] = React.useState(false);
-    const [page,setPage] = React.useState(1);
-    const [perPage,setPerPage] = React.useState(25);
-    const [items,setItems] = React.useState<{
-        fosstodon: UIItem[]
-        mastodonSocial: UIItem[];
-        bluesky: UIItem[];
-        items: UIItem[];
-    }>(() => {
-        return {
-            fosstodon: [],
-            mastodonSocial: [],
-            bluesky: [],
-            items: []
-        }
+    const [isLoading,setIsLoading] = React.useState(false);
+    const {
+        pageState,
+        dispatchPageAction,
+        hasPage,
+    } = usePagedState<UIItem,UIItem>({account});
+
+    const [currentPages,setCurrentPages] = React.useState({
+        mastodonSocial: 1,
+        fosstodon: 1,
+        bluesky: 1
     });
-    const [nextCursor, setNextCursor] = React.useState<string | undefined>(undefined);
+    const [showAll,setShowAll] = React.useState(false);
+    const [perPage,setPerPage] = React.useState(25);
+    const currentPage = useMemo(()=>currentPages[account],[currentPages,account]);
+    const hasNextPage = true;
+    const hasPrevPage = useMemo(() => {
+        return currentPage > 1;
+    },[currentPage]);
+    const setNextPage = () => {
+        if( hasNextPage ){
+            setCurrentPages(prev => {
+                return {
+                    ...prev,
+                    [account]: prev[account] + 1
+                }
+            })
+        }
+    }
+
+    const setPrevPage = () => {
+        if( hasPrevPage ){
+            setCurrentPages(prev => {
+                return {
+                    ...prev,
+                    [account]: prev[account] - 1
+                }
+            });
+        }
+    }
+
     React.useEffect(() => {
-            fetchItems({page,perPage,search:undefined,source:showAll ? undefined : account})
-                .then(({statuses,nextCursor}) => {
-                    setItems((prevItems) => {
-                        if( showAll ){
-                            return {
-                                ...prevItems,
-                                items: statuses
-                            }
-                        }
-                        return {
-                            ...prevItems,
-                            [account]: statuses
-                        }
-                    });
-                    setNextCursor(nextCursor);
+        if( isLoading || hasPage(currentPage) ){
+            return;
+        }
+        setIsLoading(true);
+            fetchItems({page:currentPage,perPage,search:undefined,source:showAll ? undefined : account})
+                .then(({statuses}) => {
+                    dispatchPageAction({
+                        account,
+                        statuses,
+                        page:currentPage,
+                    })
+                }).finally(() => {
+                    setIsLoading(false);
                 });
 
-    },[account])
+    },[account,currentPage,perPage,showAll,isLoading,hasPage,dispatchPageAction]);
+
     const posts = React.useMemo<Timeline_Post[]>(() => {
         const itemToPost = (item:UIItem) => {
             const post : Timeline_Post = {
@@ -97,11 +122,13 @@ export default function Items({account}:{
                         };
             return post;
         }
-        if( showAll ){
-            return items.items.map(itemToPost)
+
+        const state =  pageState[account].statuses[currentPage];
+        if( ! state ){
+            return [];
         }
-        return items[account].map(itemToPost)
-    },[showAll,items,account]);
+        return state.map(itemToPost);
+    },[pageState,account]);
 
     const rows = React.useMemo< {
 		key:string,
@@ -149,16 +176,29 @@ export default function Items({account}:{
         return <p>No items</p>
     }
     return (
-        <>
+        <div>
             {! posts || posts.length === 0 ? <p>No items</p> : <div>
+                <TablePagination currentPage={currentPage}
+                    onClickPrev={setPrevPage}
+                    onClickNext={setNextPage}
+                    totalPages={42}
+                    displayingNum={posts.length}
+                />
+
                 <Table
                     headers={headers}
                     rows={rows}
                     caption={`Items from ${account}`}
                 />
 
-                <TablePagination currentPage={page} totalPages={1} displayingNum={posts.length}  />
+                <TablePagination currentPage={currentPage}
+                    onClickPrev={setPrevPage}
+                    onClickNext={setNextPage}
+                    totalPages={42}
+                    displayingNum={posts.length}
+                />
             </div>}
-        </>
+            {isLoading && <Spinner/>}
+        </div>
     )
 }
