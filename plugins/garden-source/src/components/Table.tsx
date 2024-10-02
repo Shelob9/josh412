@@ -23,12 +23,28 @@ export function Th({id,children,className}:{
 export  function TablePagination({
 	displayingNum,
 	totalPages,
-	currentPage
+	currentPage,
+	onClickNext,
+	onClickPrev
 }:{
 	displayingNum:number,
 	currentPage:number,
-	totalPages:number
+	totalPages:number,
+	onClickNext:()=>void,
+	onClickPrev:()=>void,
 }){
+	const hasNext = currentPage < totalPages;
+	const hasPrev = currentPage > 1;
+	const handleClickNext = () => {
+		if( hasNext ){
+			onClickNext();
+		}
+	}
+	const handleClickPrev = () => {
+		if( hasPrev ){
+			onClickPrev();
+		}
+	}
 	return (
 		<div className="tablenav bottom">
 
@@ -45,14 +61,22 @@ export  function TablePagination({
 					<span id="table-paging" className="paging-input">
 						<span className="tablenav-paging-text">{currentPage} of <span className="total-pages">{totalPages}</span></span>
 					</span>
-					<a className="next-page button" href="#">
+					<button
+						className="next-page button"
+						disabled={!hasNext}
+						onClick={handleClickNext}
+					>
 						<span className="screen-reader-text">Next page</span>
 						<span aria-hidden="true">›</span>
-					</a>
-					<a className="last-page button" href="#">
+					</button>
+					<button
+						className="last-page button"
+						disabled={!hasNext}
+						onClick={handleClickNext}
+					>
 						<span className="screen-reader-text">Last page</span>
 						<span aria-hidden="true">»</span>
-					</a>
+					</button>
 				</span>
 			</div>
 			<br className="clear"/>

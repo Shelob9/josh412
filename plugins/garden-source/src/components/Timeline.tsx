@@ -9,7 +9,7 @@ import { accounts } from '../accounts';
 import { Accounts, See } from '../types';
 import fetchTimeline from './api/fetchTimeline';
 import { BskyPostSimple } from './bluesky';
-import { pageState } from './hooks/useTimelines';
+import { CursoredPageState } from './hooks/useTimelines';
 import useTimeLinesWithSearch from './hooks/useTimelinesWithSearch';
 import TimelinePost, { Timeline_Post } from './TimelinePost';
 
@@ -217,8 +217,8 @@ export function TimelineRender({
     const isMastodon = 'mastodon' === accountDetails?.type;
 
     const posts = useMemo<Timeline_Post[]>(() => {
-        const getPage = (state:pageState) =>state[account].currentPage
-        const getState = (state:pageState) => state[account].statuses[page]?.statuses;
+        const getPage = (state:CursoredPageState<any,BskyPostSimple>) =>state[account].currentPage
+        const getState = (state:CursoredPageState<any,BskyPostSimple>) => state[account].statuses[page]?.statuses;
         const page = getPage(showSearch ? searchPageState : pageState);
         const state = getState(showSearch ? searchPageState : pageState);
         if( ! state ){

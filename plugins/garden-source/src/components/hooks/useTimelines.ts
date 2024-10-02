@@ -3,12 +3,12 @@ import { Accounts } from '../../types';
 import { BskyPostSimple } from '../bluesky';
 
 
-export type pageState = {
+export type CursoredPageState<Mt,Bt> = {
     mastodonSocial: {
         currentPage: 0,
         statuses: {[key: number]: {
             cursor?: string|undefined;
-            statuses: any[];
+            statuses: Mt[];
         }},
     },
     fosstodon: {
@@ -22,7 +22,7 @@ export type pageState = {
         currentPage: 0,
         statuses: {[key: number]: {
             cursor?: string|undefined;
-            statuses: BskyPostSimple[];
+            statuses: Bt[];
         }},
     }
 }
@@ -36,7 +36,7 @@ export type SelectorFns = {
     hasPageByCursor: (cursor:string|undefined) => boolean;
     getCurrentCursor: () => string|undefined;
 }
-const createSelectors = (state:pageState,account:Accounts):SelectorFns => {
+const createSelectors = (state:CursoredPageState<any,BskyPostSimple>,account:Accounts):SelectorFns => {
 
     const findIndexByByCursor = (cursor:string|undefined): number =>{
         if( undefined === cursor ){
@@ -110,7 +110,7 @@ export type Page_State_Actions = {
     clear: true;
 };
 
-function pageReducer( state: pageState,action: Page_State_Actions ): pageState{
+function pageReducer<Mt,Bt>( state: CursoredPageState<Mt,Bt>,action: Page_State_Actions ): CursoredPageState<Mt,Bt>{
     const actionAccount = action.account as string;
     if( 'clear' in action ){
         return {
@@ -196,7 +196,7 @@ function pageReducer( state: pageState,action: Page_State_Actions ): pageState{
 
 
 
-const defaultPageState :pageState = {
+const defaultPageState :CursoredPageState<any,BskyPostSimple> = {
 
         mastodonSocial: {
             currentPage: 0,
@@ -223,7 +223,7 @@ const defaultPageState :pageState = {
 
 export type TimelineStateApi =
     SelectorFns & {
-        pageState: pageState;
+        pageState: CursoredPageState<any,BskyPostSimple>;
         currentCursor: string|undefined;
         dispatchPageAction: (action:Page_State_Actions) => void;
     }

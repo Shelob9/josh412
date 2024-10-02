@@ -2,7 +2,6 @@ import React from "react";
 import { Accounts } from "../types";
 import fetchItems from "./api/fetchItemts";
 import Table, { TablePagination } from "./Table";
-import { TimelineRender } from "./Timeline";
 import { Timeline_Post } from "./TimelinePost";
 type UIItem = {
     uuid: string;
@@ -152,19 +151,10 @@ export default function Items({account}:{
     return (
         <>
             {! posts || posts.length === 0 ? <p>No items</p> : <div>
-                <TimelineRender
-                    account={account}
-                    see="statuses"
-                    onChangeAccount={() => {}}
-                    searchMyPostsOnly={false}
-                    search={''}
-                    Render={() => (
-                        <Table
-                            headers={headers}
-                            rows={rows}
-                            caption={`Items from ${account}`}
-                        />
-                    )}
+                <Table
+                    headers={headers}
+                    rows={rows}
+                    caption={`Items from ${account}`}
                 />
 
                 <TablePagination currentPage={page} totalPages={1} displayingNum={posts.length}  />
