@@ -36,7 +36,7 @@ export type SelectorFns = {
     hasPageByCursor: (cursor:string|undefined) => boolean;
     getCurrentCursor: () => string|undefined;
 }
-const createSelectors = (state:CursoredPageState<any,BskyPostSimple>,account:Accounts):SelectorFns => {
+const createSelectors =<Mt,Bt> (state:CursoredPageState<Mt,Bt>,account:Accounts):SelectorFns => {
 
     const findIndexByByCursor = (cursor:string|undefined): number =>{
         if( undefined === cursor ){
@@ -221,16 +221,17 @@ const defaultPageState :CursoredPageState<any,BskyPostSimple> = {
         }
     };
 
-export type TimelineStateApi =
+export type TimelineStateApi<Mt,Bt> =
     SelectorFns & {
-        pageState: CursoredPageState<any,BskyPostSimple>;
+        pageState: CursoredPageState<Mt,Bt>;
         currentCursor: string|undefined;
         dispatchPageAction: (action:Page_State_Actions) => void;
     }
-function useTimelines({account}:{
+
+export function useCursoredState<Mt,Bt>({account}:{
     account: Accounts,
-}): TimelineStateApi {
-    const [pageState,dispatchPageAction] = useReducer(pageReducer,defaultPageState);
+}): TimelineStateApi<Mt,Bt> {
+    const [pageState,dispatchPageAction] = useReducer(pageReducer<Mt,Bt>,defaultPageState as CursoredPageState<Mt,Bt>);
 
     const selectors = useMemo(() => {
         return createSelectors(pageState,account);
@@ -246,6 +247,14 @@ function useTimelines({account}:{
         currentCursor,
         dispatchPageAction
     }
+}
+function useTimelines({account}:{
+    account: Accounts,
+}): TimelineStateApi<any,BskyPostSimple> {
+
+    const api = useCursoredState<any,BskyPostSimple>({account});
+
+    return api;
 }
 
 export default useTimelines;
