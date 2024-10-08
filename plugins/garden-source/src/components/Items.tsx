@@ -138,7 +138,10 @@ export default function Items({account}:{
                     },
                     {
                         key: 'content',
-                        Render:() =>  post.content
+                        Render:() =>  <div
+                            dangerouslySetInnerHTML={{__html: post.content}}
+                        />
+
                     },
 
                     {
