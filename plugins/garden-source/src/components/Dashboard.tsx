@@ -44,7 +44,7 @@ export default function Dashboard() {
         }
     }, []);
 	return (
-        <>
+        <div>
 
 
             <TabPanel
@@ -137,7 +137,7 @@ export default function Dashboard() {
             </TabPanel>
 
 
-        </>
+        </div>
 
     )
 }

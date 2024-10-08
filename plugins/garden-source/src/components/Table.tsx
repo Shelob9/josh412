@@ -25,16 +25,21 @@ export  function TablePagination({
 	totalPages,
 	currentPage,
 	onClickNext,
-	onClickPrev
+	onClickPrev,
+	hasNext,
+	hasPrev,
+	goToPage,
 }:{
+	goToPage:(page:number)=>void,
 	displayingNum:number,
 	currentPage:number,
 	totalPages:number,
 	onClickNext:()=>void,
 	onClickPrev:()=>void,
+	hasNext:boolean,
+	hasPrev:boolean
 }){
-	const hasNext = currentPage < totalPages;
-	const hasPrev = currentPage > 1;
+
 	const handleClickNext = () => {
 		if( hasNext ){
 			onClickNext();
@@ -55,8 +60,16 @@ export  function TablePagination({
 			<div className="tablenav-pages">
 				<span className="displaying-num">{displayingNum} items</span>
 				<span className="pagination-links">
-					<span className="tablenav-pages-navspan button disabled" aria-hidden="true">«</span>
-					<span className="tablenav-pages-navspan button disabled" aria-hidden="true">‹</span>
+					<button
+						disabled={currentPage === 1}
+						className={`tablenav-pages-navspan button ${currentPage == 1 ? 'disabled':''}`} aria-hidden="true"
+						onClick={() => goToPage(1)}
+					>«</button>
+					<button className={`tablenav-pages-navspan button ${hasPrev ? '':'disabled'}`} aria-hidden="true"
+						onClick={() => handleClickPrev()}
+					>
+						‹
+					</button>
 					<span className="screen-reader-text">Current Page</span>
 					<span id="table-paging" className="paging-input">
 						<span className="tablenav-paging-text">{currentPage} of <span className="total-pages">{totalPages}</span></span>
@@ -70,9 +83,9 @@ export  function TablePagination({
 						<span aria-hidden="true">›</span>
 					</button>
 					<button
-						className="last-page button"
-						disabled={!hasNext}
-						onClick={handleClickNext}
+						className={`last-page button ${currentPage === totalPages ? 'disabled':''}`}
+						disabled={currentPage === totalPages}
+						onClick={() => goToPage(totalPages)}
 					>
 						<span className="screen-reader-text">Last page</span>
 						<span aria-hidden="true">»</span>

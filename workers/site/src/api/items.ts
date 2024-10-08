@@ -26,7 +26,12 @@ api.get('/', async (c) => {
             source,
             sourceType,
         });
-        return c.json({ items,route,nextCursor: page ?page + 1 : 2 });
+        const totalPages = await itemsDb.totalPages({
+            source,
+            sourceType,
+            perPage:numberArg(c.req,'perPage'),
+        });
+        return c.json({ items,route,nextCursor: page ?page + 1 : 2,totalPages });
    } catch (e) {
      return c.json({ err: e.message,route }, 500);
    }
@@ -44,7 +49,11 @@ api.get('/sourcetype/:sourceType', async (c) => {
             perPage:numberArg(c.req,'perPage'),
             sourceType,
         });
-        return c.json({ items,route,nextCursor: page ?page + 1 : 2 });
+        const totalPages = await itemsDb.totalPages({
+            sourceType,
+            perPage:numberArg(c.req,'perPage'),
+        });
+        return c.json({ items,route,nextCursor: page ?page + 1 : 2,totalPages });
    } catch (e) {
      return c.json({ err: e.message,route }, 500);
    }
@@ -64,7 +73,11 @@ api.get('/source/:source', async (c) => {
             perPage:numberArg(c.req,'perPage'),
             source,
         });
-        return c.json({ items,route,nextCursor: page ?page + 1 : 2 });
+        const totalPages = await itemsDb.totalPages({
+            source,
+            perPage:numberArg(c.req,'perPage'),
+        });
+        return c.json({ items,route,nextCursor: page ?page + 1 : 2,totalPages });
    } catch (e) {
      return c.json({ err: e.message,route }, 500);
    }

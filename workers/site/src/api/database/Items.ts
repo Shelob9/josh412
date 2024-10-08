@@ -324,6 +324,26 @@ export default class ItemsApi {
         return items;
     }
 
+    //total number of items
+    async totalPages(args: Pagignation&{
+        source?: string,
+        sourceType?: string
+    }): Promise<number> {
+        let where = undefined;
+        if(args.source || args.sourceType){
+            where = {
+                source: args.source,
+                sourceType: args.sourceType
+            }
+        }
+
+        const count = await this.prisma.item.count({
+            where
+        });
+        return Math.ceil(count / (args.perPage ?? 25));
+
+    }
+
     async all(args: Pagignation&{
         source?: string,
         sourceType?: string

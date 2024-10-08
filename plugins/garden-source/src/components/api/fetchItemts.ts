@@ -62,9 +62,9 @@ export default function fetchItems({page,perPage,search,source}:{
     nextCursor?: string;
     cursor?: string;
     source?: string;
+    totalPages: number;
 }>{
     let url = new URL(`${apiUrl}/items`);
-
     if( source ){
         if( 'bluesky' === source ){
             url = new URL(`${apiUrl}/items/sourcetype/bluesky`);
@@ -94,7 +94,7 @@ export default function fetchItems({page,perPage,search,source}:{
                 return {
                     ...json,
                     statuses: json.items,
-
+                    totalPages: json.totalPages,
                 }
             }
             return json;

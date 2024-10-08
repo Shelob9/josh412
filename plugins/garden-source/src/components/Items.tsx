@@ -50,39 +50,25 @@ export default function Items({account}:{
         pageState,
         dispatchPageAction,
         hasPage,
+        currentPage,
+        setCurrentPage,
+        perPage,
+        totalPages
     } = usePagedState<UIItem,UIItem>({account});
 
-    const [currentPages,setCurrentPages] = React.useState({
-        mastodonSocial: 1,
-        fosstodon: 1,
-        bluesky: 1
-    });
-    const [showAll,setShowAll] = React.useState(false);
-    const [perPage,setPerPage] = React.useState(25);
-    const currentPage = useMemo(()=>currentPages[account],[currentPages,account]);
-    const hasNextPage = true;
+    const hasNextPage = useMemo(() => currentPage < totalPages,[currentPage,totalPages]);
     const hasPrevPage = useMemo(() => {
         return currentPage > 1;
     },[currentPage]);
     const setNextPage = () => {
         if( hasNextPage ){
-            setCurrentPages(prev => {
-                return {
-                    ...prev,
-                    [account]: prev[account] + 1
-                }
-            })
+            setCurrentPage(currentPage + 1);
         }
     }
 
     const setPrevPage = () => {
         if( hasPrevPage ){
-            setCurrentPages(prev => {
-                return {
-                    ...prev,
-                    [account]: prev[account] - 1
-                }
-            });
+            setCurrentPage(currentPage - 1);
         }
     }
 
@@ -91,18 +77,19 @@ export default function Items({account}:{
             return;
         }
         setIsLoading(true);
-            fetchItems({page:currentPage,perPage,search:undefined,source:showAll ? undefined : account})
-                .then(({statuses}) => {
+            fetchItems({page:currentPage,perPage,search:undefined,source:account})
+                .then(({statuses,totalPages}) => {
                     dispatchPageAction({
                         account,
                         statuses,
                         page:currentPage,
+                        totalPages,
                     })
                 }).finally(() => {
                     setIsLoading(false);
                 });
 
-    },[account,currentPage,perPage,showAll,isLoading,hasPage,dispatchPageAction]);
+    },[account,currentPage,perPage,isLoading,hasPage,dispatchPageAction]);
 
     const posts = React.useMemo<Timeline_Post[]>(() => {
         const itemToPost = (item:UIItem) => {
@@ -138,7 +125,9 @@ export default function Items({account}:{
 			className?:string
 		}[]
 	}[]>(() => {
-
+        if(! posts || posts.length === 0 ){
+            return [];
+        }
         return posts.map((post) => {
             return {
                 key: post.id,
@@ -178,25 +167,27 @@ export default function Items({account}:{
     return (
         <div>
             {! posts || posts.length === 0 ? <p>No items</p> : <div>
-                <TablePagination currentPage={currentPage}
-                    onClickPrev={setPrevPage}
+                <TablePagination
+                    hasNext={hasNextPage}
+                    hasPrev={hasPrevPage}
                     onClickNext={setNextPage}
-                    totalPages={42}
+                    onClickPrev={setPrevPage}
                     displayingNum={posts.length}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    goToPage={setCurrentPage}
                 />
 
-                <Table
-                    headers={headers}
-                    rows={rows}
-                    caption={`Items from ${account}`}
-                />
+                <div>
+                    <Table
+                        headers={headers}
+                        rows={rows}
+                        caption={`Items from ${account}`}
+                    />
 
-                <TablePagination currentPage={currentPage}
-                    onClickPrev={setPrevPage}
-                    onClickNext={setNextPage}
-                    totalPages={42}
-                    displayingNum={posts.length}
-                />
+                </div>
+
+
             </div>}
             {isLoading && <Spinner/>}
         </div>

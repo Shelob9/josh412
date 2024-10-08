@@ -4,6 +4,7 @@ import { TabPanel, ToggleControl } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import React, { useState } from 'react';
 import { Accounts, See } from '../types';
+import Items from './Items';
 import { SearchGardern } from './SearchGarden';
 import Timeline from './Timeline';
 import TimelineViewToggles from './TimelineViewToggles';
@@ -57,6 +58,11 @@ export default function GardenSource({search,setSearch}) {
                         title: 'Search',
                         className: 'search-tab',
                     },
+                    {
+                        name: 'items',
+                        title: 'Items',
+                        className: 'items-tab',
+                    }
                 ] }
             >
                 { ( tab ) => {
@@ -72,6 +78,10 @@ export default function GardenSource({search,setSearch}) {
                                     searchMyPostsOnly={searchMyPostsOnly}
                                 />
                             break;
+                        case 'items':
+                            return <Items
+                                account={account}
+                               />
 
                         default:
                             return <>

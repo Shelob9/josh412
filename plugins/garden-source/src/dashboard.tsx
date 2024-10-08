@@ -13,14 +13,19 @@ function removeChildren(el: HTMLElement|null){
 }
 //on ready
 window.addEventListener('DOMContentLoaded', (event) => {
-    const el = document.getElementById('dashboard-widgets-wrap');
+    const el = document.getElementById('wpbody-content');
     if(!el){
         return;
     }
+    el.setAttribute('notranslate', 'true' );
     removeChildren(el);
+
     removeChildren(document.getElementById('wpfooter'));
     //react dom client render on el
     const root = createRoot(el);
-    root.render(<Dashboard />);
+    root.render(<div className="wrap">
+        <h1>Dashboard</h1>
+        <Dashboard />
+    </div>);
 
 });
