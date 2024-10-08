@@ -80,7 +80,9 @@ export default function GardenSource({search,setSearch}) {
                             break;
                         case 'items':
                             return <Items
-                                account={account}
+                                    account={account}
+                                    onCopy={(content) => addParagraph(content)}
+                                    onQuote={(content,citation) => addBlockquote(content,citation)}
                                />
 
                         default:

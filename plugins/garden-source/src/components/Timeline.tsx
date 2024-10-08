@@ -35,10 +35,14 @@ function postUriToUrl(uri:string,authorHandle:string){
 
 }
 
-
 export type UseProps = {
     onCopy: (content: string) => void;
     onQuote: (content: string, citation: string) => void;
+}
+
+export type UsePropsOptional = {
+    onCopy?: (content: string) => void;
+    onQuote?: (content: string, citation: string) => void;
 }
 
 export default function Timeline(props:Omit<TimelineProps, 'onChangeSee'|'onChangeNetwork'>&UseProps&{

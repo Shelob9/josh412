@@ -12,15 +12,16 @@ import {
 } from '@wordpress/components';
 import { PostHeader } from "./Posts";
 import { UseProps } from "./Timeline";
+export type Timeline_Post_Author = {
+    url: string,
+    displayName: string,
+    avatar: string,
+};
 export type Timeline_Post = {
     id:string,
     createdAt:string,
     content:string,
-    postAuthor: {
-        url: string,
-        displayName: string,
-        avatar: string,
-    },
+    postAuthor: Timeline_Post_Author,
     postUrl: string,
     reply?: {
         url:string

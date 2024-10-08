@@ -1,10 +1,11 @@
-import { Spinner } from "@wordpress/components";
+import { Button, Spinner } from "@wordpress/components";
 import React, { useMemo } from "react";
 import { Accounts } from "../types";
 import fetchItems from "./api/fetchItemts";
 import usePagedState from "./hooks/usePagedState";
 import Table, { TablePagination } from "./Table";
-import { Timeline_Post } from "./TimelinePost";
+import { UsePropsOptional } from "./Timeline";
+import { Timeline_Post, Timeline_Post_Author } from "./TimelinePost";
 type UIItem = {
     uuid: string;
     content: string;
@@ -42,9 +43,42 @@ const headers = [
         children: 'URL'
     }
 ]
-export default function Items({account}:{
-    account: Accounts
-}) {
+
+function IdWithActions({id,onCopy,onQuote,content,postAuthor}:{
+    id:string,
+    content:string,
+    postAuthor: Timeline_Post_Author
+
+}&UsePropsOptional){
+    if(onCopy || onQuote){
+        return (
+            <div>
+
+                {id}
+                {onCopy && <Button onClick={() => onCopy(content)}>Copy</Button>}
+                {onQuote && (
+                    <Button
+                        onClick={() => onQuote(
+                            `<p>${content}</p>`,
+                            `<a href="${postAuthor.url}">${postAuthor.displayName}</a>`
+                        )}
+
+                    >
+                        Quote
+                    </Button>
+                )}
+            </div>
+        )
+
+    }
+    return <div>{id}</div>
+
+}
+
+export default function Items({account,onCopy,onQuote}:{
+    account: Accounts,
+
+}&UsePropsOptional) {
     const [isLoading,setIsLoading] = React.useState(false);
     const {
         pageState,
@@ -134,14 +168,19 @@ export default function Items({account}:{
                 cells: [
                     {
                         key: 'id',
-                        Render:() =>  post.id
+                        Render:() =>  <IdWithActions
+                            id={post.id}
+                            onCopy={onCopy}
+                            onQuote={onQuote}
+                            content={post.content}
+                            postAuthor={post.postAuthor}
+                        />
                     },
                     {
                         key: 'content',
                         Render:() =>  <div
                             dangerouslySetInnerHTML={{__html: post.content}}
                         />
-
                     },
 
                     {
