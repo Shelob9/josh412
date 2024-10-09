@@ -1,26 +1,8 @@
 import { Accounts } from "../../types";
 import { AccountDetailsMinimal } from "../Timeline";
-
-const  { apiUrl,token } : {
-    apiUrl: string;
-    token: string;
-}
-//@ts-ignore
-= window.GARDEN || {
-    apiUrl: '',
-    token: '',
-};
+import dataFetch, { apiUrl } from "./dataFetch";
 
 
-const headers = {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-}
-export type CreatedItem = {
-    uuid: string;
-    created:boolean;
-    remoteId: string;
-}
 
 export function fetchInjestItems({account,cursor,}:{
     account:AccountDetailsMinimal,
@@ -40,8 +22,7 @@ export function fetchInjestItems({account,cursor,}:{
         }
     }
 
-    return fetch(url.toString(),{
-        headers,
+    return dataFetch(url.toString(),{
         method: 'POST',
     })
         .then(response => response.json())
@@ -85,9 +66,7 @@ export default function fetchItems({page,perPage,search,source}:{
     if( perPage ){
         url.searchParams.append('perPage',perPage.toString());
     }
-    return fetch(url.toString(),{
-        headers,
-    })
+    return dataFetch(url.toString())
         .then(response => response.json())
         .then(json => {
             if('items' in json){

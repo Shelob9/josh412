@@ -2,12 +2,104 @@ import { Spinner } from "@wordpress/components";
 import React from "react";
 import { accounts } from "../accounts";
 import { Accounts } from "../types";
+import dataFetch from "./api/dataFetch";
 import { CreatedItem, fetchInjestItems } from "./api/fetchItemts";
 import Table from "./Table";
 import { AccountDetailsMinimal } from "./Timeline";
+const  { apiUrl,token } : {
+    apiUrl: string;
+    token: string;
+}
+//@ts-ignore
+= window.GARDEN || {
+    apiUrl: '',
+    token: '',
+};
+function useClassifications({account}:{
+    account: Accounts
+}){
+    const [classifyPage,setClassifyPage] = React.useState(0);
+    const [totalClasified,setTotalClassified] = React.useState({
+        mastodonSocial: 0,
+        fosstodon: 0,
+        bluesky: 0,
+    });
+    const [pagesClassified,setPagesClassified] = React.useState<{[key:number]:boolean}>({
+        0: false,
+        1: false,
+    });
+
+    React.useEffect(() => {
+        dataFetch(`/classifications`)
+            .then(r => r.json())
+            .then((r) => {
+                console.log({
+                    classifications: r
+                });
+            });
+        dataFetch(`/classifications?itemType=${account}`)
+            .then(r => r.json())
+            .then((r) => {
+                console.log({
+                    account: r
+                });
+            });
+    },[account]);
+    React.useEffect(() => {
+        console.log({
+            classifyPage,account,pagesClassified,
+            classifiedPage: pagesClassified[classifyPage],
+            conditional: false === pagesClassified[classifyPage]
+        })
+        if(classifyPage && false === pagesClassified[classifyPage]){
+            dataFetch(`/classifications/process/${account}`,{
+                method: 'POST',
+                body: JSON.stringify({
+                    page: classifyPage
+                }),
+            }).then(r =>r.json())
+            .then((r) => {
+                console.log(r);
+                setPagesClassified((prev) => {
+                    return {
+                        ...prev,
+                        [classifyPage]: true
+                    }
+                });
+                setTotalClassified((prev) => {
+                    return {
+                        ...prev,
+                        [account]: r.created
+                    }
+                });
+            });
+        }
+    },[classifyPage,account,pagesClassified]);
+
+    function classifyNext(){
+        setClassifyPage(classifyPage + 1);
+        setPagesClassified((prev) => {
+            return {
+                ...prev,
+                [classifyPage + 1]: false
+            }
+        });
+    }
+
+
+    return {
+        classifyNext,
+        totalClasified,
+    }
+}
 export default function Injest({account}:{
     account: Accounts
 }) {
+    const {
+        classifyNext,
+        totalClasified,
+    } = useClassifications({account});
+
     const ranOnce = React.useRef(false);
     const [createdItems,setCreatedItems] = React.useState<{
         fosstodon: CreatedItem[];
@@ -95,6 +187,15 @@ export default function Injest({account}:{
     },[account]);
 
 
+    function onResetInjest(){
+        localStorage.removeItem(`nextCursorInjest${account}`)
+        setNextCursor(undefined);
+        setCreatedItems({
+            ...createdItems,
+            [account]: []
+        });
+
+    }
 
     if( ! accountDetails || ! accountDetails.name ){
         return null;
@@ -116,9 +217,30 @@ export default function Injest({account}:{
                 >
                     Injest All
                 </button>
+                <button onClick={onResetInjest}>
+                    Reset Injest
+                </button>
 
             </div>)}
             {isLoading ? <Spinner />: null}
+            <div>
+                <button
+                    onClick={classifyNext}
+                >
+                    Classify {accountDetails.name}
+                </button>
+                <ul>
+                    <li>
+                        Classified Bluesky: {totalClasified['bluesky']}
+                    </li>
+                    <li>
+                        Classified Fosstodon: {totalClasified['fosstodon']}
+                    </li>
+                    <li>
+                        Classified Mastodon Social: {totalClasified['mastodonSocial']}
+                    </li>
+                </ul>
+            </div>
             {createdItems[account].length ?(<Table
                 headers={[{
                     id: 'uuid',

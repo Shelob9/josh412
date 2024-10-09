@@ -65,6 +65,11 @@ export const CLASSIFIER_GM = createClassifier([
 export const CLASSIFIER_WP = createClassifier([
     'wordpress',
     'WordPress',
+    'wpdrama',
+    'automattic',
+    'Gutenberg',
+    'gutenberg',
+    'Automattic',
 ],false,CLASSIFIER_WP_ID);
 //Includes JavaScript, javascript, js
 // Or React or react or tsx or jsx

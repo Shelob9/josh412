@@ -6,6 +6,8 @@ import usePagedState from "./hooks/usePagedState";
 import Table, { TablePagination } from "./Table";
 import { UsePropsOptional } from "./Timeline";
 import { Timeline_Post, Timeline_Post_Author } from "./TimelinePost";
+
+
 type UIItem = {
     uuid: string;
     content: string;
@@ -25,6 +27,9 @@ type UIItem = {
     url: string
 }
 
+type Timeline_Post_From_UIItem = Timeline_Post &{
+    item: UIItem
+}
 const headers = [
     {
         id: 'id',
@@ -41,6 +46,14 @@ const headers = [
     {
         id: 'url',
         children: 'URL'
+    },
+    {
+        id: 'source',
+        children: 'Source'
+    },
+    {
+        id: 'sourceType',
+        children: 'Source Type'
     }
 ]
 
@@ -125,9 +138,9 @@ export default function Items({account,onCopy,onQuote}:{
 
     },[account,currentPage,perPage,isLoading,hasPage,dispatchPageAction]);
 
-    const posts = React.useMemo<Timeline_Post[]>(() => {
+    const posts = React.useMemo<Timeline_Post_From_UIItem[]>(() => {
         const itemToPost = (item:UIItem) => {
-            const post : Timeline_Post = {
+            const post : Timeline_Post_From_UIItem = {
                 id: item.uuid,
                 createdAt:'',//not saved
                 content:item.content,
@@ -140,7 +153,8 @@ export default function Items({account,onCopy,onQuote}:{
                 reply: {
                     url: item.remoteReplyToId ?? '',
                 },
-                        };
+                item
+            };
             return post;
         }
 
@@ -196,6 +210,14 @@ export default function Items({account,onCopy,onQuote}:{
                             target="_blank"
                             rel="noreferrer"
                         >{post.postUrl}</a>
+                    },
+                    {
+                        key:'source',
+                        Render:() => <span>{post.item.source}</span>
+                    },
+                    {
+                        key:'sourceType',
+                        Render:() => <span>{post.item.sourceType}</span>
                     }
                 ]
             }

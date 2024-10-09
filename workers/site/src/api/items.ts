@@ -1,17 +1,13 @@
 import { blueskyDidToCongig, isValidAccontId, mastodonAccountIdToConfig, MastodonApi, tryBskyLogin } from "@app/social";
-import { Hono, HonoRequest } from "hono";
+import { Hono } from "hono";
 import { Bindings, Variables } from "../../app.types";
 import { fetchBlueskyStatusesSimple } from "./util/BlueskyStatusToSimple";
+import { numberArg } from "./util/numberArg";
 
 const api = new Hono<{Variables: Variables,Bindings:Bindings}>();
 
 
-const numberArg = (req:HonoRequest,key:string) => {
-    if( ! req.query(key)){
-        return undefined;
-    }
-    return parseInt(req.query(key) as string);
-}
+
 api.get('/', async (c) => {
     const route = 'GET /items';
     const itemsDb = c.get('ItemsApi');

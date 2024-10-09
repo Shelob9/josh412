@@ -1,21 +1,8 @@
 import { See } from "../../types";
 import { AccountDetailsMinimal } from "../Timeline";
-
-const  { apiUrl,token } : {
-    apiUrl: string;
-    token: string;
-}
-//@ts-ignore
-= window.GARDEN || {
-    apiUrl: '',
-    token: '',
-};
+import dataFetch, { apiUrl } from "./dataFetch";
 
 
-const headers = {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-}
 
 function fetchTimeline({account,see,cursor,search,searchMyPostsOnly}:{
     account:AccountDetailsMinimal,
@@ -43,9 +30,7 @@ function fetchTimeline({account,see,cursor,search,searchMyPostsOnly}:{
             }
         }
 
-        return fetch(url.toString(),{
-            headers,
-        })
+        return dataFetch(url.toString())
             .then(response => response.json())
             .then(json => {
                 console.log({mastodon:json})
@@ -70,7 +55,7 @@ function fetchTimeline({account,see,cursor,search,searchMyPostsOnly}:{
             }
         }
         console.log({url})
-        return fetch(url,{headers})
+        return dataFetch(url)
                 .then(response => response.json())
                 .then(json => {
                     console.log({bluesky:json})

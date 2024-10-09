@@ -4,70 +4,75 @@ import { CLASSIFIERS } from "./classify/classifiers";
 import { Classification_Source, classifySources } from "./classify/classify";
 import ClassificationsApi, { Classification } from "./database/Classifications";
 import ItemsApi from "./database/Items";
+import { numberArg } from "./util/numberArg";
 const api = new Hono<{Variables: Variables,Bindings:Bindings}>({ strict: false });
 
-api.get('/classify', async (c) => {
-    const route = 'GET /api/classify';
-    const sources : Classification_Source[] = [
-        {
-            text: 'Good morning',
-            sourcetype: 'text',
-            id: '1'
-        }
-    ];
-    const classified = await classifySources(sources,CLASSIFIERS);
-    return c.json({ classified,route,sources });
+api.get('/', async (c) => {
+    const classificationApi = c.get('classifications');
+    const route = 'GET /api/classifications';
+    const itemType = c.req.query('itemType') || undefined;
+    const classifications = await classificationApi.all({
+        page: numberArg(c.req,'page',1),
+        perPage:numberArg(c.req,'perPage',25),
+        itemType,
+    });
+    return c.json({ classifications,route, itemType});
 });
 
-api.post('/process', async (c) => {
-    const itemsApi = c.get('ItemsApi') as ItemsApi;
-    const classificationApi = c.get('classifications');
-    const body = await c.req.json() as unknown as {
-        items: {
-            content: string,
-            remote_id: string
-        } []
-    }
-    const item_type = 'mastodon_post'
-    if( body.items ){
-        const sources : Classification_Source[] = body.items.map(({content,remote_id}) => {
-            return {
-                text: content,
-                sourcetype: item_type,
-                id: remote_id
-            }
+api.post('/process/:source', async (c) => {
+    const source = c.req.param('source');
+    const route = `/api/process/${source}`;
+    const itemsDb = c.get('ItemsApi') as ItemsApi;
+    const body : {
+        page?: number,
+        perPage?: number,
+    } = await c.req.json();
+    const page = body.page || 1;
+    try {
+        const items = await itemsDb.all({
+            page,
+            perPage: body.perPage || 25,
+            source,
         });
-        const classifications = classifySources(sources,CLASSIFIERS);console.log({classifications})
-        //return c.json({ route:'/api/process',sources,classifications });
-        const processed = await Promise.all(Object.keys(classifications).map(async (source_id) => {
-           const classification_ids = classifications[source_id];
-           const source = sources.find(s => s.id === source_id)as Classification_Source;
-           if( source ){
-                const itemId = await itemsApi.create({
-                    remote_id: source_id,
-                    item_type,
-                    content:source.text
+        const classificationApi = c.get('classifications');
+        const sources: Classification_Source[] = [];
+        items.forEach(item => {
+            //remove html tags
+            const text = item.content.replace(/<[^>]*>?/gm, '');
+            sources.push({
+                text,
+                sourcetype: source,
+                id: item.uuid
+            });
+        });
+        const classifications = classifySources(sources,CLASSIFIERS);
+        const prepared : Omit<Classification, 'uuid'>[] = [];
+        Object.keys(classifications).forEach(item => {
+            classifications[item].forEach(classification => {
+                prepared.push({
+                    item,
+                    item_type: source,
+                    classification,
                 });
-                classification_ids.forEach(async (classification_id) => {
-                    await classificationApi.create({
-                        item: itemId,
-                        item_type,
-                        classification: classification_id
-                    });
-                });
-                return {
-                    source_id,
-                    item_id: itemId,
-                    classification_ids
-                }
-           }
+
+            });
 
 
-        }) );
-        return c.json({ route:'/api/process',sources,processed });
-    }else{
-        return c.json({route:'/api/process',body});
+        });
+        try {
+            const created = await classificationApi.createMany(prepared);
+
+            return c.json({ route,sources,classifications,created,body,prepared});
+
+        } catch (error) {
+            return c.json({ route,sources,classifications,created:[],error });
+
+        }
+    } catch (error) {
+        return c.json({ route, error:error.message });
     }
+
+
 
 });
 
@@ -86,35 +91,7 @@ api.get('/byitem/:item', async (c) => {
     }
 
 });
- api.get('/:uuid', async (c) => {
-    const route = `GET /api/classifications/:uuid`
-     const uuid = c.req.param('uuid');
-     if( ! uuid) {
-            return c.json({ err: "uuid is required",route });
-        }
-        const service = c.get('classifications') as ClassificationsApi;
-     try {
-         const classification = await service.get(uuid);
-         return c.json({ classification,uuid, route });
-     } catch (e) {
-         return c.json({ err: e.message, uuid,route}, 500);
-     }
- });
- api.get('/', async (c) => {
-    const route = 'GET /api/classifications';
-    const service = c.get('classifications') as ClassificationsApi;
 
-    try {
-        const classifications = await service.all({
-            page: 1,
-            perPage:25
-        });
-        return c.json({ classifications,route });
-   } catch (e) {
-     return c.json({ err: e.message,route }, 500);
-   }
-
-});
 
 
 
@@ -129,4 +106,6 @@ api.get('/byitem/:item', async (c) => {
         return c.json({ deleted:false,err: e.message,route }, 500);
     }
 });
+
+
  export default api;
