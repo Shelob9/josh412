@@ -34,7 +34,7 @@ function useClassifications({account}:{
         1: false,
     });
     const isDone = useMemo(() => {
-        return pagesClassified[classifyPage] && pagesClassified[classifyPage];
+        return pagesClassified[totalPages[account]] && true === pagesClassified[totalPages[account]];
     },[totalPages,totalClasified,account]);
     //when accoutn changes, empty pagesClassified
     React.useEffect(() => {
@@ -60,11 +60,7 @@ function useClassifications({account}:{
             });
     },[account]);
     React.useEffect(() => {
-        console.log({
-            classifyPage,account,pagesClassified,
-            classifiedPage: pagesClassified[classifyPage],
-            conditional: false === pagesClassified[classifyPage]
-        })
+
         if(classifyPage && false === pagesClassified[classifyPage]){
             dataFetch(`/classifications/process/${account}`,{
                 method: 'POST',
@@ -89,7 +85,7 @@ function useClassifications({account}:{
                 setTotalPages((prev) => {
                     return {
                         ...prev,
-                        [account]: r.totalItems
+                        [account]: r.totalPages
                     }
                 });
             });
@@ -111,6 +107,8 @@ function useClassifications({account}:{
         classifyNext,
         totalClasified,
         isDone,
+        totalPages,
+        classifyPage,
     }
 }
 export default function Injest({account}:{
@@ -119,7 +117,9 @@ export default function Injest({account}:{
     const {
         classifyNext,
         totalClasified,
-        isDone:isClassifyDone
+        isDone:isClassifyDone,
+        totalPages: totalClassifyPages,
+        classifyPage,
     } = useClassifications({account});
 
     const ranOnce = React.useRef(false);
@@ -254,6 +254,7 @@ export default function Injest({account}:{
                             Classify {accountDetails.name}
                         </button>
                         <p>Classified {accountDetails.name}: {totalClasified[account]}</p>
+                        <p>page: {classifyPage}</p>
                     </>
                 )}
             </div>

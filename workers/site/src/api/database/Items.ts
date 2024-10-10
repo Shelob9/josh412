@@ -341,7 +341,7 @@ export default class ItemsApi {
         }
 
         const count = await this.prisma.item.count({
-            where
+            where,
         });
         return Math.ceil(count / (args.perPage ?? 25));
 

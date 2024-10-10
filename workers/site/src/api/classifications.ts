@@ -34,7 +34,7 @@ api.post('/process/:source', async (c) => {
             perPage: body.perPage || 25,
             source,
         });
-        const totalItems = await itemsDb.totalPages({
+        const totalPages = await itemsDb.totalPages({
             source,
             perPage: body.perPage || 25,
         });
@@ -61,12 +61,10 @@ api.post('/process/:source', async (c) => {
 
             });
 
-
         });
         try {
             const created = await classificationApi.createMany(prepared);
-
-            return c.json({ route,created,body,prepared,totalItems,totalPages:Math.ceil(totalItems/(body.perPage || 25)) });
+            return c.json({ route,created,body,prepared,totalPages });
 
         } catch (error) {
             return c.json({ route,sources,classifications,created:[],error });
