@@ -3,8 +3,11 @@ import {
     Status as MastodonStatus
 } from "@app/types/mastodon";
 import { Item, PrismaClient } from "@prisma/client";
+import { Classification } from "./Classifications";
 import { Pagignation } from "./types";
-
+export type ItemWithClassification = ItemWithAuthor &{
+    classifications: Classification[]
+}
 
 const validateSourceType = (type: string): boolean => {
     return ['bluesky', 'twitter', 'mastodon', 'wordpress'].includes(type);
@@ -346,8 +349,9 @@ export default class ItemsApi {
 
     async all(args: Pagignation&{
         source?: string,
-        sourceType?: string
-    }): Promise<ItemWithAuthor[]> {
+        sourceType?: string,
+        withClassification?: boolean
+    }): Promise<ItemWithClassification[]> {
         let where = undefined;
         if(args.source || args.sourceType){
             where = {
@@ -371,8 +375,12 @@ export default class ItemsApi {
                 },
             }
         });
-        return items.map((item:Item) => {
+
+        return await Promise.all(items.map(async (item:Item) => {
             const author = authors.find((a) => a.remoteId === item.remoteAuthorId);
+            const classifications = await this.getItemClassifications(
+                item.uuid
+            )
             return {
                 ...item,
                 author: author ?{
@@ -387,9 +395,10 @@ export default class ItemsApi {
                     avatar: '',
                     handle: '',
                     uuid: ''
-                } as ItemAuthor
-            } as ItemWithAuthor;
-        });
+                } as ItemAuthor,
+                classifications,
+            }
+        }));
     }
 
     async allByType(args: Pagignation&{
@@ -407,9 +416,15 @@ export default class ItemsApi {
         return items as Item[];
     }
 
+    private async  getItemClassifications(uuid: string): Promise<Classification[]> {
+        return this.prisma.classification.findMany({
+            where: {
+                item: uuid
+            }
+        });
+    }
 
-
-    async get(uuid: string): Promise<Item> {
+    async get(uuid: string): Promise<ItemWithClassification> {
 
         const item = await this.prisma.item.findUnique({
             where: {
@@ -419,7 +434,11 @@ export default class ItemsApi {
         if (!item) {
             throw new Error("Item not found");
         }
-        return item as Item;
+        const classifications = await this.getItemClassifications(item.uuid);
+        return {
+            ...item,
+            classifications
+        } as ItemWithClassification
     }
 
 

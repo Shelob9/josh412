@@ -3,33 +3,12 @@ import React, { useMemo } from "react";
 import { Accounts } from "../types";
 import fetchItems from "./api/fetchItemts";
 import usePagedState from "./hooks/usePagedState";
+import { Timeline_Post_From_UIItem, UIItem } from "./items.types";
 import Table, { TablePagination } from "./Table";
 import { UsePropsOptional } from "./Timeline";
-import { Timeline_Post, Timeline_Post_Author } from "./TimelinePost";
+import { Timeline_Post_Author } from "./TimelinePost";
 
 
-type UIItem = {
-    uuid: string;
-    content: string;
-    source: string;
-    sourceType: string;
-    remoteId: string
-    remoteAuthorId: string;
-    remoteReplyToAuthorId?: string
-    remoteReplyToId?: string
-    author: {
-        url: string,
-        displayName: string,
-        avatar: string,
-        handle: string
-        uuid: string
-    },
-    url: string
-}
-
-type Timeline_Post_From_UIItem = Timeline_Post &{
-    item: UIItem
-}
 const headers = [
     {
         id: 'id',
@@ -54,7 +33,11 @@ const headers = [
     {
         id: 'sourceType',
         children: 'Source Type'
-    }
+    },
+    {
+        id: 'classifications',
+        children: 'Classifications'
+    },
 ]
 
 function IdWithActions({id,onCopy,onQuote,content,postAuthor}:{
@@ -165,6 +148,7 @@ export default function Items({account,onCopy,onQuote}:{
         return state.map(itemToPost);
     },[pageState,account]);
 
+
     const rows = React.useMemo< {
 		key:string,
 		cells: {
@@ -182,13 +166,15 @@ export default function Items({account,onCopy,onQuote}:{
                 cells: [
                     {
                         key: 'id',
-                        Render:() =>  <IdWithActions
-                            id={post.id}
-                            onCopy={onCopy}
-                            onQuote={onQuote}
-                            content={post.content}
-                            postAuthor={post.postAuthor}
-                        />
+                        Render:() =>  <>
+                            <IdWithActions
+                                id={post.id}
+                                onCopy={onCopy}
+                                onQuote={onQuote}
+                                content={post.content}
+                                postAuthor={post.postAuthor}
+                            />
+                        </>
                     },
                     {
                         key: 'content',
@@ -218,6 +204,10 @@ export default function Items({account,onCopy,onQuote}:{
                     {
                         key:'sourceType',
                         Render:() => <span>{post.item.sourceType}</span>
+                    },
+                    {
+                        key:'classifications',
+                        Render:() => <>{post.item.classifications? <span>{post.item.classifications.map((classification) => classification.classification).join(', ')}</span>:''}</>
                     }
                 ]
             }

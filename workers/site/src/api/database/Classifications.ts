@@ -8,7 +8,7 @@ export type Classification = {
     //item source type
     item_type: string;
     classification: string;
-    parent?: string;
+    parent?: string|null;
 };
 export default class ClassificationsApi {
     public constructor(private prisma: PrismaClient) {
@@ -18,12 +18,12 @@ export default class ClassificationsApi {
         itemType?: string;
     }): Promise<Classification &{
         item:Item;
-        item_uuid:string;
+        itemUuid:string;
     }[]> {
         const page = args && args.page || 1;
         const perPage = args && args.perPage || 10;
 
-        const results = await this.prisma.classification.findMany({
+        const results  : Classification[]= await this.prisma.classification.findMany({
             skip: (page - 1) * perPage,
             take: perPage,
             where:  args.itemType ? {
@@ -31,17 +31,26 @@ export default class ClassificationsApi {
             }: undefined,
 
         });
-        //@todo replace with a join (need to fix schema)
-        return await Promise.all(results.map(async(result) => {
-            const item = await this.prisma.item.findFirst({
-                where: { uuid: result.item },
-            });
-            return {
-                ...result,
-                item_uuid: result.item,
-                item,
-            };
-        }));
+        const itemUuids = results.map((result) => result.item);
+        const items = await this.prisma.item.findMany({
+            where: {
+                uuid: {
+                    in: itemUuids,
+                },
+            },
+        });
+        const itemMap = items.reduce((acc, item) => {
+            //@ts-ignore
+            acc[item.uuid] = item;
+            return acc;
+        }, {});
+        return results.map((result) => ({
+            ...result,
+            itemUuid: result.item,
+            //@ts-ignore
+            item: itemMap[result.item] as Item,
+        }))
+
 
     }
 

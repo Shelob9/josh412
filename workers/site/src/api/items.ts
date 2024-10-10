@@ -21,6 +21,8 @@ api.get('/', async (c) => {
             perPage:numberArg(c.req,'perPage'),
             source,
             sourceType,
+            withClassification: true,
+
         });
         const totalPages = await itemsDb.totalPages({
             source,
@@ -44,6 +46,7 @@ api.get('/sourcetype/:sourceType', async (c) => {
             page,
             perPage:numberArg(c.req,'perPage'),
             sourceType,
+            withClassification: true,
         });
         const totalPages = await itemsDb.totalPages({
             sourceType,
@@ -68,6 +71,7 @@ api.get('/source/:source', async (c) => {
             page,
             perPage:numberArg(c.req,'perPage'),
             source,
+            withClassification: true,
         });
         const totalPages = await itemsDb.totalPages({
             source,

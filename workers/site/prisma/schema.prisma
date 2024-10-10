@@ -24,7 +24,7 @@ model Clipping {
 
 model Classification {
   uuid           String  @id @default(uuid())
-  item           String //item uuid
+  item           String
   item_type      String //item source type
   classification String
   parent         String? @map("parent_uuid")

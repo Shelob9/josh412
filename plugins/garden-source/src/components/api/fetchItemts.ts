@@ -1,8 +1,15 @@
 import { Accounts } from "../../types";
+import { UIItem } from "../items.types";
 import { AccountDetailsMinimal } from "../Timeline";
 import dataFetch, { apiUrl } from "./dataFetch";
 
-
+export function fetchItem({id}:{id:string}): Promise<UIItem>{
+    return dataFetch(`${apiUrl}/items/${id}`)
+        .then(response => response.json())
+        .then(json => {
+            return json;
+        });
+}
 
 export function fetchInjestItems({account,cursor,}:{
     account:AccountDetailsMinimal,
