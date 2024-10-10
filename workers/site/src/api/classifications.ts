@@ -66,7 +66,7 @@ api.post('/process/:source', async (c) => {
         try {
             const created = await classificationApi.createMany(prepared);
 
-            return c.json({ route,sources,classifications,created,body,prepared,totalItems,totalPages:Math.ceil(totalItems/(body.perPage || 25)) });
+            return c.json({ route,created,body,prepared,totalItems,totalPages:Math.ceil(totalItems/(body.perPage || 25)) });
 
         } catch (error) {
             return c.json({ route,sources,classifications,created:[],error });

@@ -36,6 +36,13 @@ function useClassifications({account}:{
     const isDone = useMemo(() => {
         return pagesClassified[classifyPage] && pagesClassified[classifyPage];
     },[totalPages,totalClasified,account]);
+    //when accoutn changes, empty pagesClassified
+    React.useEffect(() => {
+        setPagesClassified({
+            0: false,
+            1: false,
+        });
+    },[account]);
     React.useEffect(() => {
         dataFetch(`/classifications`)
             .then(r => r.json())
