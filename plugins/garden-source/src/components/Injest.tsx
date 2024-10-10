@@ -1,5 +1,5 @@
 import { Spinner } from "@wordpress/components";
-import React from "react";
+import React, { useMemo } from "react";
 import { accounts } from "../accounts";
 import { Accounts } from "../types";
 import dataFetch from "./api/dataFetch";
@@ -24,11 +24,18 @@ function useClassifications({account}:{
         fosstodon: 0,
         bluesky: 0,
     });
+    const [totalPages,setTotalPages] = React.useState({
+        mastodonSocial: 0,
+        fosstodon: 0,
+        bluesky: 0,
+    });
     const [pagesClassified,setPagesClassified] = React.useState<{[key:number]:boolean}>({
         0: false,
         1: false,
     });
-
+    const isDone = useMemo(() => {
+        return pagesClassified[classifyPage] && pagesClassified[classifyPage];
+    },[totalPages,totalClasified,account]);
     React.useEffect(() => {
         dataFetch(`/classifications`)
             .then(r => r.json())
@@ -72,6 +79,12 @@ function useClassifications({account}:{
                         [account]: r.created
                     }
                 });
+                setTotalPages((prev) => {
+                    return {
+                        ...prev,
+                        [account]: r.totalItems
+                    }
+                });
             });
         }
     },[classifyPage,account,pagesClassified]);
@@ -90,6 +103,7 @@ function useClassifications({account}:{
     return {
         classifyNext,
         totalClasified,
+        isDone,
     }
 }
 export default function Injest({account}:{
@@ -98,6 +112,7 @@ export default function Injest({account}:{
     const {
         classifyNext,
         totalClasified,
+        isDone:isClassifyDone
     } = useClassifications({account});
 
     const ranOnce = React.useRef(false);
@@ -224,22 +239,16 @@ export default function Injest({account}:{
             </div>)}
             {isLoading ? <Spinner />: null}
             <div>
-                <button
-                    onClick={classifyNext}
-                >
-                    Classify {accountDetails.name}
-                </button>
-                <ul>
-                    <li>
-                        Classified Bluesky: {totalClasified['bluesky']}
-                    </li>
-                    <li>
-                        Classified Fosstodon: {totalClasified['fosstodon']}
-                    </li>
-                    <li>
-                        Classified Mastodon Social: {totalClasified['mastodonSocial']}
-                    </li>
-                </ul>
+                {isClassifyDone ? <strong>Done With Classifications</strong>:(
+                    <>
+                        <button
+                            onClick={classifyNext}
+                        >
+                            Classify {accountDetails.name}
+                        </button>
+                        <p>Classified {accountDetails.name}: {totalClasified[account]}</p>
+                    </>
+                )}
             </div>
             {createdItems[account].length ?(<Table
                 headers={[{

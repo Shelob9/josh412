@@ -34,6 +34,10 @@ api.post('/process/:source', async (c) => {
             perPage: body.perPage || 25,
             source,
         });
+        const totalItems = await itemsDb.totalPages({
+            source,
+            perPage: body.perPage || 25,
+        });
         const classificationApi = c.get('classifications');
         const sources: Classification_Source[] = [];
         items.forEach(item => {
@@ -62,7 +66,7 @@ api.post('/process/:source', async (c) => {
         try {
             const created = await classificationApi.createMany(prepared);
 
-            return c.json({ route,sources,classifications,created,body,prepared});
+            return c.json({ route,sources,classifications,created,body,prepared,totalItems,totalPages:Math.ceil(totalItems/(body.perPage || 25)) });
 
         } catch (error) {
             return c.json({ route,sources,classifications,created:[],error });

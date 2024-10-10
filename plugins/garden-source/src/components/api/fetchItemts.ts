@@ -18,6 +18,8 @@ export function fetchInjestItems({account,cursor,}:{
 }): Promise<{
     nextCursor?: string;
     items:CreatedItem[];
+    totalPages: number;
+    totalItems: number;
 }>{
 
     let url = new URL(`${apiUrl}/items/injest/${account.type}/${account.id}`);
