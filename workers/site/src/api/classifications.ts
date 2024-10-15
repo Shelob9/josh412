@@ -44,11 +44,13 @@ api.post('/process/:source', async (c) => {
         const items = await itemsDb.all({
             page,
             perPage: body.perPage || 25,
-            source,
+            source: source != 'bluesky' ?  source  : undefined,
+            sourceType: source == 'bluesky' ? source : undefined,
         });
         const totalPages = await itemsDb.totalPages({
-            source,
             perPage: body.perPage || 25,
+            source: source != 'bluesky' ?  source  : undefined,
+            sourceType: source == 'bluesky' ? source : undefined,
         });
         const classificationApi = c.get('classifications');
         const sources: Classification_Source[] = [];

@@ -88,9 +88,11 @@ function useClassifications({account}:{
                         [account]: r.totalPages
                     }
                 });
+
             });
         }
     },[classifyPage,account,pagesClassified]);
+
 
     function classifyNext(){
         setClassifyPage(classifyPage + 1);
@@ -254,7 +256,7 @@ export default function Injest({account}:{
                             Classify {accountDetails.name}
                         </button>
                         <p>Classified {accountDetails.name}: {totalClasified[account]}</p>
-                        <p>page: {classifyPage}</p>
+                        <p>page: {classifyPage} of {totalClassifyPages[account]}</p>
                     </>
                 )}
             </div>
