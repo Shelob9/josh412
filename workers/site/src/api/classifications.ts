@@ -19,6 +19,18 @@ api.get('/', async (c) => {
     return c.json({ classifications,route, itemType});
 });
 
+api.get('/:itemType', async (c) => {
+    const classificationApi = c.get('classifications');
+    const itemType = c.req.param('itemType');
+    const route = `GET /api/classifications/${itemType}`;
+    const classifications = await classificationApi.all({
+        page: numberArg(c.req,'page',1),
+        perPage:numberArg(c.req,'perPage',25),
+        itemType,
+    });
+    return c.json({ classifications,route, itemType});
+})
+
 api.post('/process/:source', async (c) => {
     const source = c.req.param('source');
     const route = `/api/process/${source}`;
@@ -63,6 +75,7 @@ api.post('/process/:source', async (c) => {
 
         });
         try {
+
             const created = await classificationApi.createMany(prepared);
             return c.json({ route,created,body,prepared,totalPages });
 

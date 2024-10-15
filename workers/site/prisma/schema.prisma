@@ -29,6 +29,7 @@ model Classification {
   classification String
   parent         String? @map("parent_uuid")
   @@index([item_type])
+  @@unique([item, item_type])
 }
 
 

@@ -1,15 +1,7 @@
-import { Item, PrismaClient } from "@prisma/client";
+import { Classification, Item, PrismaClient } from "@prisma/client";
 import { Pagignation } from "./types";
 
-export type Classification = {
-    uuid: string;
-    //item uuid
-    item: string;
-    //item source type
-    item_type: string;
-    classification: string;
-    parent?: string|null;
-};
+
 export default class ClassificationsApi {
     public constructor(private prisma: PrismaClient) {
     }
@@ -22,7 +14,6 @@ export default class ClassificationsApi {
     }[]> {
         const page = args && args.page || 1;
         const perPage = args && args.perPage || 10;
-
         const results  : Classification[]= await this.prisma.classification.findMany({
             skip: (page - 1) * perPage,
             take: perPage,
@@ -65,22 +56,49 @@ export default class ClassificationsApi {
     }
 
     async create({ classification, item, parent, item_type }: Omit<Classification, 'uuid'>): Promise<string> {
-        const result = await this.prisma.classification.create({
-            data: {
+        const result = await this.prisma.classification.upsert({
+            create: {
                 classification,
                 item,
-                item_type,
                 parent,
+                item_type,
+            },
+            update: {
+                classification,
+                item,
+                parent,
+                item_type,
+            },
+            where: {
+                item_item_type: {
+                    item,
+                    item_type,
+                },
             },
         });
         return result.uuid;
     }
 
-    async createMany(classifications: Omit<Classification, 'uuid'>[]): Promise<number> {
-        const results = await this.prisma.classification.createMany({
-            data: classifications,
+    async exists({item, item_type}: {
+        item:string;
+        item_type:string;
+    }): Promise<boolean> {
+
+        const result = await this.prisma.classification.count({
+            where: {
+                item,
+                item_type,
+            },
         });
-        return results.count;
+        return result > 0;
+    }
+
+    async createMany(classifications: Omit<Classification, 'uuid'>[]): Promise<number> {
+        await Promise.all(classifications.map(async (classification) => await this.create(classification) ))
+        .catch((error) => {
+            console.error({ error });
+        });
+        return classifications.length;
     }
 
     async delete(uuid: string): Promise<boolean> {
