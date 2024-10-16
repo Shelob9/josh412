@@ -256,7 +256,7 @@ export default function Injest({account}:{
                             Classify {accountDetails.name}
                         </button>
                         <p>Classified {accountDetails.name}: {totalClasified[account]}</p>
-                        <p>page: {classifyPage} of {totalClassifyPages[account]}</p>
+                        <p>Classified page: {classifyPage} of {totalClassifyPages[account]}</p>
                     </>
                 )}
             </div>

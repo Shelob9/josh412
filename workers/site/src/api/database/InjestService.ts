@@ -1,10 +1,10 @@
 import { MastodonApi, tryBskyLogin } from "@app/social";
-import { Classification } from "@prisma/client";
+import { Classification, Item } from "@prisma/client";
 import { CLASSIFIERS } from "../classify/classifiers";
 import { Classification_Source, classifySources } from "../classify/classify";
 import { fetchBlueskyStatusesSimple } from "../util/BlueskyStatusToSimple";
 import ClassificationsApi from "./Classifications";
-import ItemsApi from "./Items";
+import ItemsApi, { Processed } from "./Items";
 
 export default class InjestService{
     constructor(private classificationApi:ClassificationsApi,private itemsDb:ItemsApi,private config :{
@@ -16,6 +16,42 @@ export default class InjestService{
     private makeUrl(endpoint:string,args?:any) {
         return this.config.makeUrl(endpoint,args);
     }
+
+    async classifyItems(items: Item[],type:string):Promise<{
+        created: number,
+        prepared: Omit<Classification, 'uuid'>[],
+    }> {
+        const sources: Classification_Source[] = [];
+        items.forEach(item => {
+            //remove html tags
+            const text = item.content.replace(/<[^>]*>?/gm, '');
+            sources.push({
+                text,
+                sourcetype: type,
+                id: item.uuid
+            });
+        });
+        const classifications = classifySources(sources,CLASSIFIERS);
+        const prepared : Omit<Classification, 'uuid'>[] = [];
+        Object.keys(classifications).forEach(item => {
+            classifications[item].forEach(classification => {
+                prepared.push({
+                    item,
+                    item_type: type,
+                    classification,
+                    parent: null,
+                });
+
+            });
+
+        });
+        const created = await this.classificationApi.createMany(prepared);
+        return {
+            created,
+            prepared,
+        }
+    }
+
 
     async classify(page:number,perPage:number,source:string) {
         const items = await this.itemsDb.all({
@@ -29,31 +65,10 @@ export default class InjestService{
             source: source != 'bluesky' ?  source  : undefined,
             sourceType: source == 'bluesky' ? source : undefined,
         });
-        const sources: Classification_Source[] = [];
-        items.forEach(item => {
-            //remove html tags
-            const text = item.content.replace(/<[^>]*>?/gm, '');
-            sources.push({
-                text,
-                sourcetype: source,
-                id: item.uuid
-            });
-        });
-        const classifications = classifySources(sources,CLASSIFIERS);
-        const prepared : Omit<Classification, 'uuid'>[] = [];
-        Object.keys(classifications).forEach(item => {
-            classifications[item].forEach(classification => {
-                prepared.push({
-                    item,
-                    item_type: source,
-                    classification,
-                    parent: null,
-                });
-
-            });
-
-        });
-        const created = await this.classificationApi.createMany(prepared);
+        const {
+            created,
+            prepared
+        } = await this.classifyItems(items,source);
         return {
             created,
             prepared,
@@ -71,7 +86,14 @@ export default class InjestService{
         instanceUrl:string,
         slug:'mastodonSocial'|'fosstodon',
         maxId?:string
-    }){
+    }):Promise<{
+        maxId?:string,
+        next?:string,
+        nextCursor?:string,
+        cursor?:string,
+        items: Processed[],
+        accountId:string,
+    }> {
         const api = new MastodonApi(instanceUrl);
         const statuses = await api.getStatuses({accountId,maxId});
         if( ! statuses || statuses.length === 0) {
@@ -84,15 +106,8 @@ export default class InjestService{
             next: this.makeUrl(`/api/items/injest/mastodon/${accountId}`,{maxId:lastId}),
             nextCursor:lastId,
             cursor: maxId,
-            items: items.map( i => {
-                return {
-                    uuid: i.uuid,
-                    remoteId: i.remoteId,
-                    created: i.created,
-                }
-            } ),
+            items,
             accountId,
-
         };
 
     }
@@ -108,7 +123,13 @@ export default class InjestService{
             identifier:string,
             password:string,
         },
-    }) {
+    }):Promise<{
+        cursor?:string,
+        next?:string,
+        nextCursor?:string,
+        items: Processed[],
+        did:string,
+    }> {
         const agent = await tryBskyLogin({
             identifier: bluesky.identifier,
             password: bluesky.password,
@@ -128,13 +149,7 @@ export default class InjestService{
             cursor: returnValue.cursor,
             next: returnValue.next,
             nextCursor: returnValue.nextCursor?.replace('cursor=',''),
-            items: items.map( i => {
-                return {
-                    uuid: i.uuid,
-                    remoteId: i.remoteId,
-                    created: i.created,
-                }
-            } ),
+            items,
             did,
 
         };

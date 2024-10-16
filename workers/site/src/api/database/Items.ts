@@ -47,6 +47,10 @@ export type CreateItemArgs ={
         url: string
     }
 }
+
+export type Processed = Item&{
+    created :boolean,
+}
 // Omit<Item, 'uuid'>
 export default class ItemsApi {
 
@@ -111,18 +115,13 @@ export default class ItemsApi {
 
     async injestBluesky({statuses}:{
         statuses: BskyPostSimple[]
-    }){
+    }): Promise<Processed[]> {
 
         const sourceArg = {
             source: 'bsky.social',
             sourceType: 'bluesky',
         }
-        const processed: {
-
-            remoteId: string,
-            uuid: string |false,
-            created:boolean
-        }[] = [];
+        const processed: Processed[] = [];
         for(const status of statuses){
 
 
@@ -132,9 +131,8 @@ export default class ItemsApi {
             });
             if( exists ){
                 processed.push({
-                    created: false,
-                    remoteId: status.cid,
-                    uuid: exists.uuid,
+                    ...exists,
+                    created:false,
                 });
                 continue;
             }
@@ -157,9 +155,8 @@ export default class ItemsApi {
 
                 });
                 processed.push({
-                    created: true,
-                    remoteId: status.cid,
-                    uuid: created ? created.uuid : false
+                    ...created,
+                    created:true,
                 });
 
             } catch (error) {
@@ -173,31 +170,22 @@ export default class ItemsApi {
     async injestMastodon({statuses,source}:{
         statuses: MastodonStatus[],
         source: 'mastodonSocial'|'fosstodon'
-    }){
+    }): Promise<Processed[]> {
 
         const sourceArg = {
             source,
             sourceType: 'mastodon',
         }
-        const processed: {
-
-            remoteId: string,
-            uuid: string |false,
-            created:false | Item
-        }[] = [];
+        const processed:Processed[] = [];
         for(const status of statuses){
-
-
-
             const exists = await this.hasItem({
                 source: sourceArg.source,
                 remoteId: status.id
             });
             if( exists ){
                 processed.push({
-                    created: false,
-                    uuid: exists.uuid,
-                    remoteId:status.id
+                    ...exists,
+                    created:false,
                 });
                 continue;
             }
@@ -219,9 +207,8 @@ export default class ItemsApi {
 
                 });
                 processed.push({
-                    created: created,
-                    remoteId: status.id,
-                    uuid: created ? created.uuid : false
+                    ...created,
+                    created:true,
                 });
             } catch (error) {
                 console.log({error});
