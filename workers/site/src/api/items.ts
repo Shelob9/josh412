@@ -1,7 +1,6 @@
-import { blueskyDidToCongig, isValidAccontId, mastodonAccountIdToConfig, MastodonApi, tryBskyLogin } from "@app/social";
+import { blueskyDidToCongig, isValidAccontId, mastodonAccountIdToConfig } from "@app/social";
 import { Hono } from "hono";
 import { Bindings, Variables } from "../../app.types";
-import { fetchBlueskyStatusesSimple } from "./util/BlueskyStatusToSimple";
 import { numberArg } from "./util/numberArg";
 
 const api = new Hono<{Variables: Variables,Bindings:Bindings}>();
@@ -94,8 +93,8 @@ api.get('/search', async (c) => {
     try {
         const items = await itemsDb.search({
             query,
-            page: numberArg(c.req,'page'),
-            perPage:numberArg(c.req,'perPage'),
+            page: numberArg(c.req,'page',1) as number,
+            perPage:numberArg(c.req,'perPage',25)as number,
         });
         return c.json({ items,route });
     } catch (e) {
@@ -117,54 +116,26 @@ api.post('injest/bluesky/:did', async (c) => {
 		return c.json({error: 'account not found'}, 404);
 	}
 	const cursor = c.req.query("cursor") || undefined;
-    const itemsDb = c.get('ItemsApi');
-
+    const injestor = c.get('Injestor');
 	try {
-		const agent = await tryBskyLogin({
-			identifier: account?.name,
-			password: c.env.JOSH412_BSKY,
-		});
-		try {
-			const returnValue = await fetchBlueskyStatusesSimple({
-				agent: agent.agent,
-				actor: account.did,
-				cursor,
-                makeNextUri: (did,cursor) => c.get('makeUrl')(`/api/items/injest/bluesky/${did}`,{cursor}),
-			})
-            try{
-                const items = await itemsDb.injestBluesky({statuses:returnValue.statuses});
-                if( ! items || items.length === 0) {
-                    return c.json({ err: "No items created",did,cursor });
-                }
-                return c.json({
-                    cursor: returnValue.cursor,
-                    next: returnValue.next,
 
-                    nextCursor: returnValue.nextCursor?.replace('cursor=',''),
-                    items: items.map( i => {
-                        return {
-                            uuid: i.uuid,
-                            remoteId: i.remoteId,
-                            created: i.created,
-                        }
-                    } ),
-                    did,
-
-                });
-            }catch(e){
-                console.log(e);
-                return c.json({ err: e.message,did,cursor,1:1}, 500);
+        const returnValue = await injestor.injestBlueSky({
+            did,
+            cursor,
+            bluesky: {
+                identifier: account?.name,
+			    password: c.env.JOSH412_BSKY,
             }
+        });
 
-		} catch (error) {
-			//console.log({error});
-			return c.json({error: 'Error1'}, 501);
+            return c.json(returnValue);
 
-		}
-	} catch (error) {
-		console.log(error);
-		return c.json({error: 'Error',login:'Bsky error',2:3}, 500);
-	}
+    } catch (error) {
+        //console.log({error});
+        return c.json({error: 'Error1'}, 501);
+
+    }
+
 
 });
 
@@ -176,38 +147,14 @@ api.post('/injest/mastodon/:accountId', async (c) => {
 	const maxId = c.req.query("maxId") || undefined;
 	try {
         const {instanceUrl,slug} = mastodonAccountIdToConfig(accountId);
-        const itemsDb = c.get('ItemsApi');
-        const api = new MastodonApi(instanceUrl);
-        try {
-            const statuses = await api.getStatuses({accountId,maxId});
-            if( ! statuses || statuses.length === 0) {
-                return c.json({ err: "No statuses found",accountId,maxId });
-            }
-            const lastId = statuses[statuses.length - 1].id;
-            try {
-                const items = await itemsDb.injestMastodon({statuses,source:slug});
-                return c.json({
-                    maxId,
-                    next: c.get('makeUrl')(`/api/items/injest/mastodon/${accountId}`,{maxId:lastId}),
-                    nextCursor:lastId,
-                    cursor: maxId,
-                    items: items.map( i => {
-                        return {
-                            uuid: i.uuid,
-                            remoteId: i.remoteId,
-                            created: i.created,
-                        }
-                    } ),
-                    accountId,
-
-                });
-            } catch (error) {
-                return c.json({ err: error.message,accountId,l:58 }, 500);
-            }
-        } catch (error) {
-            return c.json({ err: error.message,accountId, l:61 }, 500);
-        }
-
+        const injestor = c.get('Injestor');
+        const returnValue = await injestor.injestMastodon({
+            accountId,
+            maxId,
+            instanceUrl,
+            slug
+        });
+        return c.json(returnValue);
     } catch (error) {
         return c.json({ err: error.message,accountId }, 500);
     }

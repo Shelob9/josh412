@@ -1,6 +1,7 @@
 
   import ClassificationsApi from "@app/api/database/Classifications";
 import ClippingsApi from "@app/api/database/Clippings";
+import InjestService from "@app/api/database/InjestService";
 import ItemsApi from "@app/api/database/Items";
 import { PrismaClient } from "@prisma/client";
 import { Hono } from "hono";
@@ -17,6 +18,7 @@ import { Hono } from "hono";
     classifications: ClassificationsApi
     ItemsApi: ItemsApi
     prisma: PrismaClient
+    Injestor: InjestService
     makeUrl:(path:string,args?:{[key:string]:string|number|undefined}) => string
 
   }

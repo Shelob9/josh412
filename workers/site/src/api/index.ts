@@ -6,6 +6,7 @@ import classifications from "./classifications";
 import clippings from "./clippings";
 import ClassificationsApi from "./database/Classifications";
 import ClippingsApi from "./database/Clippings";
+import InjestService from "./database/InjestService";
 import ItemsApi from "./database/Items";
 import items from "./items";
 import search from "./search";
@@ -14,7 +15,7 @@ const api = new Hono<{Variables:Variables,Bindings:Bindings}>({ strict: false })
 
 api.use("*", async (c, next) => {
     const prisma = createClient(c.env.DB);
-    c.set('makeUrl', (path:string,args?:{[key:string]:string|number|undefined}) => {
+    const makeUrl = (path:string,args?:{[key:string]:string|number|undefined}) => {
         const requestUrl = new URL(c.req.url);
         const newUrl = new URL(`${requestUrl.protocol}//${requestUrl.host}${path}`);
         if(args){
@@ -24,11 +25,22 @@ api.use("*", async (c, next) => {
 
         }
         return newUrl.toString();
-    });
+    }
+    c.set('makeUrl', makeUrl );
+    const classificationsApi = new ClassificationsApi(prisma);
+    const itemsApi = new ItemsApi(prisma,c.env.KV);
     c.set('prisma', prisma );
     c.set('clippings', new ClippingsApi(prisma));
-    c.set('classifications', new ClassificationsApi(prisma));
-    c.set('ItemsApi', new ItemsApi(prisma,c.env.KV));
+    c.set('classifications', classificationsApi);
+    c.set('ItemsApi', itemsApi);
+    c.set('Injestor', new InjestService(
+        classificationsApi,
+        itemsApi,
+        {
+            makeUrl,
+        }
+
+    ));
     await next()
 });
 api.get("/status", (c) => c.json({ status: "ok",url:c.get('makeUrl')('/api/status') }));
