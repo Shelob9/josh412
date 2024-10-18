@@ -1,6 +1,23 @@
 
+export type ServiceConfig = {
+    cacheSeconds: number;
+    uri: string;
+    social: {
+        mastodon: {
+            name: string;
+            instanceUrl: string;
+            accountId: string;
+            slug: string;
+        }[];
+        bluesky: {
+            name: string;
+            did: string;
+            slug: string;
+        }[];
+    };
+}
 
-export default {
+const config: ServiceConfig = {
     cacheSeconds: 604800,
     uri: `https://josh412.com`,
     social: {
@@ -26,4 +43,5 @@ export default {
             }
         ],
     }
-}
+};
+export default config;
