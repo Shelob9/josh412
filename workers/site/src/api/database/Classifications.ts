@@ -20,6 +20,9 @@ export default class ClassificationsApi {
             where:  args.itemType ? {
                 item_type: args.itemType
             }: undefined,
+            orderBy: {
+                createdAt: 'desc',
+            },
 
         });
         const itemUuids = results.map((result) => result.item);

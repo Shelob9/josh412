@@ -17,7 +17,8 @@ export type UIItem = {
         uuid: string
     },
     url: string;
-    classifications: any[]
+    classifications: any[],
+    createdAt?: string
 }
 
 export type Timeline_Post_From_UIItem = Timeline_Post &{

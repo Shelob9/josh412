@@ -1,4 +1,5 @@
 import { Button, Spinner } from "@wordpress/components";
+import { dateI18n } from "@wordpress/date"; //
 import React, { useMemo } from "react";
 import { Accounts } from "../types";
 import fetchItems from "./api/fetchItemts";
@@ -7,7 +8,6 @@ import { Timeline_Post_From_UIItem, UIItem } from "./items.types";
 import Table, { TablePagination } from "./Table";
 import { UsePropsOptional } from "./Timeline";
 import { Timeline_Post_Author } from "./TimelinePost";
-
 
 const headers = [
     {
@@ -38,6 +38,10 @@ const headers = [
         id: 'classifications',
         children: 'Classifications'
     },
+    {
+        id:'createdAt',
+        children:'Created At'
+    }
 ]
 
 function IdWithActions({id,onCopy,onQuote,content,postAuthor}:{
@@ -136,6 +140,7 @@ export default function Items({account,onCopy,onQuote}:{
                 reply: {
                     url: item.remoteReplyToId ?? '',
                 },
+                createdAt: item.createdAt ? item.createdAt : undefined,
                 item
             };
             return post;
@@ -208,6 +213,10 @@ export default function Items({account,onCopy,onQuote}:{
                     {
                         key:'classifications',
                         Render:() => <>{post.item.classifications? <span>{post.item.classifications.map((classification) => classification.classification).join(', ')}</span>:''}</>
+                    },
+                    {
+                        key:'createdAt',
+                        Render:() => <span>{post.createdAt ? dateI18n('d M y', post.createdAt, undefined):''}</span>
                     }
                 ]
             }

@@ -19,6 +19,7 @@ model Clipping {
   domain String
   path   String?
   text   String
+  createdAt DateTime @default(now())
   @@index([domain])
 }
 
@@ -28,6 +29,7 @@ model Classification {
   item_type      String //item source type
   classification String
   parent         String? @map("parent_uuid")
+  createdAt DateTime @default(now())
   @@index([item_type])
   @@unique([item, item_type])
 }
@@ -43,6 +45,7 @@ model Item {
   remoteReplyToAuthorId String?
   remoteAuthorId  String
   url String
+  createdAt DateTime @default(now())
   @@unique([source, remoteId])
   @@index([remoteAuthorId])
   @@index([remoteReplyToAuthorId])
@@ -59,4 +62,5 @@ model RemoteAuthor {
   avatar String
   displayName String
   handle String
+  createdAt DateTime @default(now())
 }

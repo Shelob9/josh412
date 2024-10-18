@@ -116,6 +116,7 @@ function useClassifications({account}:{
 export default function Injest({account}:{
     account: Accounts
 }) {
+    const [doFullInjest,setDoFullInjest] = React.useState(false);
     const {
         classifyNext,
         totalClasified,
@@ -221,12 +222,27 @@ export default function Injest({account}:{
 
     }
 
+    React.useEffect(() => {
+        if(doFullInjest){
+            setIsLoading(true);
+            dataFetch(`/scheduled`,{}).catch((e) => {
+                console.error(e);
+            }).finally(() => {
+                setDoFullInjest(false);
+                setIsLoading(false);
+            });
+        }
+    },[doFullInjest]);
+
     if( ! accountDetails || ! accountDetails.name ){
         return null;
     }
 
     return (
         <div>
+            <button onClick={() => setDoFullInjest(true)}>
+                Run Full Injest
+            </button>
             {isDone ?<strong>Done With Injest</strong>:(<div>
                 <button onClick={() => {
                     setClicked(true);

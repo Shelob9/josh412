@@ -230,7 +230,8 @@ api.post('/', async (c) => {
                     type: string
                     url: string
                 },
-            }
+            },
+            createdAt?: string,
 
         };
         //@todo: validate body

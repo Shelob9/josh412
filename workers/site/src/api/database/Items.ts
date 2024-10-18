@@ -46,6 +46,7 @@ export type CreateItemArgs ={
         displayName: string
         url: string
     }
+    createdAt?: Date| string
 }
 
 export type Processed = Item&{
@@ -94,7 +95,8 @@ export default class ItemsApi {
                         remoteAuthorId: data.remoteAuthorId,
                         remoteReplyToId: data.remoteReplyToId,
                         remoteReplyToAuthorId: data.remoteReplyToAuthorId,
-                        url: data.url
+                        url: data.url,
+                        createdAt: data.createdAt ?? undefined,
                     }
                 });
                 return item;
@@ -123,8 +125,6 @@ export default class ItemsApi {
         }
         const processed: Processed[] = [];
         for(const status of statuses){
-
-
             const exists = await this.hasItem({
                 source:sourceArg.source,
                 remoteId: status.cid
@@ -151,8 +151,8 @@ export default class ItemsApi {
                         displayName: status.author.displayName,
                         url: `https://bsky.app/profile/${status.author.handle}`
                     },
-                    url: blueskyPostUriToUrl(status.uri,status.author.handle)
-
+                    url: blueskyPostUriToUrl(status.uri,status.author.handle),
+                    createdAt: status.createdAt,
                 });
                 processed.push({
                     ...created,
@@ -203,7 +203,8 @@ export default class ItemsApi {
                         displayName: status.account.display_name,
                         url: status.account.url
                     },
-                    url: status.url as string
+                    url: status.url as string,
+                    createdAt: status.created_at,
 
                 });
                 processed.push({
@@ -301,7 +302,7 @@ export default class ItemsApi {
 
         query: string,
         page: number,
-        perPage: number
+        perPage: number,
     }) {
         const items = await this.prisma.item.findMany({
             where: {
@@ -309,7 +310,10 @@ export default class ItemsApi {
                     contains: query
                 }
             },
-            ...this.argsToSkipTake({page,perPage})
+            ...this.argsToSkipTake({page,perPage}),
+            orderBy: {
+                createdAt: 'desc',
+            },
         });
         return items;
     }
@@ -351,6 +355,9 @@ export default class ItemsApi {
             {
                     ...this.argsToSkipTake(args),
                     where,
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
 
 
             }
@@ -397,7 +404,10 @@ export default class ItemsApi {
                     ...this.argsToSkipTake(args),
                     where: {
                         sourceType: args.sourceType
-                    }
+                    },
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
             }
         );
         return items as Item[];
