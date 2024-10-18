@@ -37,7 +37,9 @@ api.use("*", async (c, next) => {
         classificationsApi,
         itemsApi,
         {
+            ...config,
             makeUrl,
+            bluseskyPassowrd: c.env.JOSH412_BSKY
         }
 
     ));
@@ -45,6 +47,16 @@ api.use("*", async (c, next) => {
 });
 api.get("/status", (c) => c.json({ status: "ok",url:c.get('makeUrl')('/api/status') }));
 
+//Run the scheduled function
+api.get('/scheduled', async (c) => {
+    const inestor = c.get('Injestor');
+    try {
+        await inestor.sync();
+        return c.json({ status: "ok" });
+    } catch (error) {
+        return c.json({ status: "error", error: error.message },500);
+    }
+});
 
 api.get('/status/accounts', (c) => {
     return c.json({

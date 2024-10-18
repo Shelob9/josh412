@@ -1,4 +1,5 @@
 import { MastodonApi, tryBskyLogin } from "@app/social";
+import { ServiceConfig } from "@lib/config";
 import { Classification, Item } from "@prisma/client";
 import { CLASSIFIERS } from "../classify/classifiers";
 import { Classification_Source, classifySources } from "../classify/classify";
@@ -7,14 +8,116 @@ import ClassificationsApi from "./Classifications";
 import ItemsApi, { Processed } from "./Items";
 
 export default class InjestService{
-    constructor(private classificationApi:ClassificationsApi,private itemsDb:ItemsApi,private config :{
-
+    constructor(private classificationApi:ClassificationsApi,private itemsDb:ItemsApi,private config :ServiceConfig &{
+        bluseskyPassowrd:string,
         makeUrl:(endpoint:string,args?:any) => string
     }) {
     }
 
     private makeUrl(endpoint:string,args?:any) {
         return this.config.makeUrl(endpoint,args);
+    }
+
+    async sync(){
+        const maxTimesNoNewItems = 5;
+        console.log(`start mastodon sync`);
+        await Promise.all(this.config.social.mastodon.map(async ({
+            accountId,
+            instanceUrl,
+            slug,
+
+        }) => {
+            console.log(`start mastodon sync for ${slug}`);
+            let newItems : Processed[] = [];
+            let ranOnce = false;
+            let maxId :string|undefined = undefined;
+            let timesNoNewItems = 0;
+            //while ranOnce is false or maxId is not undefined
+            while( ! ranOnce || maxId ){
+                try {
+                    newItems = [];
+                    const returnValue = await this.injestMastodon({
+                        accountId,
+                        maxId,
+                        instanceUrl,
+                        slug: slug as 'mastodonSocial'|'fosstodon'
+                    });
+                    newItems = returnValue.items.filter( i => i.created);
+                    console.log({
+                        slug,
+                        newItems
+                    })
+                    if( newItems.length > 0){
+                        await this.classifyItems(newItems,'mastodon');
+                    }else{
+                        timesNoNewItems++;
+                    }
+                    if(returnValue.maxId){
+                        maxId = returnValue.maxId;
+                    }else{
+                        maxId = undefined;
+                    }
+                    ranOnce = true;
+                } catch (error) {
+                    console.error({error});
+                    break;
+                }
+                if(timesNoNewItems > maxTimesNoNewItems){
+                    break;
+                }
+            }
+
+
+        }))
+        console.log(`Start bluesky sync`);
+        await Promise.all(this.config.social.bluesky.map(async ({
+            did,name
+        }) => {
+            let timesNoNewItems = 0;
+            console.log(`start bluesky sync for ${name}`);
+            let ranOnce = false;
+            let newItems : Processed[] = [];
+            let cursor :string|undefined = undefined;
+            while( ! ranOnce || cursor ){
+                try {
+                    newItems = [];
+                    const returnValue = await this.injestBlueSky({
+                        did,
+                        cursor,
+                        bluesky: {
+                            identifier: did,
+                            password: this.config.bluseskyPassowrd,
+                        }
+                    });
+                    //Classify
+                    newItems = returnValue.items.filter( i => i.created);
+                    console.log({
+                        newItems: newItems
+                    })
+                    if( newItems.length > 0){
+                        console.log(`Classifying ${newItems.length} items`);
+                        const classified = await this.classifyItems(newItems,'bluesky');
+                        console.log(`Classified ${classified.created} items`);
+                    }else{
+                        timesNoNewItems++;
+                    }
+                    if(returnValue.cursor){
+                        cursor = returnValue.cursor;
+                    }else{
+                        cursor = undefined;
+                    }
+                    ranOnce = true;
+
+                } catch (error) {
+                    console.error({error});
+                    break;
+                }
+                if(timesNoNewItems > maxTimesNoNewItems){
+                    break;
+                }
+            }
+
+        }));
     }
 
     async classifyItems(items: Item[],type:string):Promise<{
