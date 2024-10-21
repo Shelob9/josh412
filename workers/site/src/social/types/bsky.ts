@@ -109,6 +109,16 @@ export type BskyAuthorSimple = {
     handle: string;
     did: string;
 }
+export type BskyPostSimpleImage = {
+    description: string;
+    url: string;
+    previewUrl: string;
+    remoteId: string;
+    height: number;
+    width: number;
+
+}
+
 export type BskyPostSimple = {
     url: string;
     uri: string;
@@ -120,9 +130,5 @@ export type BskyPostSimple = {
     author: BskyAuthorSimple;
     text: string;
     reply?: BskyPostSimple;
-    images:{
-        description: string;
-        url: string;
-        preview_url: string;
-    }
+    images:BskyPostSimpleImage[];
 }

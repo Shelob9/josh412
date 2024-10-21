@@ -39,7 +39,7 @@ api.use("*", async (c, next) => {
         {
             ...config,
             makeUrl,
-            bluseskyPassowrd: c.env.JOSH412_BSKY
+            bluseskyPassword: c.env.JOSH412_BSKY
         }
 
     ));

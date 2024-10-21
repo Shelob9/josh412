@@ -9,7 +9,7 @@ import ItemsApi, { Processed } from "./Items";
 
 export default class InjestService{
     constructor(private classificationApi:ClassificationsApi,private itemsDb:ItemsApi,private config :ServiceConfig &{
-        bluseskyPassowrd:string,
+        bluseskyPassword:string,
         makeUrl:(endpoint:string,args?:any) => string
     }) {
     }
@@ -86,7 +86,7 @@ export default class InjestService{
                         cursor,
                         bluesky: {
                             identifier: did,
-                            password: this.config.bluseskyPassowrd,
+                            password: this.config.bluseskyPassword,
                         }
                     });
                     //Classify
@@ -143,6 +143,7 @@ export default class InjestService{
                     item_type: type,
                     classification,
                     parent: null,
+                    createdAt: new Date(),
                 });
 
             });
@@ -212,6 +213,10 @@ export default class InjestService{
             items,
             accountId,
         };
+
+    }
+
+    async injestMedia(){
 
     }
 

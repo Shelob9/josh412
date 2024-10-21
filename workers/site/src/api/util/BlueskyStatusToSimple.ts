@@ -1,4 +1,4 @@
-import { blueskyPostUriToUrl, BskyPostSimple, Get_Bsky_Statuses_Args, getBlueskyStatuses, } from '@app/social';
+import { blueskyPostUriToUrl, BskyPostSimple, BskyPostSimpleImage, Get_Bsky_Statuses_Args, getBlueskyStatuses, } from '@app/social';
 import { AppBskyFeedDefs } from '@atproto/api';
 function blueskyPostImageToUrl(authorDid:string,link:string,type:string){
 
@@ -24,6 +24,23 @@ export async function fetchBlueskyStatusesSimple({agent,actor,cursor,makeNextUri
 
     };
 }
+
+function collectImages(post){
+	const images = post.embed?.images ? post.embed?.images.map(image => {
+		const id = image.image.ref.toString();
+		const url = blueskyPostImageToUrl(author.did, id,image.image.mimeType);
+		return {
+				description: image.alt,
+				url,
+				preview_url: url,
+				id,
+				remoteId: id,
+				height: image.aspectRatio.height,
+				width: image.aspectRatio.width,
+				previewUrl: image.thumb,
+		}
+	}) :[]
+}
 export default function BlueskyStatusToSimple(s:AppBskyFeedDefs.FeedViewPost):BskyPostSimple|undefined {
 	const {post} = s;
 	if( ! post ){
@@ -32,12 +49,17 @@ export default function BlueskyStatusToSimple(s:AppBskyFeedDefs.FeedViewPost):Bs
 
 
 
-	const {uri,cid,author,record,replyCount,likeCount,repostCount,} = post;
+	const {uri,cid,author,record,replyCount,likeCount,repostCount} = post;
 	const {handle} = author;
 	const url = blueskyPostUriToUrl(uri,handle);
-	//@ts-ignore
-	const images = record.embed?.images ?? [];
+	let images : BskyPostSimpleImage[] = [];
 
+
+	if(post.embed?.images){
+		console.log('images',typeof post.embed.images);
+
+
+	}
 	return {
 		uri,
 		cid,
@@ -58,17 +80,7 @@ export default function BlueskyStatusToSimple(s:AppBskyFeedDefs.FeedViewPost):Bs
 		repostCount: repostCount ?? 0,
 		//@ts-ignore
 		hasrSr: s.reply && s.reply.root ? true : false,
-		//@ts-ignore
-		images: record.embed?.images ? record.embed.images.map(image => {
-			const id = image.image.ref.toString();
-			const url = blueskyPostImageToUrl(author.did, id,image.image.mimeType);
-			return {
-					description: image.alt,
-					url,
-					preview_url: url,
-					id
-			}
-		}) :[],
+		images,
 		//@ts-ignore
 		reply: s.reply && s.reply.root && s.reply.root.$type === 'app.bsky.feed.defs#postView' ? {
 			"uri": s.reply.root.uri,

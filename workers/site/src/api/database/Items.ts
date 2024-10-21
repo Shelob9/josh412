@@ -2,11 +2,13 @@ import { blueskyPostUriToUrl, BskyPostSimple } from "@app/social";
 import {
     Status as MastodonStatus
 } from "@app/types/mastodon";
-import { Item, PrismaClient } from "@prisma/client";
-import { Classification } from "./Classifications";
+import { Classification, Item, Media, PrismaClient, RemoteAuthor } from "@prisma/client";
 import { Pagignation } from "./types";
-export type ItemWithClassification = ItemWithAuthor &{
+export type ItemWithAll = Item & {
+    author: ItemAuthor
+
     classifications: Classification[]
+    media: Media[]
 }
 
 const validateSourceType = (type: string): boolean => {
@@ -20,9 +22,7 @@ export type ItemAuthor = {
     handle: string
     uuid: string
 }
-export type ItemWithAuthor =  Item & {
-    author: ItemAuthor
-};
+
 export type SourceArg = {
     url: string,
     type: string
@@ -115,6 +115,9 @@ export default class ItemsApi {
 
     }
 
+
+
+
     async injestBluesky({statuses}:{
         statuses: BskyPostSimple[]
     }): Promise<Processed[]> {
@@ -154,6 +157,20 @@ export default class ItemsApi {
                     url: blueskyPostUriToUrl(status.uri,status.author.handle),
                     createdAt: status.createdAt,
                 });
+                if(status.images && status.images.length > 0){
+                    status.images.forEach(async (image) => {
+                        await this.upsertMedia({
+                            url: image.url,
+                            itemType: sourceArg.source,
+                            remoteId: image.remoteId,
+                            item: created.uuid,
+                            description: image.description,
+                            height: image.height,
+                            width: image.width,
+                            previewUrl: image.previewUrl
+                        });
+                    })
+                }
                 processed.push({
                     ...created,
                     created:true,
@@ -167,6 +184,9 @@ export default class ItemsApi {
         return processed
 
     }
+
+
+
     async injestMastodon({statuses,source}:{
         statuses: MastodonStatus[],
         source: 'mastodonSocial'|'fosstodon'
@@ -207,6 +227,11 @@ export default class ItemsApi {
                     createdAt: status.created_at,
 
                 });
+                await this.injestMastodonMedia({
+                    status,
+                    source: sourceArg.source,
+                    item: created.uuid
+                });
                 processed.push({
                     ...created,
                     created:true,
@@ -222,6 +247,31 @@ export default class ItemsApi {
         return processed
 
     }
+
+    private async injestMastodonMedia({status,source,item}:{
+        item:string;//uuid
+        status: MastodonStatus,
+        source: 'mastodonSocial'|'fosstodon'
+    }){
+        if(status.media_attachments && status.media_attachments.length > 0){
+            status.media_attachments.forEach(async (media) => {
+                if('image' == media.type){
+                    await this.upsertMedia({
+                        url: media.url,
+                        item,
+                        itemType: source,
+                        description: media.description ?? '',
+                        height: media.meta.original.height,
+                        width: media.meta.original.width,
+                        remoteId: media.id,
+                    });
+                }
+            });
+        }
+
+    }
+
+
 
     public async hasItem({
         source,
@@ -338,11 +388,45 @@ export default class ItemsApi {
 
     }
 
+    private async decorateItem(item: Item,findAuthor:(remoteId:string)=>RemoteAuthor|undefined): Promise<ItemWithAll> {
+
+            const author = findAuthor( item.remoteAuthorId);
+            const classifications = await this.getItemClassifications(
+                item.uuid
+            )
+            const media = await this.getItemMedia({
+                item: item.uuid
+            });
+            return {
+                ...item,
+                author: author ?{
+                    url: author.url,
+                    displayName: author.displayName,
+                    avatar: author.avatar,
+                    handle: author.handle,
+                    uuid: author.uuid
+                }: {
+                    url: '',
+                    displayName: '',
+                    avatar: '',
+                    handle: '',
+                    uuid: ''
+                } as ItemAuthor,
+                classifications,
+                media,
+            }
+
+    }
+
+    private async decorateItems(items: Item[],findAuthor:(remoteId:string)=>RemoteAuthor|undefined): Promise<ItemWithAll[]> {
+        return await Promise.all(items.map(async (item:Item) => await this.decorateItem(item,findAuthor)));
+    }
+
     async all(args: Pagignation&{
         source?: string,
         sourceType?: string,
         withClassification?: boolean
-    }): Promise<ItemWithClassification[]> {
+    }): Promise<ItemWithAll[]> {
         let where = undefined;
         if(args.source || args.sourceType){
             where = {
@@ -362,37 +446,17 @@ export default class ItemsApi {
 
             }
         );
-        const authors = await this.prisma.remoteAuthor.findMany({
-            where: {
-                remoteId: {
-                    in: Array.from(new Set(items.map((a) => a.remoteAuthorId)))
-                },
-            }
-        });
 
-        return await Promise.all(items.map(async (item:Item) => {
-            const author = authors.find((a) => a.remoteId === item.remoteAuthorId);
-            const classifications = await this.getItemClassifications(
-                item.uuid
-            )
-            return {
-                ...item,
-                author: author ?{
-                    url: author.url,
-                    displayName: author.displayName,
-                    avatar: author.avatar,
-                    handle: author.handle,
-                    uuid: author.uuid
-                }: {
-                    url: '',
-                    displayName: '',
-                    avatar: '',
-                    handle: '',
-                    uuid: ''
-                } as ItemAuthor,
-                classifications,
-            }
-        }));
+        const findAuthor = await this.makeAuthorFinder();
+        return await  this.decorateItems(items,findAuthor)
+    }
+
+    private async makeAuthorFinder(): Promise<(remoteId: string) => RemoteAuthor | undefined> {
+        const authors = await this.prisma.remoteAuthor.findMany();
+        const findAuthor = (remoteId: string):RemoteAuthor|undefined => {
+            return authors.find((a) => a.remoteId === remoteId);
+        }
+        return findAuthor;
     }
 
     async allByType(args: Pagignation&{
@@ -410,7 +474,8 @@ export default class ItemsApi {
                     },
             }
         );
-        return items as Item[];
+        const findAuthor = await this.makeAuthorFinder();
+        return await this.decorateItems(items,findAuthor);
     }
 
     private async  getItemClassifications(uuid: string): Promise<Classification[]> {
@@ -421,7 +486,7 @@ export default class ItemsApi {
         });
     }
 
-    async get(uuid: string): Promise<ItemWithClassification> {
+    async get(uuid: string): Promise<ItemWithAll> {
 
         const item = await this.prisma.item.findUnique({
             where: {
@@ -431,11 +496,8 @@ export default class ItemsApi {
         if (!item) {
             throw new Error("Item not found");
         }
-        const classifications = await this.getItemClassifications(item.uuid);
-        return {
-            ...item,
-            classifications
-        } as ItemWithClassification
+        const finalItem = await this.decorateItem(item,await this.makeAuthorFinder());
+        return finalItem;
     }
 
 
@@ -459,27 +521,120 @@ export default class ItemsApi {
         return authors;
     }
 
+    async getItemMedia({item}:{
+        item: string
+    }) {
+        return this.prisma.media.findMany({
+            where: {
+                item
+            }
+        });
+    }
 
+    async deleteItemMedia({item}:{
+        item: string
+    }) {
+        return this.prisma.media.deleteMany({
+            where: {
+                item
+            }
+        });
+    }
 
-    async delete(uuid: string): Promise<boolean> {
+    private async deleteItemClassifications({item}:{
+        item: string
+    }) {
+        return this.prisma.classification.deleteMany({
+            where: {
+                item
+            }
+        });
+    }
+
+    async delete(uuid: string,deleteAlso?:{
+        media: boolean
+        classifications: boolean
+    }): Promise<boolean> {
         try {
+            if(deleteAlso?.classifications){
+                await this.deleteItemClassifications({
+                    item: uuid
+                });
+            }
+            if(deleteAlso?.media){
+                await this.deleteItemMedia({
+                    item: uuid
+                });
+            }
+
             await this.prisma.item.delete({
                 where: {
                     uuid
                 }
             });
-
-
-
             return true;
         } catch (e) {
             return false;
         }
     }
 
-    async update({ content, uuid }: {
+    async upsertMedia({url,key, item, itemType,description,height,width,remoteId,previewUrl}:{
+        url: string,
+        item: string,
+        itemType: string,
+        description: string,
+        height: number,
+        width: number,
+        key?: string,
+        remoteId: string,
+        previewUrl?: string
+    }): Promise<Media> {
+        return this.prisma.media.upsert({
+            where: {
+                url,
+                item_itemType:{
+                    item,
+                    itemType
+                }
+
+            },
+            create: {
+                url,
+                item,
+                itemType,
+                description,
+                height,
+                width,
+                remoteId,
+                previewUrl,
+                key,
+            },
+            update: {
+                description,
+                height,
+                width,
+                remoteId,
+                previewUrl,
+                key,
+            }
+        });
+    }
+    async update({ content, uuid,media }: {
         content: string;
         uuid: string;
+        media?: {
+            uuid?: string
+            remoteId: string
+            item: string
+            description: string
+            height: number
+            width: number
+            itemType: string
+            url: string
+            previewUrl?: string
+            key?: string
+            createdAt?: Date
+        }[]
     }): Promise<Item> {
         await this.prisma.item.update({
             where: {
@@ -489,6 +644,12 @@ export default class ItemsApi {
                 content
             }
         });
+        if(media){
+
+            await Promise.all(media.map(async (media) => {
+                await this.upsertMedia(media);
+            }));
+        }
         return this.get(uuid);
     }
 

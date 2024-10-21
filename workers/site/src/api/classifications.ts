@@ -1,3 +1,4 @@
+import config from "@lib/config";
 import { Hono } from "hono";
 import { Bindings, Variables } from "../../app.types";
 import ClassificationsApi, { Classification } from "./database/Classifications";
@@ -36,7 +37,11 @@ api.post('/process/:source', async (c) => {
     const source = c.req.param('source');
     const route = `/api/process/${source}`;
     const itemsDb = c.get('ItemsApi') as ItemsApi;
-    const injest = new InjestService(c.get('classifications'),itemsDb);
+    const injest = new InjestService(c.get('classifications'),itemsDb,{
+        ...config,
+        makeUrl:c.get('makeUrl'),
+        bluseskyPassword: c.env.JOSH412_BSKY
+    });
     const body : {
         page?: number,
         perPage?: number,

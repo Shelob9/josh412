@@ -38,6 +38,9 @@ app
   }
 )
   .use("*",async (c, next) => {
+    if(c.req.path.startsWith('/api/status')){
+      return next();
+    }
     console.log(`[${c.req.method}] ${c.req.url}`)
     const bearer = bearerAuth({ token: [c.env.TOKEN] })
     return bearer(c, next)

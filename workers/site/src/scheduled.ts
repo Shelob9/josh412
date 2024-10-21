@@ -27,7 +27,7 @@ DB: D1Database;
     const injestor = new InjestService(classificationsApi,itemsApi,{
         ...config,
         makeUrl,
-        bluseskyPassowrd: env.JOSH412_BSKY
+        bluseskyPassword: env.JOSH412_BSKY
     });
     try {
         await injestor.sync();
