@@ -8,5 +8,5 @@
 ## Release
 
 - Find and replace current version with new
-- `npm run plugin:zip`
+- `npm run plugin:build`
 - `bun run uploadBuild.ts`
