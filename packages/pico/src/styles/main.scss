@@ -1,0 +1,325 @@
+@use "@picocss/pico/scss/pico" with (
+  $theme-color: "sand",
+  $semantic-root-element: "#root",
+  $enable-semantic-container: true,
+);
+// B&W
+$black: #000;
+$white: #fff;
+
+// Blue
+$blue-900: #0c1a41;
+$blue-700: #1343a0;
+$blue-500: #3c71f7;
+$blue-300: #9ca7fa;
+$blue-200: #bfc3fa;
+$blue-100: #e0e1fa;
+$blue: $blue-500;
+
+// Gray
+
+$gray-900: #191c20;
+$gray-500: #6f7887;
+$gray-300: #a4acba;
+$gray-200: #c2c7d0;
+$gray-100: #e0e3e7;
+$gray-50: #f0f1f3;
+$gray: $gray-500;
+
+// Red
+$red-900: #30130a;
+$red-800: #5c160d;
+$red-700: #861d13;
+$red-600: #af291d;
+$red-500: #d93526;
+$red-400: #f06048;
+$red-300: #f38f79;
+$red-200: #f5b7a8;
+$red-100: #f8dcd6;
+$red: $red-500;
+
+// Green
+$green-900: #131f07;
+$green-800: #173806;
+$green-700: #205107;
+$green-600: #2c6c0c;
+$green-500: #398712;
+$green-400: #47a417;
+$green-300: #55c21e;
+$green-200: #62d926;
+$green-100: #95fb62;
+$green: $green-500;
+
+
+// Yellow
+$yellow-900: #1f1c02;
+$yellow-800: #363100;
+$yellow-700: #4e4700;
+$yellow-600: #685f00;
+$yellow-500: #827800;
+$yellow-400: #9e9200;
+$yellow-300: #bbac00;
+$yellow-200: #d9c800;
+$yellow-100: #f2df0d;
+$yellow: $yellow-100;
+
+
+// Pumpkin
+$pumpkin-900: #271805;
+$pumpkin-800: #482802;
+$pumpkin-700: #693a00;
+$pumpkin-600: #8b4f00;
+$pumpkin-500: #ad6400;
+$pumpkin-400: #d27a01;
+$pumpkin-300: #ff9500;
+$pumpkin-200: #feb670;
+$pumpkin-100: #fcdcc1;
+$pumpkin: $pumpkin-300;
+
+// Orange
+$orange-900: $pumpkin-900;
+$orange-800: $pumpkin-800;
+$orange-700: $pumpkin-700;
+$orange-600: $pumpkin-600;
+$orange-500: $pumpkin-500;
+$orange-400: $pumpkin-400;
+$orange-300: $pumpkin-300;
+$orange-200: $pumpkin-200;
+$orange-100: $pumpkin-100;
+$orange: $orange-500;
+
+$bg-warning-color: $red;
+$bg-error-color: $red;
+$bg-danger-color: $red;
+$bg-success-color: $green;
+$bg-info-color: $blue;
+$bg-primary-color: $blue;
+$bg-secondary-color: $blue-300;
+
+
+// Mixin for background color
+@mixin bg-color($color, $text-color: $white) {
+  background-color: $color;
+  color: $text-color;
+}
+
+// Mixin for text color
+@mixin text-color($color) {
+  color: $color;
+}
+
+// Background color classes
+.bg-red {
+  @include bg-color($red);
+}
+
+.bg-red-500 {
+  @include bg-color($red-500);
+}
+
+.bg-green {
+  @include bg-color($green);
+}
+
+.bg-green-500 {
+  @include bg-color($green-500);
+}
+
+.bg-yellow {
+  @include bg-color($yellow);
+}
+
+.bg-yellow-500 {
+  @include bg-color($yellow-500);
+}
+
+.bg-orange {
+  @include bg-color($orange);
+}
+
+.bg-orange-500 {
+  @include bg-color($orange-500);
+}
+
+$bg-colors: (
+  primary: $bg-primary-color,
+  secondary: $bg-secondary-color,
+  warning: $bg-warning-color,
+  error: $bg-error-color,
+  danger: $bg-danger-color,
+  info: $bg-info-color,
+  success: $bg-success-color,
+);
+
+@each $name, $color in $bg-colors {
+  .bg-#{$name} {
+    border-radius: 4px;
+    @include bg-color($color);
+  }
+  button.bg-#{$name}.button.outline, .bg-#{$name}.outline {
+    background-color: transparent;
+    @include text-color($color);
+  }
+  .bg-#{$name}.outline {
+    border: 1px solid $color;
+  }
+}
+
+.bg-gray {
+  @include bg-color($gray);
+}
+
+.bg-gray-500 {
+  @include bg-color($gray-500);
+}
+
+.bg-blue {
+  @include bg-color($blue);
+}
+
+.bg-blue-500 {
+  @include bg-color($blue-500);
+}
+
+.bg-blue-300 {
+  @include bg-color($blue-300);
+}
+
+
+// Text color classes
+.text-red {
+  @include text-color($red);
+}
+
+.text-green {
+  @include text-color($green);
+}
+
+.text-yellow {
+  @include text-color($yellow);
+}
+
+.text-orange {
+  @include text-color($orange);
+}
+
+.text-black {
+  @include text-color($black);
+}
+
+.text-white {
+  @include text-color($white);
+}
+
+.text-gray {
+  @include text-color($gray);
+}
+
+.text-gray-500 {
+  @include text-color($gray-500);
+}
+
+.text-blue {
+  @include text-color($blue);
+}
+
+.text-blue-500 {
+  @include text-color($blue-500);
+}
+
+h1 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+.hidden {
+  display: none;
+  visibility: hidden;
+}
+
+
+nav[role="tablist"] {
+  justify-content: left;
+  a {
+    margin-right: 0px;
+    padding-left: 4px;
+    padding-right: 4px;
+    border-radius: 0px;
+    text-decoration: underline;
+    text-decoration-color: $gray;
+
+    &:first-child {
+      border-top-left-radius: 8px; // Adjust the radius value as needed
+    }
+
+    &:last-child {
+      border-top-right-radius: 8px; // Adjust the radius value as needed
+    }
+  }
+
+  .tab-active {
+    text-decoration-color: $white;
+
+  }
+
+}
+
+$widths: (
+  0: 0,
+  2: .5rem,
+  4: 1rem,
+  8: 2rem,
+
+);
+
+@each $width, $actual in $widths {
+  .m-#{$width} {
+    margin: $actual;
+  }
+  .p-#{$width} {
+    padding: $actual;
+  }
+  .pt-#{$width} {
+    padding-top: $actual;
+  }
+  .pb-#{$width} {
+    padding-bottom: $actual;
+  }
+  .mt-#{$width} {
+    margin-top: $actual;
+  }
+  .mb-#{$width} {
+    margin-bottom: $actual;
+  }
+  .ml-#{$width} {
+    margin-left: $actual;
+  }
+  .mr-#{$width} {
+    margin-right: $actual;
+  }
+  .pl-#{$width} {
+    padding-left: $actual;
+  }
+  .pr-#{$width} {
+    padding-right: $actual;
+  }
+  .mx-#{$width} {
+    margin-left: $actual;
+    margin-right: $actual;
+  }
+  .my-#{$width} {
+    margin-top: $actual;
+    margin-bottom: $actual;
+  }
+  .px-#{$width} {
+    padding-left: $actual;
+    padding-right: $actual;
+  }
+  .py-#{$width} {
+    padding-top: $actual;
+    padding-bottom: $actual;
+  }
+}
