@@ -12,6 +12,7 @@ import { Hono } from "hono";
     KV: KVNamespace;
     TOKEN: string;
     MASTODON_TOKENS: string;
+    MEDIA_BUCKET: R2Bucket
   };
   export type Variables = {
     clippings: ClippingsApi;

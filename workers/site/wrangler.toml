@@ -27,3 +27,7 @@ crons = [ "45 * * * *" ]
 
 [env.dev.triggers]
 crons = ["* * * * *"]
+
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "josh412-medias"
