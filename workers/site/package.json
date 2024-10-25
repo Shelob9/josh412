@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev --port 4000",
+    "dev": "wrangler dev --port 4100",
     "start": "bunx --bun vite",
     "build": "vite build",
     "server": "tsx server.ts",

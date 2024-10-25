@@ -7,7 +7,7 @@ import clippings from "./clippings";
 import ClassificationsApi from "./database/Classifications";
 import ClippingsApi from "./database/Clippings";
 import InjestService from "./database/InjestService";
-import ItemsApi from "./database/Items";
+import ItemsApi, { ItemSource } from "./database/Items";
 import items from "./items";
 import search from "./search";
 import { fetchMedia } from "./util/fetchMedia";
@@ -28,7 +28,7 @@ api.use("*", async (c, next) => {
         return newUrl.toString();
     }
     c.set('makeUrl', makeUrl );
-    const classificationsApi = new ClassificationsApi(prisma);
+    const classificationsApi = new ClassificationsApi(prisma,c.env.KV);
     const itemsApi = new ItemsApi(prisma,c.env.KV);
     c.set('prisma', prisma );
     c.set('clippings', new ClippingsApi(prisma));
@@ -37,6 +37,7 @@ api.use("*", async (c, next) => {
     c.set('Injestor', new InjestService(
         classificationsApi,
         itemsApi,
+        c.env.MEDIA_BUCKET,
         {
             ...config,
             makeUrl,
@@ -48,15 +49,61 @@ api.use("*", async (c, next) => {
 });
 api.get("/status", (c) => c.json({ status: "ok",url:c.get('makeUrl')('/api/status') }));
 
-//Run the scheduled function
-api.get('/scheduled', async (c) => {
-    const inestor = c.get('Injestor');
-    try {
-        await inestor.sync();
-        return c.json({ status: "ok" });
+api.get('/status/gm', async (c) => {
+
+try {
+    const classification = 'gm';
+    const source = c.req.query('source') as ItemSource|| 'mastodonSocial';
+    //@ts-ignore
+    const page = c.req.query('page')as number || 1;
+    //@ts-ignore
+    const limit = c.req.query('limit')as number || 1;
+    const classifications = await c.get('classifications').allForSource({
+        source,
+        classification,
+        page,
+        perPage: limit,
+    });
+
+
+    return c.json({ status: "ok",classifications:classifications, });
     } catch (error) {
-        return c.json({ status: "error", error: error.message },500);
+
+    return c.json({ status: "error", error: error.message },500);
+
     }
+});
+//Get the scheduled items
+api.get('/status/scheduled', async (c) => {
+    const classification = 'gm';
+    const source = c.req.query('source') as ItemSource|| 'mastodonSocial';
+    //@ts-ignore
+    const page = c.req.query('page')as number || 1;
+    //@ts-ignore
+    const limit = c.req.query('limit')as number || 1;
+    const injestor = c.get('Injestor');
+    try {
+        const i = await c.get('classifications').allForSource({
+            source,
+            classification,
+            page: 1,
+            perPage: 25,
+        })
+        const itemUuids = await injestor.getItemsToUploadMedia({
+            itemType: source,
+            classification,
+        }).catch((error) => {
+            console.log({
+                getItemsToUploadMediaError: true,
+                error
+            })
+        });
+        return c.json({ status: "ok",itemUuids,items:i });
+    } catch (error) {
+        console.log(error);
+    }
+    return c.json({ status: "notok" });
+
 });
 
 api.get('/status/accounts', (c) => {

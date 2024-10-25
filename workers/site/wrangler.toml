@@ -23,7 +23,7 @@ binding = "KV"
 id = "57f0bd6a06dd4e2287d18fb4360adb5b"
 
 [triggers]
-crons = [ "45 * * * *" ]
+crons = [ "0 * * * *"]
 
 [env.dev.triggers]
 crons = ["* * * * *"]

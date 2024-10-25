@@ -1,4 +1,8 @@
-
+type MediaUploadConfig = {
+    mastodonSocial: string[],
+    fosstodon: string[],
+    bluesky: string[],
+}
 export type ServiceConfig = {
     cacheSeconds: number;
     uri: string;
@@ -15,6 +19,8 @@ export type ServiceConfig = {
             slug: string;
         }[];
     };
+    mediaUploads: MediaUploadConfig;
+
 }
 
 const config: ServiceConfig = {
@@ -42,6 +48,13 @@ const config: ServiceConfig = {
                 slug: 'bluesky'
             }
         ],
+    },
+    mediaUploads: {
+        mastodonSocial: [
+            "gm",
+        ],
+        fosstodon: [],
+        bluesky: [],
     }
 };
 export default config;

@@ -1,15 +1,18 @@
-import { Classification, Item, PrismaClient } from "@prisma/client";
-import { Pagignation } from "./types";
+import { Classification, Item } from "@prisma/client";
+import DbApi from "./DbApi";
+import { ItemSource } from "./Items";
+import { ItemWithAll, Pagignation } from "./types";
 
 
-export default class ClassificationsApi {
-    public constructor(private prisma: PrismaClient) {
-    }
+export default class ClassificationsApi extends DbApi {
+
 
     async all(args: Pagignation&{
         itemType?: string;
+        classification?: string;
+        item?: string;
     }): Promise<Classification &{
-        item:Item;
+        item:ItemWithAll;
         itemUuid:string;
     }[]> {
         const page = args && args.page || 1;
@@ -18,7 +21,9 @@ export default class ClassificationsApi {
             skip: (page - 1) * perPage,
             take: perPage,
             where:  args.itemType ? {
-                item_type: args.itemType
+                item_type: args.itemType,
+                classification: args.classification ?? undefined,
+                item: args.item ?? undefined,
             }: undefined,
             orderBy: {
                 createdAt: 'desc',
@@ -38,13 +43,92 @@ export default class ClassificationsApi {
             acc[item.uuid] = item;
             return acc;
         }, {});
-        return results.map((result) => ({
-            ...result,
-            itemUuid: result.item,
-            //@ts-ignore
-            item: itemMap[result.item] as Item,
-        }))
 
+        const findAuthor = async (remoteAuthorId: string) => {
+                try {
+                    const author = await this.findAuthor(remoteAuthorId).catch(() => {
+                        return undefined;
+                    });
+                    return author;
+                } catch (error) {
+                    return undefined;
+
+                }
+        }
+
+        return await Promise.all(results.map(async (result) => {
+            //@ts-ignore
+            const item = await this.decorateItem(
+                itemMap[result.item] as Item,
+                findAuthor
+            );
+
+            return {
+                ...result,
+                itemUuid: result.item,
+                item,
+            }
+        }));
+
+    }
+
+    async allForSource(args:Pagignation &{
+        source:ItemSource;
+        classification:string;
+    }): Promise<Classification[]> {
+        const {
+            classification
+        } = args;
+        const page = args && args.page || 1;
+        const perPage = args && args.perPage || 10;
+        const offset = (page - 1) * perPage;
+        const source = args.source === 'bluesky' ? 'bsky.social' : args.source;
+        console.log({ source });
+        const results = await this.prisma.$queryRaw`
+        SELECT classification.*,
+        item.uuid as itemUuid,
+        item.source as itemSource,
+        item.sourceType as itemSourceType,
+        item.remoteId as itemRemoteId
+        FROM classification
+        JOIN item ON item.uuid = classification.item
+        WHERE item.source = ${source} AND classification = ${classification}
+        ORDER BY classification.createdAt DESC
+        LIMIT ${perPage} OFFSET ${offset}` as undefined | {
+             uuid: string;
+             item: string;
+             item_type: string;
+             classification: string;
+             parent_uuid: string | null;
+             createdAt: string;
+             itemSource: string;
+             itemSourceType: string;
+             itemRemoteId: string;
+
+        }[];
+        if(!results || results.length === 0) {
+            return [];
+        }
+        return results.map((result):Classification &{
+            itemUuid: string;
+            itemSource: string;
+            itemSourceType: string;
+            itemRemoteId: string;
+        } => {
+            return {
+                uuid: result.uuid,
+                item: result.item,
+                itemUuid: result.item,
+                item_type: result.item_type,
+                classification: result.classification,
+                parent: result.parent_uuid,
+                createdAt: new Date(result.createdAt),
+                itemSource: result.itemSource,
+                itemSourceType: result.itemSourceType,
+                itemRemoteId: result.itemRemoteId,
+
+            }
+        });
 
     }
 

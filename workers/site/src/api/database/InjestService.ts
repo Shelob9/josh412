@@ -1,17 +1,24 @@
 import { MastodonApi, tryBskyLogin } from "@app/social";
 import { ServiceConfig } from "@lib/config";
-import { Classification, Item } from "@prisma/client";
+import { Classification, Item, Media } from "@prisma/client";
 import { CLASSIFIERS } from "../classify/classifiers";
 import { Classification_Source, classifySources } from "../classify/classify";
 import { fetchBlueskyStatusesSimple } from "../util/BlueskyStatusToSimple";
+import { fetchMedia } from "../util/fetchMedia";
 import ClassificationsApi from "./Classifications";
-import ItemsApi, { Processed } from "./Items";
+import ItemsApi, { ItemSource, Processed } from "./Items";
+
 
 export default class InjestService{
-    constructor(private classificationApi:ClassificationsApi,private itemsDb:ItemsApi,private config :ServiceConfig &{
-        bluseskyPassword:string,
-        makeUrl:(endpoint:string,args?:any) => string
-    }) {
+    constructor(
+        private classificationApi:ClassificationsApi,
+        private itemsDb:ItemsApi,
+        private BUCKET: R2Bucket,
+        private config :ServiceConfig & {
+            bluseskyPassword:string,
+            makeUrl:(endpoint:string,args?:any) => string,
+            //per each account, which classifications to upload medias for
+        }) {
     }
 
     private makeUrl(endpoint:string,args?:any) {
@@ -19,6 +26,7 @@ export default class InjestService{
     }
 
     async sync(){
+        let totalCreated = 0;
         const maxTimesNoNewItems = 5;
         console.log(`start mastodon sync`);
         await Promise.all(this.config.social.mastodon.map(async ({
@@ -51,6 +59,7 @@ export default class InjestService{
                         await this.classifyItems(newItems,'mastodon');
                     }else{
                         timesNoNewItems++;
+                        totalCreated += newItems.length;
                     }
                     if(returnValue.maxId){
                         maxId = returnValue.maxId;
@@ -100,6 +109,8 @@ export default class InjestService{
                         console.log(`Classified ${classified.created} items`);
                     }else{
                         timesNoNewItems++;
+                        totalCreated += newItems.length;
+
                     }
                     if(returnValue.cursor){
                         cursor = returnValue.cursor;
@@ -118,6 +129,7 @@ export default class InjestService{
             }
 
         }));
+        return totalCreated;
     }
 
     async classifyItems(items: Item[],type:string):Promise<{
@@ -216,8 +228,115 @@ export default class InjestService{
 
     }
 
-    async injestMedia(){
+    async syncMedia(){
+        console.log(`Starting media upload`);
+        Object.keys(this.config.mediaUploads).forEach(async (account) => {
+            await Promise.all(this.config.mediaUploads[account as ItemSource].map(
+                async classification => {
+                    console.log(`Getting items to upload for ${account} and ${classification}`);
+                    try {
+                        const itemUuids = await this.getItemsToUploadMedia({
+                            itemType: account as ItemSource,
+                            classification,
 
+                        }).catch((error) => {
+                            console.log({
+                                getItemsToUploadMediaError: true,
+                                error
+                            })
+                        });
+                        console.log(`Getting media for ${itemUuids.length} items for ${account} and ${classification}`);
+
+                        const medias = await this.itemsDb.allMediasByItemsUuids(itemUuids,true);
+
+
+                        console.log(`Found ${medias.length} media items for ${account} and ${classification}`);
+                        if(!medias || medias.length === 0){
+                            return;
+                        }
+                        await Promise.all(
+                            medias.map(
+                                async media =>
+                                await this.uploadBlobForMedia(media).catch((error) => {
+                                    console.log({
+                                        uploadBlobForMediaError: true,
+                                        error
+                                    })
+                                })
+                            )
+                        );
+
+                        console.log(`Done uploading media items for ${account} and ${classification}`);
+                    } catch (error) {
+                        console.log(`Error uploading media for ${account} and ${classification}`);
+
+                    }
+                })
+            );
+        });
+
+    }
+
+    async uploadBlobForMedia(media:Media){
+        try {
+            const fetchedMedia = await fetchMedia(media.url);
+            if(  fetchedMedia){
+                const key = media.url.split('/').pop();
+                await this.BUCKET.put(key as string,fetchedMedia.data);
+                await this.itemsDb.setMediaKey({
+                    uuid: media.uuid,
+                    key: key as string
+                });
+
+            }
+        } catch (error) {
+            console.log({
+                uploadBlobForMediaError: true,
+                error
+            })
+        }
+    }
+
+    async uploadMediaForItem(itemUuid:string){
+        const item = await this.itemsDb.get(itemUuid);
+        if( ! item){
+            throw new Error("Item not found");
+        }
+        const medias = await this.itemsDb.getItemMedia({
+            item: item.uuid
+        });
+        if( ! medias || medias.length === 0){
+            throw new Error("No media found");
+        }
+        await Promise.all(
+            medias.map(
+                async media =>
+                await this.uploadBlobForMedia(media)
+            )
+        );
+    }
+
+
+    async getItemsToUploadMedia({itemType,classification}:{classification:string;itemType:ItemSource}):Promise<string[]> {
+        let page = 1;
+        const items : string[] = [];
+        let notDone = true;
+        while(notDone){
+            const classifications = await this.classificationApi.allForSource({
+                source: itemType,
+                classification,
+                page: page,
+                perPage: 25,
+            })
+            if( ! classifications || classifications.length === 0) {
+                notDone = false;
+            }
+            for (const classification of classifications) {
+                items.push(classification.item);
+            }
+            page++;
+        }
+        return items;
     }
 
     async injestBlueSky({
