@@ -83,6 +83,31 @@ api.get('/source/:source', async (c) => {
 
 });
 
+api.get('/media/:source', async (c) => {
+    const source = c.req.param('source');
+
+    const route = 'GET /items/media/:source';
+    const itemsDb = c.get('ItemsApi');
+    const page = numberArg(c.req,'page');
+
+    try {
+        const items = await itemsDb.getSourceMedia({
+            page,
+            perPage:numberArg(c.req,'perPage'),
+            // @ts-ignore
+            source,
+        });
+        const totalPages = await itemsDb.totalPages({
+            source,
+            perPage:numberArg(c.req,'perPage'),
+        });
+        return c.json({ items,route,nextCursor: page ?page + 1 : 2,totalPages });
+   } catch (e) {
+     return c.json({ err: e.message,route }, 500);
+   }
+
+});
+
 api.get('/search', async (c) => {
     const query = c.req.query("q");
     const itemsDb = c.get('ItemsApi');

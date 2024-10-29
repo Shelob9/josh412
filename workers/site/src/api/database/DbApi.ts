@@ -1,5 +1,5 @@
 import { Classification, Item, Media, PrismaClient, RemoteAuthor } from "@prisma/client";
-import { ItemAuthor, ItemWithAll } from "./types";
+import { ItemAuthor, ItemWithAll, Pagignation } from "./types";
 
 export default abstract class DbApi {
     protected prisma: PrismaClient;
@@ -103,6 +103,21 @@ export default abstract class DbApi {
         });
     }
 
+    async getSourceMedia({source,page,perPage}:Pagignation &{
+        source: 'mastodonSocial'|'fosstodon'
+    }) {
+        perPage = perPage || 25;
+        page = page || 1;
+        return this.prisma.media.findMany({
+            where: {
+                itemType: source,
+
+            },
+            skip: page ? (page - 1) * perPage  :undefined,
+            take: perPage
+        });
+    }
+
     async getItemMedia({item}:{
         item: string
     }) {
@@ -137,6 +152,21 @@ export default abstract class DbApi {
         });
     }
 
+    async findMedia({url, item, itemType}:{
+        url: string,
+        item: string,
+        itemType: string,
+    }){
+        return await this.prisma.media.findMany({
+            where: {
+                url,
+                item,
+                itemType
+
+            },
+        });
+
+    }
     async upsertMedia({url,key, item, itemType,description,height,width,remoteId,previewUrl}:{
         url: string,
         item: string,

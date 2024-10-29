@@ -245,24 +245,25 @@ export default class InjestService{
                                 error
                             })
                         });
-                        console.log(`Getting media for ${itemUuids.length} items for ${account} and ${classification}`);
+                        console.log(`Getting media for ${itemUuids ? itemUuids.length:0} items for ${account} and ${classification}`);
 
-                        const medias = await this.itemsDb.allMediasByItemsUuids(itemUuids,true);
-
-
+                        const medias = itemUuids ? await this.itemsDb.allMediasByItemsUuids(itemUuids,true) : [];
                         console.log(`Found ${medias.length} media items for ${account} and ${classification}`);
                         if(!medias || medias.length === 0){
                             return;
                         }
                         await Promise.all(
                             medias.map(
-                                async media =>
-                                await this.uploadBlobForMedia(media).catch((error) => {
-                                    console.log({
-                                        uploadBlobForMediaError: true,
-                                        error
-                                    })
-                                })
+                                async media => {
+                                    if(! media.key  && media.url){
+                                        await this.uploadBlobForMedia(media).catch((error) => {
+                                            console.log({
+                                                uploadBlobForMediaError: true,
+                                                error
+                                            })
+                                        })
+                                    }
+                                }
                             )
                         );
 

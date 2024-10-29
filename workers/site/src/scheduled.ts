@@ -28,9 +28,8 @@ DB: D1Database;
     const todayString = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
 
     const itemsApi = new ItemsApi(prisma,env.KV);
-    const savedCount = await env.KV.get(`injestorCreatedCount-${todayString}`);
+    const savedCount = await env.KV.get(`_injestorCreatedCount-${todayString}`);
     let createdCount: number = savedCount ? parseInt(savedCount) : 0;
-
     const injestor = new InjestService(
         classificationsApi,
         itemsApi,
@@ -43,15 +42,15 @@ DB: D1Database;
     try {
         try {
             const created = await injestor.sync();
-            await env.KV.put(`injestorCreatedCount-${todayString}`, (createdCount + created).toString());
-            const hasSyncedMediaToday = await env.KV.get(`hasSyncedMediaToday${todayString}`);
+            await env.KV.put(`_injestorCreatedCount-${todayString}`, (createdCount + created).toString());
+            const hasSyncedMediaToday = await env.KV.get(`_MediahasSyncedToday${todayString}`);
             if(!hasSyncedMediaToday){
                 try {
                     await injestor.syncMedia();
                 } catch (error) {
                     console.log({injestorSyncMediaError: true,error});
                 }finally{
-                    await env.KV.put(`hasSyncedMediaToday${todayString}`,'true');
+                    await env.KV.put(`_MediahasSyncedToday${todayString}`,'true');
                 }
             }
         } catch (error) {

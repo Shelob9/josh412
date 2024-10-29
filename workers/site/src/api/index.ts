@@ -76,6 +76,7 @@ try {
 //Get the scheduled items
 api.get('/status/scheduled', async (c) => {
     const classification = 'gm';
+    const itemsDb = c.get('ItemsApi');
     const source = c.req.query('source') as ItemSource|| 'mastodonSocial';
     //@ts-ignore
     const page = c.req.query('page')as number || 1;
@@ -98,7 +99,25 @@ api.get('/status/scheduled', async (c) => {
                 error
             })
         });
-        return c.json({ status: "ok",itemUuids,items:i });
+        const medias = itemUuids ? await itemsDb.allMediasByItemsUuids(itemUuids,true) : [];
+        await Promise.all(
+            medias.map(
+                async media => {
+                    if(!media.key){
+                        await injestor.uploadBlobForMedia(media).catch((error) => {
+                            console.log({
+                                uploadBlobForMediaError: true,
+                                error
+                            })
+                        })
+                    }
+
+                }
+
+            )
+        );
+        const medias2 = itemUuids ? await itemsDb.allMediasByItemsUuids(itemUuids,true) : [];
+        return c.json({ status: "ok",itemUuids,items:i, medias,medias2});
     } catch (error) {
         console.log(error);
     }
