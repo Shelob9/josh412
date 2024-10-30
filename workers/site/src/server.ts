@@ -16,7 +16,7 @@ import { cache } from "hono/cache";
 import { cors } from 'hono/cors';
 import { SSRRender } from "src/entry-server";
 import api from "./api";
-
+import ui from "./app";
 const app  = new Hono<{Variables:Variables,Bindings:Bindings}>();
 
 app
@@ -38,7 +38,7 @@ app
   }
 )
   .use("*",async (c, next) => {
-    if(c.req.path.startsWith('/api/status')){
+    if(c.req.path.startsWith('/api/status')|| c.req.path.startsWith('/ui')){
       return next();
     }
     console.log(`[${c.req.method}] ${c.req.url}`)
@@ -125,7 +125,7 @@ app
 
 //@ts-ignore
 app.route('/api', api );
-
+app.route('/ui', ui );
 export default {
   fetch: app.fetch,
 };
