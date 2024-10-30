@@ -7,7 +7,9 @@ export default defineConfig({
     preflight: true,
 
     // Where to look for your css declarations
-    include: ["./src/**/*.{js,jsx,ts,tsx}"],
+    include: ["./src/**/*.{js,jsx,ts,tsx}",
+        './dist/panda.buildinfo.json',
+    ],
 
     // Files to exclude
     exclude: [],
@@ -20,4 +22,5 @@ export default defineConfig({
     // The output directory for your css system
     // outdir: "styled-system",
     outdir: "@shadow-panda/styled-system",
+    importMap: '@josh412/shadow-panda',
 });

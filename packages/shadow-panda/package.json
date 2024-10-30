@@ -1,16 +1,17 @@
 {
-    "name": "s2",
+    "name": "@josh412/shadow-panda",
     "private": true,
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "__prepare": "panda codegen",
+        "prepare": "panda codegen",
         "dev": "vite",
         "build": "tsc -b && vite build",
         "check": "tsc",
         "lint": "eslint . --report-unused-disable-directives",
         "lint:fix": "prettier .  --write && npm run lint -- --fix",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "ship":"panda ship --outfile dist/panda.buildinfo.json"
     },
     "dependencies": {
         "@radix-ui/react-avatar": "^1.1.1",
