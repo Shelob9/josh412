@@ -15,9 +15,7 @@ import { Hono } from "hono";
 import { bearerAuth } from 'hono/bearer-auth';
 import { cache } from "hono/cache";
 import { cors } from 'hono/cors';
-import { SSRRender } from "src/entry-server";
 import api from "./api";
-import ui from "./app";
 const app  = new Hono<{Variables:Variables,Bindings:Bindings}>();
 app
 .use(
@@ -86,7 +84,6 @@ app
       }
     }
   })
-  .get("/app/*", async (c) => c.newResponse(await SSRRender()))
   .get('/', async (c) => {
     return c.json({
       ok: true,
@@ -126,7 +123,6 @@ app
 
 //@ts-ignore
 app.route('/api', api );
-app.route('/ui', ui );
 export default {
   fetch: app.fetch,
 };

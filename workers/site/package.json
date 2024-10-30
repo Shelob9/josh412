@@ -3,7 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "workspaces": ["packages/*","workers/*"],
   "scripts": {
     "dev": "wrangler dev --port 4000",
     "start": "bunx --bun vite",
@@ -17,8 +16,6 @@
     "prisma:studio": "prisma studio"
   },
   "dependencies": {
-    "@josh412/pkg-a": "workspace:*",
-    "@josh412/shadow-panda": "workspace:*",
     "@hono/zod-validator": "^0.1.10",
     "@prisma/client": "^5.16.2",
     "@tanstack/react-query": "^5.0.5",
