@@ -8,6 +8,7 @@ import {
   getAssetFromKV,
   serveSinglePageApp,
 } from "@cloudflare/kv-asset-handler";
+import a from '@josh412/pkg-a';
 import assetManifest from "__STATIC_CONTENT_MANIFEST";
 import { Bindings, Variables } from "app.types";
 import { Hono } from "hono";
@@ -18,11 +19,11 @@ import { SSRRender } from "src/entry-server";
 import api from "./api";
 import ui from "./app";
 const app  = new Hono<{Variables:Variables,Bindings:Bindings}>();
-
 app
 .use(
   '*',
   (c, next) => {
+    a();
     const corsed = cors({
         origin: (origin: string) =>  {
           if( '12345' === c.env.TOKEN ) {
