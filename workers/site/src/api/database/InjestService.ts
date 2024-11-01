@@ -3,6 +3,7 @@ import { ServiceConfig } from "@lib/config";
 import { Classification, Item, Media } from "@prisma/client";
 import { CLASSIFIERS } from "../classify/classifiers";
 import { Classification_Source, classifySources } from "../classify/classify";
+import { putMediaItem } from "../media";
 import { fetchBlueskyStatusesSimple } from "../util/BlueskyStatusToSimple";
 import { fetchMedia } from "../util/fetchMedia";
 import ClassificationsApi from "./Classifications";
@@ -278,12 +279,24 @@ export default class InjestService{
 
     }
 
-    async uploadBlobForMedia(media:Media){
+    async uploadBlobForMedia(media:Media,alt?:string){
         try {
             const fetchedMedia = await fetchMedia(media.url);
             if(  fetchedMedia){
                 const key = media.url.split('/').pop();
-                await this.BUCKET.put(key as string,fetchedMedia.data);
+                await putMediaItem(
+                    this.BUCKET,
+                    key as string,
+                    fetchedMedia.data,
+                    {
+
+                    },
+                    alt ?{
+                        alt,
+                        media:media.uuid,
+                        item: media.item,
+                    }:undefined
+                );
                 await this.itemsDb.setMediaKey({
                     uuid: media.uuid,
                     key: key as string

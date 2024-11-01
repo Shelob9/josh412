@@ -8,7 +8,6 @@ import {
   getAssetFromKV,
   serveSinglePageApp,
 } from "@cloudflare/kv-asset-handler";
-import a from '@josh412/pkg-a';
 import assetManifest from "__STATIC_CONTENT_MANIFEST";
 import { Bindings, Variables } from "app.types";
 import { Hono } from "hono";
@@ -16,12 +15,15 @@ import { bearerAuth } from 'hono/bearer-auth';
 import { cache } from "hono/cache";
 import { cors } from 'hono/cors';
 import api from "./api";
+import { getMediaItem } from "./api/media";
+// Middleware to handle specific paths
+
+
 const app  = new Hono<{Variables:Variables,Bindings:Bindings}>();
 app
 .use(
   '*',
   (c, next) => {
-    a();
     const corsed = cors({
         origin: (origin: string) =>  {
           if( '12345' === c.env.TOKEN ) {
@@ -37,7 +39,7 @@ app
   }
 )
   .use("*",async (c, next) => {
-    if(c.req.path.startsWith('/api/status')|| c.req.path.startsWith('/ui')){
+    if(c.req.path.startsWith('/api/status')|| c.req.path.startsWith('/ui')|| c.req.path.startsWith('/assets')|| c.req.path.startsWith('/app')){
       return next();
     }
     console.log(`[${c.req.method}] ${c.req.url}`)
@@ -84,6 +86,18 @@ app
       }
     }
   })
+  .get('/app/media/:key', async (c) => {
+    const key = c.req.param('key');
+    try {
+      const {body,headers} = await getMediaItem(c.env.MEDIA_BUCKET,key);
+      return c.body(body.body, { headers });
+
+    } catch (error) {
+      return c.html(`<h1>Not Found</h1><p>Key ${key}</p>`, 404);
+    }
+})
+
+
   .get('/', async (c) => {
     return c.json({
       ok: true,
@@ -102,6 +116,7 @@ app
   )
   //@ts-ignore
   .onError((err, c) => {
+    console.log(err);
     if('object' === typeof err && 'function' === typeof err.getResponse){
       const response = err.getResponse();
       const statusText = response.statusText;
