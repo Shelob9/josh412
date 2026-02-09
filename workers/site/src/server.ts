@@ -15,7 +15,10 @@ import { bearerAuth } from 'hono/bearer-auth';
 import { cache } from "hono/cache";
 import { cors } from 'hono/cors';
 import api from "./api";
+import ClassificationsApi from "./api/database/Classifications";
+import ItemsApi from "./api/database/Items";
 import { getMediaItem } from "./api/media";
+import createClient from "./db";
 // Middleware to handle specific paths
 
 
@@ -95,6 +98,24 @@ app
     } catch (error) {
       return c.html(`<h1>Not Found</h1><p>Key ${key}</p>`, 404);
     }
+})
+
+.get('/app/josh/gm', async (c) => {
+  const itemType = 'mastodonSocial';
+  const classification = 'gm';
+  const page = c.req.query('page')|| 1;
+  const perPage = c.req.query('perPage')  || 25;
+  const prisma = createClient(c.env.DB);
+  const classificationsApi = new ClassificationsApi(prisma,c.env.KV);
+  const itemsApi = new ItemsApi(prisma,c.env.KV);
+    const classifications = await classificationsApi.allForSource({
+      source: itemType,
+      classification,
+      page: page as number,
+      perPage: perPage as number,
+  });
+  const items = await prisma.$queryRaw`SELECT * FROM items WHERE id IN (SELECT item FROM classifications WHERE classification = ${classification} AND source = ${itemType})`;
+  return c.json({ classifications,items});
 })
 
 

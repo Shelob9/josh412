@@ -55,7 +55,7 @@ try {
     const classification = 'gm';
     const source = c.req.query('source') as ItemSource|| 'mastodonSocial';
     //@ts-ignore
-    const page = c.req.query('page')as number || 1;
+    const page = c.req.query('page')as number || 25;
     //@ts-ignore
     const limit = c.req.query('limit')as number || 1;
     const classifications = await c.get('classifications').allForSource({
@@ -192,6 +192,7 @@ api.get('/status/media/uploaded.png', async (c) => {
     headers.set("etag", object.httpEtag);
     return c.body(object.body, { headers });
 });
+
 
 
 
